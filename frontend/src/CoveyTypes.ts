@@ -30,4 +30,6 @@ export type CoveyAppState = {
   apiClient: TownsServiceClient,
 };
 
-export type ObjectLocation = {xIndex: number, yIndex: number}
+export type ObjectLocation = { xIndex: number, yIndex: number }
+
+export type objectSpecification = { objectID: string, objectLocation: ObjectLocation }

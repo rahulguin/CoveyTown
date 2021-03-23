@@ -7,4 +7,7 @@ export type UserLocation = {
 };
 export type CoveyTownList = { friendlyName: string; coveyTownID: string; currentOccupancy: number; maximumOccupancy: number }[];
 
+export type ObjectLocation = { xIndex: number, yIndex: number }
+
+export type objectSpecification = { objectID: string, objectLocation: ObjectLocation }
 
