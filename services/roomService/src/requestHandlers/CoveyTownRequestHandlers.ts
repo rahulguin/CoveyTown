@@ -80,6 +80,61 @@ export interface TownUpdateRequest {
 }
 
 /**
+ * payload sent by the client to add an object to a town
+ */
+ export interface ObjectAddRequest {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: mapLocation
+}
+
+export interface ObjectAddResponse {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: mapLocation
+}
+
+/**
+ * represents a location on the map basedon pixels
+ */
+export interface mapLocation {
+  locationX: number
+  locationY: number
+}
+
+/**
+ * Payload sent by the client to delete an object from a town
+ */
+export interface ObjectDeleteRequest {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  location: mapLocation
+}
+
+/**
+ * Payload sent by the client to retrive objects from a town
+ */
+export interface ObjectListRequest {
+  coveyTownID: string,
+}
+
+export interface ObjectInfo {
+  coveyTownID: string,
+  objectID: string,
+  objectName: string,
+  location: mapLocation
+}
+
+/**
+ * Responce from the server for a list of objects
+ */
+export interface ObjectListResponce {
+  objects: ObjectInfo[]
+}
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {
@@ -166,7 +221,17 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
     response: {},
     message: !success ? 'Invalid password or update values specified. Please double check your town update password.' : undefined,
   };
+}
 
+// methods for adding, deleting, and listing objects
+
+export async function addObjectHandler(requestData: ObjectAddRequest): Promise<ResponseEnvelope<ObjectAddResponse>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.addObjectToTown(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  return {
+    isOK: success,
+
+  }
 }
 
 /**

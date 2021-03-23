@@ -77,6 +77,62 @@ export interface TownUpdateRequest {
 }
 
 /**
+ * payload sent by the client to add an object to a town
+ */
+export interface ObjectAddRequest {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: mapLocation
+}
+
+export interface ObjectAddResponse {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: mapLocation
+}
+
+/**
+ * represents a location on the map basedon pixels
+ */
+export interface mapLocation {
+  locationX: number
+  locationY: number
+}
+
+/**
+ * Payload sent by the client to delete an object from a town
+ */
+export interface ObjectDeleteRequest {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  location: mapLocation
+}
+
+/**
+ * Payload sent by the client to retrive objects from a town
+ */
+export interface ObjectListRequest {
+  coveyTownID: string,
+}
+
+export interface ObjectInfo {
+  coveyTownID: string,
+  objectID: string,
+  objectName: string,
+  location: mapLocation
+}
+
+/**
+ * Responce from the server for a list of objects
+ */
+export interface ObjectListResponce {
+  objects: ObjectInfo[]
+}
+
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {
@@ -84,6 +140,8 @@ export interface ResponseEnvelope<T> {
   message?: string;
   response?: T;
 }
+
+
 
 export type CoveyTownInfo = {
   friendlyName: string;
@@ -139,6 +197,27 @@ export default class TownsServiceClient {
 
   async joinTown(requestData: TownJoinRequest): Promise<TownJoinResponse> {
     const responseWrapper = await this._axios.post('/sessions', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  // API methods to handle object requests
+  async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/objects/${requestData.coveyTownID}/${requestData.coveyTownpassword}/${requestData.location}`, requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  // async deleteObject(requestData: ObjectDeleteRequest): Promise<void> {
+  //   const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(`/objects/${requestData.coveyTownID}/${requestData.coveyTownpassword}/${requestData.location}`, requestData);
+  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  // }
+
+  // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
+  //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`, requestData);
+  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  // }
+
+  async avaliableObject(): Promise<ObjectListResponce> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

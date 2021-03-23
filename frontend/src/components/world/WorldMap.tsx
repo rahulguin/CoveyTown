@@ -208,8 +208,24 @@ class CoveyGameScene extends Phaser.Scene {
     // Parameters: layer name (or index) from Tiled, tileset, x, y
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const belowLayer = map.createStaticLayer('Below Player', tileset, 0, 0);
-    const worldLayer = map.createStaticLayer('World', tileset, 0, 0);
+
+    // retrieves the map from the apiclient for the world
+    // need to be able to modify the data?
+    // apiClient.getWorldLayer(roomID)
+
+    // uses the retrieved map to crete the world layer
+    const worldLayer = map.createDynamicLayer('World', tileset, 0, 0);
+
     worldLayer.setCollisionByProperty({ collides: true });
+
+    // When mouse is down, put a colliding tile at the mouse location
+    const pointer = this.input.activePointer;
+    const worldPoint = pointer.positionToCamera(this.cameras.main);
+    if (pointer.isDown) {
+      const tile = worldLayer.putTileAtWorldXY(6, worldPoint.x, worldPoint.y);
+      tile.setCollision(true);
+    }
+
     const aboveLayer = map.createStaticLayer('Above Player', tileset, 0, 0);
     /* By default, everything gets depth sorted on the screen in the order we created things.
      Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give
