@@ -29,3 +29,5 @@ export type CoveyAppState = {
   socket: Socket | null,
   apiClient: TownsServiceClient,
 };
+
+export type ObjectLocation = {xIndex: number, yIndex: number}
