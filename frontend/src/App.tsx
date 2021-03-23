@@ -33,6 +33,8 @@ type CoveyAppUpdate =
   | { action: 'playerDisconnect'; player: Player }
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
+  | { action: 'weAddedObject'; objectInfo: ObjectInfo }
+  | { action: 'weDeletedObject'; location: ObjectLocation }
   ;
 
 function defaultAppState(): CoveyAppState {
@@ -181,6 +183,16 @@ async function GameController(initData: TownJoinResponse,
     socket.emit('playerMovement', location);
     dispatchAppUpdate({ action: 'weMoved', location });
   };
+
+  const emitAddObject = (objectInfo: ) => {
+    socket.emit('objectAdded', objectInfo)
+    dispatchAppUpdate({action: 'weAddedObject', objectInfo })
+  }
+
+  const emitDeleteObject = (location: ObjectLocation) => {
+    socket.emit('objectAdded', location)
+    dispatchAppUpdate({action: 'weDeletedObject', location })
+  }
 
   dispatchAppUpdate({
     action: 'doConnect',

@@ -2,7 +2,7 @@ import { Socket } from 'socket.io-client';
 import Player, { UserLocation } from './classes/Player';
 import TownsServiceClient from './classes/TownsServiceClient';
 
-export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved';
+export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved' | 'objectAdded' | 'objectRemoved';
 
 export type VideoRoom = {
   twilioID: string,

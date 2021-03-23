@@ -200,25 +200,5 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  // API methods to handle object requests
-  async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/objects/${requestData.coveyTownID}/${requestData.coveyTownpassword}/${requestData.location}`, requestData);
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  }
-
-  // async deleteObject(requestData: ObjectDeleteRequest): Promise<void> {
-  //   const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(`/objects/${requestData.coveyTownID}/${requestData.coveyTownpassword}/${requestData.location}`, requestData);
-  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  // }
-
-  // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
-  //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`, requestData);
-  //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  // }
-
-  async avaliableObject(): Promise<ObjectListResponce> {
-    const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-  }
 
 }

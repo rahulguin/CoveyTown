@@ -255,6 +255,12 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('townClosing');
       socket.disconnect(true);
     },
+    onObjectAdded() {
+      socket.emit('objectAdded')
+    },
+    onObjectDeleted() {
+      socket.emit('objectDeleted')
+    }
   };
 }
 
@@ -296,5 +302,15 @@ export function townSubscriptionHandler(socket: Socket): void {
   // location, inform the CoveyTownController
   socket.on('playerMovement', (movementData: UserLocation) => {
     townController.updatePlayerLocation(s.player, movementData);
+  });
+
+  // Register and even listener for the client socket: if the client adds an object, inform the CoveyTownController
+  socket.on('onObjectAdd', (objectAddData: CreateType) => {
+    townController.addObject(s.player, objectAddData);
+  });
+
+  // Register and even listener for the client socket: if the client deletes an object, inform the CoveyTownController
+  socket.on('onObjectDelete', (objectDeleteData: CreateType) => {
+    townController.addObject(s.player, objectDeleteData);
   });
 }
