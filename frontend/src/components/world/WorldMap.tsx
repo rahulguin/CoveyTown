@@ -111,6 +111,10 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+  updateObjectLocations(objects: ObjectSpecification[]) {
+    throw Error("implement this")
+  }
+
   getNewMovementDirection() {
     if(this.cursors.find(keySet => keySet.left?.isDown)) {
       return 'left';
@@ -132,6 +136,19 @@ class CoveyGameScene extends Phaser.Scene {
       const speed = 175;
       const prevVelocity = this.player.sprite.body.velocity.clone();
       const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
+
+    // When mouse is down, put a colliding tile at the mouse location
+    const pointer = this.input.activePointer;
+    const worldPoint = pointer.positionToCamera(this.cameras.main);
+
+    
+    const map = this.cache.tilemap.get('map') 
+    const worldLayer = map.getLayer('World')
+    
+    if (pointer.leftButtonDown()) {
+      const tile = worldLayer.putTileAtWorldXY(6, worldPoint.x, worldPoint.y);
+      tile.setCollision(true);
+    }
 
       // Stop any previous movement from the last frame
       body.setVelocity(0);
@@ -216,15 +233,9 @@ class CoveyGameScene extends Phaser.Scene {
     // uses the retrieved map to crete the world layer
     const worldLayer = map.createDynamicLayer('World', tileset, 0, 0);
 
+
     worldLayer.setCollisionByProperty({ collides: true });
 
-    // When mouse is down, put a colliding tile at the mouse location
-    const pointer = this.input.activePointer;
-    const worldPoint = pointer.positionToCamera(this.cameras.main);
-    if (pointer.isDown) {
-      const tile = worldLayer.putTileAtWorldXY(6, worldPoint.x, worldPoint.y);
-      tile.setCollision(true);
-    }
 
     const aboveLayer = map.createStaticLayer('Above Player', tileset, 0, 0);
     /* By default, everything gets depth sorted on the screen in the order we created things.
@@ -351,7 +362,7 @@ class CoveyGameScene extends Phaser.Scene {
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
-    emitMovement, players,
+    emitMovement, players, objects
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   useEffect(() => {
@@ -382,6 +393,7 @@ export default function WorldMap(): JSX.Element {
   const deepPlayers = JSON.stringify(players);
   useEffect(() => {
     gameScene?.updatePlayersLocations(players);
+    gameScene?.updateObjectLocations(objects);
   }, [players, deepPlayers, gameScene]);
 
   return <div id="map-container"/>;

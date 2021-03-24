@@ -9,7 +9,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
 import WorldMap from './components/world/WorldMap';
 import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
-import { CoveyAppState, NearbyPlayers } from './CoveyTypes';
+import { CoveyAppState, NearbyPlayers, ObjectLocation, objectSpecification } from './CoveyTypes';
 import VideoContext from './contexts/VideoContext';
 import Login from './components/Login/Login';
 import CoveyAppContext from './contexts/CoveyAppContext';
@@ -33,7 +33,11 @@ type CoveyAppUpdate =
   | { action: 'playerDisconnect'; player: Player }
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
-  | { action: 'weAddedObject'; objectInfo: ObjectInfo }
+  | { action: 'objectAdded'; objectInfo: objectSpecification }
+  | { action: 'objectDeleted'; objectInfo: ObjectLocation }
+  | { action: 'addObject'; objectInfo: objectSpecification }
+  | { action: 'deleteObject'; objectInfo: ObjectLocation }
+  | { action: 'weAddedObject'; objectInfo: objectSpecification }
   | { action: 'weDeletedObject'; location: ObjectLocation }
   ;
 
@@ -179,18 +183,24 @@ async function GameController(initData: TownJoinResponse,
   socket.on('disconnect', () => {
     dispatchAppUpdate({ action: 'disconnect' });
   });
+  socket.on('objectAdded', () => {
+    dispatchAppUpdate({ action: 'objectedAdded'})
+  });
+  socket.on('objectDelted', () => {
+    dispatchAppUpdate({ action: 'objectAdded'})
+  });
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);
     dispatchAppUpdate({ action: 'weMoved', location });
   };
 
-  const emitAddObject = (objectInfo: ) => {
-    socket.emit('objectAdded', objectInfo)
+  const emitAddObject = (objectInfo: objectSpecification) => {
+    socket.emit('objectAdd', objectInfo)
     dispatchAppUpdate({action: 'weAddedObject', objectInfo })
   }
 
   const emitDeleteObject = (location: ObjectLocation) => {
-    socket.emit('objectAdded', location)
+    socket.emit('objectDelete', location)
     dispatchAppUpdate({action: 'weDeletedObject', location })
   }
 

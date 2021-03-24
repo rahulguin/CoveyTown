@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
 import Player from '../types/Player';
-import { CoveyTownList, UserLocation } from '../CoveyTypes';
+import { CoveyTownList, ObjectLocation, objectSpecification, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 
@@ -227,10 +227,21 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
 
 export async function addObjectHandler(requestData: ObjectAddRequest): Promise<ResponseEnvelope<ObjectAddResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.addObjectToTown(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  const success = townsStore.addObject(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
   return {
     isOK: success,
+    response: {something}
+    message: !success? 'error message'
+  }
+}
 
+export async function deleteObjectHandler(requestData: ObjectAddRequest): Promise<ResponseEnvelope<ObjectAddResponse>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.deleteObject(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  return {
+    isOK: success,
+    response: {something}
+    message: !success? 'error message'
   }
 }
 
@@ -305,12 +316,12 @@ export function townSubscriptionHandler(socket: Socket): void {
   });
 
   // Register and even listener for the client socket: if the client adds an object, inform the CoveyTownController
-  socket.on('onObjectAdd', (objectAddData: CreateType) => {
-    townController.addObject(s.player, objectAddData);
+  socket.on('addObject', (objectAddData: objectSpecification) => {
+    townController.addObject(s.player, objectAddData.objectID, objectAddData.objectLocation);
   });
 
   // Register and even listener for the client socket: if the client deletes an object, inform the CoveyTownController
-  socket.on('onObjectDelete', (objectDeleteData: CreateType) => {
-    townController.addObject(s.player, objectDeleteData);
+  socket.on('deleteObject', (objectDeleteData: ObjectLocation) => {
+    townController.deleteObject(s.player, objectDeleteData);
   });
 }

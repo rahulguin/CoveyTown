@@ -154,5 +154,31 @@ export default class CoveyTownController {
     this._listeners.forEach((listener) => listener.onTownDestroyed());
   }
 
+    /**
+     * Adds an object to this CoveyTown, checking that the player can add objects and this object can be added at this specified location.
+     * 
+     * @param player 
+     * @param objectID 
+     * @param location 
+     */
+     addObject(player: Player, objectID: string, location: ObjectLocation): void {
+       // check that player is able to add objects (could be changed to be password instead of player)
 
+       // check that object can get added 
+
+       // add object at that location
+
+       // then for all listeners to this room notify them that an object was added
+        this._listeners.forEach((listener) => listener.onObjectAdded(session.player));
+        throw Error('implement')
+    }
+
+    /**
+     * deltes and object form this CoveyTown, checking that the player can delete objects and this object can be added.
+     * @param player 
+     * @param location 
+     */
+    deleteObject(player: Player, location: ObjectLocation): void {
+      throw Error('implement')
+    }
 }
