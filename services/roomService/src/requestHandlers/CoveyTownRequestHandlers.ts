@@ -245,7 +245,7 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('townClosing');
       socket.disconnect(true);
     },
-    onPlacableAdded() {
+    onPlaceableAdded() {
       socket.emit('placeableAdded')
     },
     onPlaceableDeleted() {
