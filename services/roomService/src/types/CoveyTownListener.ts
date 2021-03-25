@@ -1,3 +1,5 @@
+import { PlaceableLocation } from '../CoveyTypes';
+import Placeable from './Placeable';
 import Player from './Player';
 
 /**
@@ -30,10 +32,10 @@ export default interface CoveyTownListener {
   /**
    * Called when an object gets added to the town
    */
-  onPlacableAdded(): void;
+  onPlaceableAdded(addedPlaceable: Placeable): void;
 
   /**
    * Called when an object gets deleted from the town
    */
-  onPlaceableDeleted(): void;
+  onPlaceableDeleted(placeableDeleted: Placeable): void;
 }
