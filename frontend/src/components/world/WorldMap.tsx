@@ -111,7 +111,7 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-  updateObjectLocations(objects: ObjectSpecification[]) {
+  updatePlaceablesLocations(placeables: PlaceableSpecification[]) {
     throw Error("implement this")
   }
 
@@ -362,7 +362,7 @@ class CoveyGameScene extends Phaser.Scene {
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
-    emitMovement, players, objects
+    emitMovement, players, placeables
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   useEffect(() => {
@@ -382,6 +382,7 @@ export default function WorldMap(): JSX.Element {
     const game = new Phaser.Game(config);
     if (video) {
       const newGameScene = new CoveyGameScene(video, emitMovement);
+      newGameScene.addDynamicWorld(placeables)
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
     }
@@ -393,7 +394,7 @@ export default function WorldMap(): JSX.Element {
   const deepPlayers = JSON.stringify(players);
   useEffect(() => {
     gameScene?.updatePlayersLocations(players);
-    gameScene?.updateObjectLocations(objects);
+    gameScene?.updatePlaceablesLocations(placeables);
   }, [players, deepPlayers, gameScene]);
 
   return <div id="map-container"/>;

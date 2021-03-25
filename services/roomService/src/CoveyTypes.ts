@@ -5,9 +5,9 @@ export type UserLocation = {
   rotation: Direction;
   moving: boolean;
 };
-export type CoveyTownList = { friendlyName: string; coveyTownID: string; currentOccupancy: number; maximumOccupancy: number; objectArray: objectArray }[];
+export type CoveyTownList = { friendlyName: string; coveyTownID: string; currentOccupancy: number; maximumOccupancy: number; placeableArray: placeableArray }[];
 
-export type ObjectLocation = { xIndex: number, yIndex: number }
+export type PlaceableLocation = { xIndex: number, yIndex: number }
 
-export type objectSpecification = { objectID: string, objectLocation: ObjectLocation }
+export type PlaceableSpecification = { placeableID: string, placeableLocation: PlaceableLocation }
 

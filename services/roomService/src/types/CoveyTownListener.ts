@@ -30,10 +30,10 @@ export default interface CoveyTownListener {
   /**
    * Called when an object gets added to the town
    */
-  onObjectAdded(): void;
+  onPlacableAdded(): void;
 
   /**
    * Called when an object gets deleted from the town
    */
-  onObjectDeleted(): void;
+  onPlaceableDeleted(): void;
 }

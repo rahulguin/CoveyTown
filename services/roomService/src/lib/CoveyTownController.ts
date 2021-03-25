@@ -1,5 +1,5 @@
 import { customAlphabet, nanoid } from 'nanoid';
-import { UserLocation } from '../CoveyTypes';
+import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
@@ -69,6 +69,8 @@ export default class CoveyTownController {
   private _isPubliclyListed: boolean;
 
   private _capacity: number;
+
+  private _placeables: Placeable[] = [];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
     this._coveyTownID = (process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID());
@@ -155,30 +157,32 @@ export default class CoveyTownController {
   }
 
     /**
-     * Adds an object to this CoveyTown, checking that the player can add objects and this object can be added at this specified location.
+     * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
      * 
      * @param player 
-     * @param objectID 
+     * @param placeableID 
      * @param location 
      */
-     addObject(player: Player, objectID: string, location: ObjectLocation): void {
-       // check that player is able to add objects (could be changed to be password instead of player)
+     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): functionToAddOnFront {
+       // check that player is able to add placeables (could be changed to be password instead of player)
 
-       // check that object can get added 
+       // check that placeable can get added 
 
-       // add object at that location
+       // add placeable at that location
+       const placeableAdded = new Placeable(placeableID, location)
+       this._placeables.push(new Placeable(placeableID, location))
 
-       // then for all listeners to this room notify them that an object was added
-        this._listeners.forEach((listener) => listener.onObjectAdded(session.player));
+       // then for all listeners to this room notify them that an placeable was added
+        this._listeners.forEach((listener) => listener.onPlacableAdded(session.player));
         throw Error('implement')
     }
 
     /**
-     * deltes and object form this CoveyTown, checking that the player can delete objects and this object can be added.
+     * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added.
      * @param player 
      * @param location 
      */
-    deleteObject(player: Player, location: ObjectLocation): void {
+    deletePlaceable(player: Player, location: PlaceableLocation): void {
       throw Error('implement')
     }
 }

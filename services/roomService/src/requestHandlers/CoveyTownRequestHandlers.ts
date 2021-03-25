@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
 import Player from '../types/Player';
-import { CoveyTownList, ObjectLocation, objectSpecification, UserLocation } from '../CoveyTypes';
+import { CoveyTownList, PlaceableLocation, PlaceableSpecification, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 
@@ -80,19 +80,19 @@ export interface TownUpdateRequest {
 }
 
 /**
- * payload sent by the client to add an object to a town
+ * payload sent by the client to add a placeable to a town
  */
- export interface ObjectAddRequest {
+ export interface PlaceableAddRequest {
   coveyTownID: string,
   coveyTownpassword: string,
-  objectID: string,
+  placeableID: string,
   location: mapLocation
 }
 
-export interface ObjectAddResponse {
+export interface PlaceableAddResponse {
   coveyTownID: string,
   coveyTownpassword: string,
-  objectID: string,
+  placeableID: string,
   location: mapLocation
 }
 
@@ -105,33 +105,33 @@ export interface mapLocation {
 }
 
 /**
- * Payload sent by the client to delete an object from a town
+ * Payload sent by the client to delete a placeable from a town
  */
-export interface ObjectDeleteRequest {
+export interface PlaceableDeleteRequest {
   coveyTownID: string,
   coveyTownpassword: string,
   location: mapLocation
 }
 
 /**
- * Payload sent by the client to retrive objects from a town
+ * Payload sent by the client to retrive placeables from a town
  */
-export interface ObjectListRequest {
+export interface PlaceableListRequest {
   coveyTownID: string,
 }
 
-export interface ObjectInfo {
+export interface PlaceableInfo {
   coveyTownID: string,
-  objectID: string,
-  objectName: string,
+  placeableID: string,
+  placeableName: string,
   location: mapLocation
 }
 
 /**
- * Responce from the server for a list of objects
+ * Responce from the server for a list of placeables
  */
-export interface ObjectListResponce {
-  objects: ObjectInfo[]
+export interface PlaceableListResponce {
+  placeables: PlaceableInfo[]
 }
 
 /**
@@ -223,27 +223,6 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
   };
 }
 
-// methods for adding, deleting, and listing objects
-
-export async function addObjectHandler(requestData: ObjectAddRequest): Promise<ResponseEnvelope<ObjectAddResponse>> {
-  const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.addObject(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
-  return {
-    isOK: success,
-    response: {something}
-    message: !success? 'error message'
-  }
-}
-
-export async function deleteObjectHandler(requestData: ObjectAddRequest): Promise<ResponseEnvelope<ObjectAddResponse>> {
-  const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.deleteObject(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
-  return {
-    isOK: success,
-    response: {something}
-    message: !success? 'error message'
-  }
-}
 
 /**
  * An adapter between CoveyTownController's event interface (CoveyTownListener)
@@ -266,11 +245,11 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('townClosing');
       socket.disconnect(true);
     },
-    onObjectAdded() {
-      socket.emit('objectAdded')
+    onPlacableAdded() {
+      socket.emit('placeableAdded')
     },
-    onObjectDeleted() {
-      socket.emit('objectDeleted')
+    onPlaceableDeleted() {
+      socket.emit('placeableDeleted')
     }
   };
 }
@@ -315,13 +294,13 @@ export function townSubscriptionHandler(socket: Socket): void {
     townController.updatePlayerLocation(s.player, movementData);
   });
 
-  // Register and even listener for the client socket: if the client adds an object, inform the CoveyTownController
-  socket.on('addObject', (objectAddData: objectSpecification) => {
-    townController.addObject(s.player, objectAddData.objectID, objectAddData.objectLocation);
+  // Register and even listener for the client socket: if the client adds a placeable, inform the CoveyTownController
+  socket.on('addPlaceable', (placeableAddData: PlaceableSpecification) => {
+    townController.addPlaceable(s.player, placeableAddData.placeableID, placeableAddData.placeableLocation);
   });
 
-  // Register and even listener for the client socket: if the client deletes an object, inform the CoveyTownController
-  socket.on('deleteObject', (objectDeleteData: ObjectLocation) => {
-    townController.deleteObject(s.player, objectDeleteData);
+  // Register and even listener for the client socket: if the client deletes aa placeable, inform the CoveyTownController
+  socket.on('deletePlaceable', (placeableDeleteData: PlaceableLocation) => {
+    townController.deletePlaceable(s.player, placeableDeleteData);
   });
 }
