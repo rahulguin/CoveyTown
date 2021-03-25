@@ -5,7 +5,7 @@ import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import TwilioVideo from './TwilioVideo';
 import IVideoClient from './IVideoClient';
-import { Placeable } from '../types/Placeable';
+import Placeable from '../types/Placeable';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -160,9 +160,9 @@ export default class CoveyTownController {
     /**
      * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
      * 
-     * @param player 
-     * @param placeableID 
-     * @param location 
+     * @param player the player that made the request to add the placeable
+     * @param placeableID the id assocaited of the placeable that is wanting to be added
+     * @param location the location the player is wanting to add the placeable
      */
      addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): number {
        // check that player is able to add placeables (could be changed to be password instead of player)
@@ -186,8 +186,8 @@ export default class CoveyTownController {
 
     /**
      * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added.
-     * @param player 
-     * @param location 
+     * @param player the player the made the request to delete the placeable
+     * @param location the location the player is wanting to delete the placeable from
      */
     deletePlaceable(player: Player, location: PlaceableLocation): void {
       // check that player is able to delete placeables (could be changed to be password instead of player)
