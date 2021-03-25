@@ -164,14 +164,14 @@ export default class CoveyTownController {
      * @param placeableID the id assocaited of the placeable that is wanting to be added
      * @param location the location the player is wanting to add the placeable
      */
-     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): number {
+     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): void {
        // check that player is able to add placeables (could be changed to be password instead of player)
 
        // check that placeable can get added 
        const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
        if (conflictingPlacement !== undefined) {
          // this means there was a conflict with placement
-        throw Error('error here because there was a location conflict')
+         this._listeners.forEach((listener) => listener.onPlaceableAddFailed(player, location))
        }
 
        // add placeable at that location
@@ -181,7 +181,6 @@ export default class CoveyTownController {
 
        // then for all listeners to this room notify them that an placeable was added
         this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
-        throw Error('implement')
     }
 
     /**
@@ -196,13 +195,15 @@ export default class CoveyTownController {
       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
       if (conflictingPlacement === undefined) {
         // this means there was nothing to be deleted from here
-       throw Error('error here because there was not a placeable at this location to delete')
+        this._listeners.forEach((listener) => listener.onPlaceableDeleteFailed(player, location))
+      }
+      else {
+        // removes the placeable from the list of placebles
+        this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
+
+        // for all listeners notifies them that the object was deleted
+        this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
       }
 
-      // removes the placeable from the list of placebles
-      this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
-
-      // for all listeners notifies them that the object was deleted
-      this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
     }
 }

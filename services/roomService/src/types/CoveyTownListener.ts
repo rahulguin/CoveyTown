@@ -38,4 +38,14 @@ export default interface CoveyTownListener {
    * Called when an object gets deleted from the town
    */
   onPlaceableDeleted(placeableDeleted: Placeable): void;
+
+  /**
+   * called when a placeable add attempt was made that failed (from lack of permission, or conflict at position)
+   */
+  onPlaceableAddFailed(attemptedPlaceable: Placeable): void;
+
+  /**
+   * called when a placeable delete attempt was made that failed (from lack of permission, or nothing to delete at location)
+   */
+   onPlaceableDeleteFailed(attemptedPlaceable: Placeable): void;
 }

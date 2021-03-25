@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import { PlaceableSpecification } from '../../CoveyTypes';
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
 class CoveyGameScene extends Phaser.Scene {
@@ -64,6 +65,16 @@ class CoveyGameScene extends Phaser.Scene {
       );
     }
   }
+
+  addDynamicWorld(placeables: PlaceableSpecification) {
+    const map = this.cache.tilemap.get('map') 
+    const worldLayer: Phaser.Tilemaps.DynamicTilemapLayer = map.getLayer('World')
+
+    placeables.array.forEach(placeable => {
+      worldLayer.putTileAt(placeable)
+    });
+  }
+
 
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find((p) => p.id === player.id);

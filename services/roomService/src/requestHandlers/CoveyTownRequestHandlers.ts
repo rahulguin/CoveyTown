@@ -4,6 +4,7 @@ import Player from '../types/Player';
 import { CoveyTownList, PlaceableLocation, PlaceableSpecification, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
+import Placeable from '../types/Placeable';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -245,11 +246,17 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('townClosing');
       socket.disconnect(true);
     },
-    onPlaceableAdded() {
-      socket.emit('placeableAdded')
+    onPlaceableAdded(placeable: Placeable) {
+      socket.emit('placeableAdded', placeable)
     },
-    onPlaceableDeleted() {
-      socket.emit('placeableDeleted')
+    onPlaceableDeleted(placeable: Placeable) {
+      socket.emit('placeableDeleted', placeable)
+    },
+    onPlaceableAddFailed(placeable: Placeable) {
+      socket.emit('placableAddFailed', placeable)
+    },
+    onPlaceableDeleteFailed(placeable: Placeable) {
+      socket.emit('placeableDeleteFailed', placeable)
     }
   };
 }
