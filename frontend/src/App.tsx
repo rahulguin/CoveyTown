@@ -9,7 +9,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
 import WorldMap from './components/world/WorldMap';
 import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
-import { CoveyAppState, NearbyPlayers, ObjectLocation, objectSpecification } from './CoveyTypes';
+import { CoveyAppState, NearbyPlayers, PlaceableLocation, PlaceableSpecification } from './CoveyTypes';
 import VideoContext from './contexts/VideoContext';
 import Login from './components/Login/Login';
 import CoveyAppContext from './contexts/CoveyAppContext';
@@ -33,12 +33,12 @@ type CoveyAppUpdate =
   | { action: 'playerDisconnect'; player: Player }
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
-  | { action: 'objectAdded'; objectInfo: objectSpecification }
-  | { action: 'objectDeleted'; objectInfo: ObjectLocation }
-  | { action: 'addObject'; objectInfo: objectSpecification }
-  | { action: 'deleteObject'; objectInfo: ObjectLocation }
-  | { action: 'weAddedObject'; objectInfo: objectSpecification }
-  | { action: 'weDeletedObject'; location: ObjectLocation }
+  | { action: 'placeableAdded'; placableInfo: PlaceableSpecification }
+  | { action: 'placeableDeleted'; placeableInfo: PlaceableLocation }
+  | { action: 'addPlaceable'; placebaleInfo: PlaceableSpecification }
+  | { action: 'deletePlaceable'; placeableInfo: PlaceableLocation }
+  | { action: 'weAddedPlaceable'; placeableInfo: PlaceableSpecification }
+  | { action: 'weDeletedPlaceable'; location: PlaceableLocation }
   ;
 
 function defaultAppState(): CoveyAppState {
@@ -183,25 +183,25 @@ async function GameController(initData: TownJoinResponse,
   socket.on('disconnect', () => {
     dispatchAppUpdate({ action: 'disconnect' });
   });
-  socket.on('objectAdded', () => {
-    dispatchAppUpdate({ action: 'objectedAdded'})
+  socket.on('placeableAdded', () => {
+    dispatchAppUpdate({ action: 'placeableAdded'})
   });
-  socket.on('objectDelted', () => {
-    dispatchAppUpdate({ action: 'objectAdded'})
+  socket.on('placeableDelted', () => {
+    dispatchAppUpdate({ action: 'placeableDeleted'})
   });
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);
     dispatchAppUpdate({ action: 'weMoved', location });
   };
 
-  const emitAddObject = (objectInfo: objectSpecification) => {
-    socket.emit('objectAdd', objectInfo)
-    dispatchAppUpdate({action: 'weAddedObject', objectInfo })
+  const emitPlaceableAdd = (placeableInfo: PlaceableSpecification) => {
+    socket.emit('placeableAdd', placeableInfo)
+    dispatchAppUpdate({action: 'weAddedPlaceable', placableInfo: placeableInfo })
   }
 
-  const emitDeleteObject = (location: ObjectLocation) => {
-    socket.emit('objectDelete', location)
-    dispatchAppUpdate({action: 'weDeletedObject', location })
+  const emitPlaceableDelete = (location: PlaceableLocation) => {
+    socket.emit('placeableDelete', location)
+    dispatchAppUpdate({action: 'weDeletedPlaceable', location })
   }
 
   dispatchAppUpdate({
