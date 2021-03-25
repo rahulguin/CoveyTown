@@ -34,9 +34,9 @@ type CoveyAppUpdate =
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
   | { action: 'placeableAdded'; placableInfo: PlaceableSpecification }
-  | { action: 'placeableDeleted'; placeableInfo: PlaceableLocation }
+  | { action: 'placeableDeleted'; placeableInfo: PlaceableSpecification }
   | { action: 'addPlaceable'; placebaleInfo: PlaceableSpecification }
-  | { action: 'deletePlaceable'; placeableInfo: PlaceableLocation }
+  | { action: 'deletePlaceable'; placeableInfo: PlaceableSpecification }
   | { action: 'weAddedPlaceable'; placeableInfo: PlaceableSpecification }
   | { action: 'weDeletedPlaceable'; location: PlaceableLocation }
   ;
@@ -183,11 +183,11 @@ async function GameController(initData: TownJoinResponse,
   socket.on('disconnect', () => {
     dispatchAppUpdate({ action: 'disconnect' });
   });
-  socket.on('placeableAdded', () => {
-    dispatchAppUpdate({ action: 'placeableAdded'})
+  socket.on('placeableAdded', (addedPlaceable: PlaceableSpecification) => {
+    dispatchAppUpdate({ action: 'placeableAdded', placableInfo: addedPlaceable})
   });
-  socket.on('placeableDelted', () => {
-    dispatchAppUpdate({ action: 'placeableDeleted'})
+  socket.on('placeableDelted', (deletedPlacable: PlaceableSpecification) => {
+    dispatchAppUpdate({ action: 'placeableDeleted', placeableInfo: deletedPlacable})
   });
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);
@@ -196,7 +196,7 @@ async function GameController(initData: TownJoinResponse,
 
   const emitPlaceableAdd = (placeableInfo: PlaceableSpecification) => {
     socket.emit('placeableAdd', placeableInfo)
-    dispatchAppUpdate({action: 'weAddedPlaceable', placableInfo: placeableInfo })
+    dispatchAppUpdate({action: 'weAddedPlaceable', placeableInfo: placeableInfo })
   }
 
   const emitPlaceableDelete = (location: PlaceableLocation) => {
