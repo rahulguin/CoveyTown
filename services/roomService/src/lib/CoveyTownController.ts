@@ -5,6 +5,7 @@ import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import TwilioVideo from './TwilioVideo';
 import IVideoClient from './IVideoClient';
+import { Placeable } from '../types/Placeable';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -163,17 +164,23 @@ export default class CoveyTownController {
      * @param placeableID 
      * @param location 
      */
-     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): functionToAddOnFront {
+     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): number {
        // check that player is able to add placeables (could be changed to be password instead of player)
 
        // check that placeable can get added 
+       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+       if (conflictingPlacement !== undefined) {
+         // this means there was a conflict with placement
+        throw Error('error here because there was a location conflict')
+       }
 
        // add placeable at that location
-       const placeableAdded = new Placeable(placeableID, location)
-       this._placeables.push(new Placeable(placeableID, location))
+       // will need to be updated to create the specific object wanted
+       const addedPlaceable = new Placeable(placeableID, location)
+       this._placeables.push(addedPlaceable)
 
        // then for all listeners to this room notify them that an placeable was added
-        this._listeners.forEach((listener) => listener.onPlacableAdded(session.player));
+        this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
         throw Error('implement')
     }
 
@@ -183,6 +190,19 @@ export default class CoveyTownController {
      * @param location 
      */
     deletePlaceable(player: Player, location: PlaceableLocation): void {
-      throw Error('implement')
+      // check that player is able to delete placeables (could be changed to be password instead of player)
+
+      // check that placeable can be deleted from here 
+      const conflictingPlacements: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+      if (conflictingPlacements.length === undefined) {
+        // this means there was nothing to be deleted from here
+       throw Error('error here because there was not a placeable at this location to delete')
+      }
+
+      // removes the placeable from the list of placebles
+      this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
+
+      // for all listeners notifies them that the object was deleted
+      this._listeners.forEach((listener) => listener.onPlaceableDeleted(location));
     }
 }
