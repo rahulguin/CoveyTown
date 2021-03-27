@@ -83,22 +83,22 @@ export interface ObjectAddRequest {
   coveyTownID: string,
   coveyTownpassword: string,
   objectID: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 export interface ObjectAddResponse {
   coveyTownID: string,
   coveyTownpassword: string,
   objectID: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 /**
- * represents a location on the map basedon pixels
+ * represents a location on the map based on index
  */
-export interface mapLocation {
-  locationX: number
-  locationY: number
+export interface placeableLocation {
+  xIndex: number
+  yIndex: number
 }
 
 /**
@@ -106,8 +106,8 @@ export interface mapLocation {
  */
 export interface ObjectDeleteRequest {
   coveyTownID: string,
-  coveyTownpassword: string,
-  location: mapLocation
+  coveyTownPassword: string,
+  location: placeableLocation
 }
 
 /**
@@ -121,7 +121,7 @@ export interface ObjectInfo {
   coveyTownID: string,
   objectID: string,
   objectName: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 /**
@@ -200,5 +200,25 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+    // API methods to handle object requests
+    async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
+      const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/placeables/${requestData.coveyTownID}`, requestData);
+      return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    }
+  
+    async deleteObject(requestData: ObjectDeleteRequest): Promise<void> {
+      const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}/${requestData.location}`);
+      return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    }
+  
+    // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
+    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects${requestData.coveyTownID}`, requestData);
+    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    // }
+  
+    // async avaliableObject(): Promise<ObjectListResponce> {
+    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
+    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    // }
 
 }
