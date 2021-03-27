@@ -217,7 +217,7 @@ export default class TownsServiceClient {
   }
 
   async deleteObject(requestData: ObjectDeleteRequest): Promise<ObjectDeleteResponce> {
-    const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}/${requestData.location}`);
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
   
