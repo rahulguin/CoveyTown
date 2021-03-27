@@ -164,14 +164,14 @@ export default class CoveyTownController {
      * @param placeableID the id assocaited of the placeable that is wanting to be added
      * @param location the location the player is wanting to add the placeable
      */
-     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): void {
+     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): string | undefined {
        // check that player is able to add placeables (could be changed to be password instead of player)
 
        // check that placeable can get added 
        const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
        if (conflictingPlacement !== undefined) {
          // this means there was a conflict with placement
-         this._listeners.forEach((listener) => listener.onPlaceableAddFailed(player, location))
+         return 'cannot add: placeable already at specified location'
        }
 
        // add placeable at that location
@@ -181,21 +181,23 @@ export default class CoveyTownController {
 
        // then for all listeners to this room notify them that an placeable was added
         this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
+        return undefined
     }
 
     /**
-     * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added.
+     * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added. 
+     * returns a string that describes why the placeable couldn't be deleted or undefined if it was deleted
      * @param player the player the made the request to delete the placeable
      * @param location the location the player is wanting to delete the placeable from
      */
-    deletePlaceable(player: Player, location: PlaceableLocation): void {
+    deletePlaceable(player: Player, location: PlaceableLocation): string | undefined {
       // check that player is able to delete placeables (could be changed to be password instead of player)
 
       // check that placeable can be deleted from here 
       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
       if (conflictingPlacement === undefined) {
         // this means there was nothing to be deleted from here
-        this._listeners.forEach((listener) => listener.onPlaceableDeleteFailed(player, location))
+        return 'cannot delete: no placeable to delete at specifed location'
       }
       else {
         // removes the placeable from the list of placebles
@@ -203,6 +205,8 @@ export default class CoveyTownController {
 
         // for all listeners notifies them that the object was deleted
         this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
+
+        return undefined
       }
 
     }

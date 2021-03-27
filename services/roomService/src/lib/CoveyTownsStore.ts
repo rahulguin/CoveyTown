@@ -1,5 +1,5 @@
 import CoveyTownController from './CoveyTownController';
-import { CoveyTownList } from '../CoveyTypes';
+import { CoveyTownList, PlaceableLocation } from '../CoveyTypes';
 
 function passwordMatches(provided: string, expected: string): boolean {
   if (provided === expected) {
@@ -66,6 +66,26 @@ export default class CoveyTownsStore {
       this._towns = this._towns.filter(town => town !== existingTown);
       existingTown.disconnectAllPlayers();
       return true;
+    }
+    return false;
+  }
+
+  addPlaceable(coveyTownID: string, coveyTownPassword: string, placeableID: string, placeableLocation: PlaceableLocation): boolean {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
+      const addResponce = existingTown.addPlaceable(PLAYER?, placeableID, placeableLocation)
+      return addResponce;
+
+    }
+    return false;
+  }
+
+  deletePlaceable(coveyTownID: string, coveyTownPassword: string, placeableLocation: PlaceableLocation): boolean {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
+      const deleteResponce = existingTown.deletePlaceable(PLAYER?, placeableLocation)
+      return deleteResponce;
+
     }
     return false;
   }
