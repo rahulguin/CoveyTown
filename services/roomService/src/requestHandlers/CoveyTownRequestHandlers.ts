@@ -85,24 +85,24 @@ export interface TownUpdateRequest {
  */
  export interface PlaceableAddRequest {
   coveyTownID: string,
-  coveyTownpassword: string,
+  coveyTownPassword: string,
   placeableID: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 export interface PlaceableAddResponse {
   coveyTownID: string,
   coveyTownpassword: string,
   placeableID: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 /**
  * represents a location on the map basedon pixels
  */
-export interface mapLocation {
-  locationX: number
-  locationY: number
+export interface placeableLocation {
+  xIndex: number
+  yInxed: number
 }
 
 /**
@@ -111,7 +111,7 @@ export interface mapLocation {
 export interface PlaceableDeleteRequest {
   coveyTownID: string,
   coveyTownpassword: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 /**
@@ -125,7 +125,7 @@ export interface PlaceableInfo {
   coveyTownID: string,
   placeableID: string,
   placeableName: string,
-  location: mapLocation
+  location: placeableLocation
 }
 
 /**
@@ -222,6 +222,28 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
     response: {},
     message: !success ? 'Invalid password or update values specified. Please double check your town update password.' : undefined,
   };
+}
+
+// methods for adding, deleting, and listing placeabless
+
+export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableAddResponse>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  return {
+    isOK: success,
+    response: {something}
+    message: !success? 'Invalid password or there is already a placeable '
+  }
+}
+
+export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableAddResponse>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  return {
+    isOK: success,
+    response: {something}
+    message: !success? 'error message'
+  }
 }
 
 

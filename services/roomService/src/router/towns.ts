@@ -9,6 +9,8 @@ import {
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
+  addPlaceableHandler,
+  deletePlaceableHandler
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -107,6 +109,49 @@ export default function addTownRoutes(http: Server, app: Express): void {
         });
     }
   });
+
+  /**
+   * Adds a placeable to a town
+   */
+  app.post('/placeables/:townID', async (req, res) => {
+    try {
+      const result = await addPlaceableHandler({
+        coveyTownID: req.params.townID,
+        coveyTownPassword: req.body.coveyTownPassword,
+        placeableID: req.body.placeableID,
+        location: req.body.location
+      });
+      res.status(StatusCodes.OK)
+        .json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({
+        message: 'Internal server error, please see log in server for more details'
+      })
+    }
+  })
+
+  /**
+   * Deletes a placeable from a town
+   */
+   app.delete(`/placeables/:townID/:townPassword`, async (req, res) => {
+    try {
+      const result = await deletePlaceableHandler({
+        coveyTownID: req.params.townID,
+        coveyTownPassword: req.params.townPassword,
+        location: {xIndex: req.params.xIndex, yIndex:req.params.yIndex}
+      });
+      res.status(StatusCodes.OK)
+        .json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({
+        message: 'Internal server error, please see log in server for more details'
+      })
+    }
+  })
 
   const socketServer = new io.Server(http, { cors: { origin: '*' } });
   socketServer.on('connection', townSubscriptionHandler);
