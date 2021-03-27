@@ -35,8 +35,6 @@ type CoveyAppUpdate =
   | { action: 'disconnect' }
   | { action: 'placeableAdded'; placableInfo: PlaceableSpecification }
   | { action: 'placeableDeleted'; placeableInfo: PlaceableSpecification }
-  | { action: 'weAddedPlaceable'; placeableInfo: PlaceableSpecification }
-  | { action: 'weDeletedPlaceable'; location: PlaceableLocation }
   ;
 
 function defaultAppState(): CoveyAppState {

@@ -111,6 +111,16 @@ export interface ObjectDeleteRequest {
 }
 
 /**
+ * Payload sent by the client to delete an object from a town
+ */
+ export interface ObjectDeleteResponce {
+  coveyTownID: string,
+  coveyTownPassword: string,
+  objectID: string,
+  location: placeableLocation
+}
+
+/**
  * Payload sent by the client to retrive objects from a town
  */
 export interface ObjectListRequest {
@@ -200,16 +210,16 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-    // API methods to handle object requests
-    async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
-      const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/placeables/${requestData.coveyTownID}`, requestData);
-      return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-    }
-  
-    async deleteObject(requestData: ObjectDeleteRequest): Promise<void> {
-      const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}/${requestData.location}`);
-      return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-    }
+  // API methods to handle object requests
+  async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/placeables/${requestData.coveyTownID}`, requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async deleteObject(requestData: ObjectDeleteRequest): Promise<ObjectDeleteResponce> {
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}/${requestData.location}`);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
   
     // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
     //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects${requestData.coveyTownID}`, requestData);
