@@ -1,5 +1,7 @@
 import CoveyTownController from './CoveyTownController';
 import { CoveyTownList, PlaceableLocation } from '../CoveyTypes';
+import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
+import Player from '../types/Player';
 
 function passwordMatches(provided: string, expected: string): boolean {
   if (provided === expected) {
@@ -73,7 +75,8 @@ export default class CoveyTownsStore {
   addPlaceable(coveyTownID: string, coveyTownPassword: string, placeableID: string, placeableLocation: PlaceableLocation): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
-      const addResponce = existingTown.addPlaceable(PLAYER?, placeableID, placeableLocation)
+      // currently provides a dummy player that can then later be swapped out for permissions funciton
+      const addResponce = existingTown.addPlaceable(new Player('dummy'), placeableID, placeableLocation)
       return addResponce;
     }
     return 'Invalid room information: Double check that the room exists and password is correct';
@@ -82,10 +85,20 @@ export default class CoveyTownsStore {
   deletePlaceable(coveyTownID: string, coveyTownPassword: string, placeableLocation: PlaceableLocation): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
-      const deleteResponce = existingTown.deletePlaceable(PLAYER?, placeableLocation)
+      // currently provides a dummy player that can then later be swapped out for permissions funciton
+      const deleteResponce = existingTown.deletePlaceable(new Player('dummy'), placeableLocation)
       return deleteResponce;
     }
     return 'Invalid room information: Double check that the room exists and password is correct';
+  }
+
+  getPlaceable(coveyTownID: string, placeableLocation: PlaceableLocation): PlaceableInfo | undefined {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown) {
+      const deleteResponce = existingTown.getPlaceableAt(placeableLocation)
+      return deleteResponce;
+    }
+    return undefined;
   }
 
 }

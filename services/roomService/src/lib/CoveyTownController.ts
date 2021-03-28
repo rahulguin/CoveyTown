@@ -211,21 +211,21 @@ export default class CoveyTownController {
       }
     }
 
-    getObjectAt(location: PlaceableLocation): PlaceableInfo {
+    getPlaceableAt(location: PlaceableLocation): PlaceableInfo {
       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
       if (conflictingPlacement === undefined) {
         return {
           coveyTownID: this._coveyTownID,
-          placeableID: Placeable.emptyPlaceableID(),
-          placeableName: Placeable.emptyPlaceableName(),
-          location: conflictingPlacement?.location
+          placeableID: Placeable.EMPTY_PLACEABLE_ID,
+          placeableName: Placeable.EMPTY_PLACEABLE_NAME,
+          location: location
         }
       }
       else {
         return {
           coveyTownID: this._coveyTownID,
           placeableID: conflictingPlacement.placeableID,
-          placeableName: conflictingPlacement.name,
+          placeableName: 'dummy name',
           location: conflictingPlacement.location
         }
       }

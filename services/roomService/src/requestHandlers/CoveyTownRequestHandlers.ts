@@ -227,12 +227,12 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
 export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.placeableID, requestData.location);
-  const objectAt = townsStore.getObjectAt(location)
+  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location)
   return {
     // if the string is undefined then addPlaceable was sucessful
     isOK: success? false : true,
     // if the string is defind then returns the placeable that should be located there
-    response: objectAt,
+    response: placeableAt,
     // the message returned is the message to be recieved
     message: success
   }
@@ -241,12 +241,12 @@ export async function addPlaceableHandler(requestData: PlaceableAddRequest): Pro
 export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.location);
-  const objectAt = townsStore.getObjectAt(location)
+  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location)
   return {
     // if the string is undefined then deletePlaceable was sucessful
     isOK: success? false : true,
     // returns the placeable that should be located there
-    response: objectAt,
+    response: placeableAt,
     // the message returned is the message to be recieved
     message: success
   }
@@ -280,12 +280,6 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlaceableDeleted(placeable: Placeable) {
       socket.emit('placeableDeleted', placeable)
     },
-    onPlaceableAddFailed(placeable: Placeable) {
-      socket.emit('placableAddFailed', placeable)
-    },
-    onPlaceableDeleteFailed(placeable: Placeable) {
-      socket.emit('placeableDeleteFailed', placeable)
-    }
   };
 }
 

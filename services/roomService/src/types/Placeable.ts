@@ -5,8 +5,8 @@ import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 export default class Placeable {
     private readonly _placeableID: string;
     private _location: PlaceableLocation
-    static readonly EMPTY_TILE_ID: string = 'empty';
-    static readonly EMPTY_TILE_NAME: string = 'empty space';
+    static readonly EMPTY_PLACEABLE_ID: string = 'empty';
+    static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
 
     constructor (placeableID: string, location: PlaceableLocation) {
         this._placeableID = placeableID
@@ -25,12 +25,12 @@ export default class Placeable {
         return this._placeableID 
     }
 
-    get EMPTY_TILE_ID(): string {
-        return this.EMPTY_TILE_ID
+    get EMPTY_PLACEABLE_ID(): string {
+        return this.EMPTY_PLACEABLE_ID
     }
 
-    get EMPTY_TILE_NAME(): string {
-        return this.EMPTY_TILE_ID
+    get EMPTY_PLACEABLE_NAME(): string {
+        return this.EMPTY_PLACEABLE_ID
     }
 
 
