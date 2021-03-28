@@ -6,6 +6,7 @@ import PlayerSession from '../types/PlayerSession';
 import TwilioVideo from './TwilioVideo';
 import IVideoClient from './IVideoClient';
 import Placeable from '../types/Placeable';
+import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -168,7 +169,7 @@ export default class CoveyTownController {
        // check that player is able to add placeables (could be changed to be password instead of player)
 
        // check that placeable can get added 
-       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
        if (conflictingPlacement !== undefined) {
          // this means there was a conflict with placement
          return 'cannot add: placeable already at specified location'
@@ -194,7 +195,7 @@ export default class CoveyTownController {
       // check that player is able to delete placeables (could be changed to be password instead of player)
 
       // check that placeable can be deleted from here 
-      const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+      const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
       if (conflictingPlacement === undefined) {
         // this means there was nothing to be deleted from here
         return 'cannot delete: no placeable to delete at specifed location'
@@ -208,6 +209,26 @@ export default class CoveyTownController {
 
         return undefined
       }
+    }
 
+    getObjectAt(location: PlaceableLocation): PlaceableInfo {
+      const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+      if (conflictingPlacement === undefined) {
+        return {
+          coveyTownID: this._coveyTownID,
+          placeableID: Placeable.emptyPlaceableID(),
+          placeableName: Placeable.emptyPlaceableName(),
+          location: conflictingPlacement?.location
+        }
+      }
+      else {
+        return {
+          coveyTownID: this._coveyTownID,
+          placeableID: conflictingPlacement.placeableID,
+          placeableName: conflictingPlacement.name,
+          location: conflictingPlacement.location
+        }
+      }
+     
     }
 }

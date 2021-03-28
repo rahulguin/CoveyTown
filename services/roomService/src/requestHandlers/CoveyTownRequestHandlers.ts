@@ -87,20 +87,18 @@ export interface TownUpdateRequest {
   coveyTownID: string,
   coveyTownPassword: string,
   placeableID: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
 export interface PlaceableAddResponse {
-  coveyTownID: string,
-  coveyTownpassword: string,
   placeableID: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
 /**
  * represents a location on the map basedon pixels
  */
-export interface placeableLocation {
+export interface PlaceableLocation {
   xIndex: number
   yInxed: number
 }
@@ -110,8 +108,8 @@ export interface placeableLocation {
  */
 export interface PlaceableDeleteRequest {
   coveyTownID: string,
-  coveyTownpassword: string,
-  location: placeableLocation
+  coveyTownPassword: string,
+  location: PlaceableLocation
 }
 
 /**
@@ -125,7 +123,7 @@ export interface PlaceableInfo {
   coveyTownID: string,
   placeableID: string,
   placeableName: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
 /**
@@ -226,23 +224,31 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
 
 // methods for adding, deleting, and listing placeabless
 
-export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableAddResponse>> {
+export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.placeableID, requestData.location);
+  const objectAt = townsStore.getObjectAt(location)
   return {
-    isOK: success,
-    response: {something}
-    message: !success? 'Invalid password or there is already a placeable '
+    // if the string is undefined then addPlaceable was sucessful
+    isOK: success? false : true,
+    // if the string is defind then returns the placeable that should be located there
+    response: objectAt,
+    // the message returned is the message to be recieved
+    message: success
   }
 }
 
-export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableAddResponse>> {
+export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.location);
+  const objectAt = townsStore.getObjectAt(location)
   return {
-    isOK: success,
-    response: {something}
-    message: !success? 'error message'
+    // if the string is undefined then deletePlaceable was sucessful
+    isOK: success? false : true,
+    // returns the placeable that should be located there
+    response: objectAt,
+    // the message returned is the message to be recieved
+    message: success
   }
 }
 

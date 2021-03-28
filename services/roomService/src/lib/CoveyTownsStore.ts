@@ -70,24 +70,22 @@ export default class CoveyTownsStore {
     return false;
   }
 
-  addPlaceable(coveyTownID: string, coveyTownPassword: string, placeableID: string, placeableLocation: PlaceableLocation): boolean {
+  addPlaceable(coveyTownID: string, coveyTownPassword: string, placeableID: string, placeableLocation: PlaceableLocation): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       const addResponce = existingTown.addPlaceable(PLAYER?, placeableID, placeableLocation)
       return addResponce;
-
     }
-    return false;
+    return 'Invalid room information: Double check that the room exists and password is correct';
   }
 
-  deletePlaceable(coveyTownID: string, coveyTownPassword: string, placeableLocation: PlaceableLocation): boolean {
+  deletePlaceable(coveyTownID: string, coveyTownPassword: string, placeableLocation: PlaceableLocation): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       const deleteResponce = existingTown.deletePlaceable(PLAYER?, placeableLocation)
       return deleteResponce;
-
     }
-    return false;
+    return 'Invalid room information: Double check that the room exists and password is correct';
   }
 
 }

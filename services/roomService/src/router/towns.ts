@@ -140,7 +140,7 @@ export default function addTownRoutes(http: Server, app: Express): void {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.params.townPassword,
-        location: {xIndex: req.params.xIndex, yIndex:req.params.yIndex}
+        location: req.body.location
       });
       res.status(StatusCodes.OK)
         .json(result);
