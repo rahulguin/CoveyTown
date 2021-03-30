@@ -225,7 +225,7 @@ export default class CoveyTownController {
         return {
           coveyTownID: this._coveyTownID,
           placeableID: conflictingPlacement.placeableID,
-          placeableName: 'dummy name',
+          placeableName: conflictingPlacement.name,
           location: conflictingPlacement.location
         }
       }

@@ -4,6 +4,9 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import Placeable from '../types/Placeable';
 import { PlaceableLocation } from '../CoveyTypes';
+import CoveyTownController from './CoveyTownController';
+import { randomInt } from 'crypto';
+import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
@@ -27,12 +30,6 @@ function mockCoveyListener(): CoveyTownListener {
     },
     onPlaceableDeleted(deletedPlaceable: Placeable) {
       mockCoveyListenerOtherFns(deletedPlaceable);
-    },
-    onPlaceableAddFailed(truePlaceable: Placeable) {
-      mockCoveyListenerOtherFns(truePlaceable);
-    },
-    onPlaceableDeleteFailed(truePlaceable: Placeable) {
-      mockCoveyListenerOtherFns(truePlaceable);
     }
   };
 }
@@ -253,5 +250,158 @@ describe('CoveyTownsStore', () => {
         .toBe(0);
     });
   });
+  describe('placeables', () => {
+    let town: CoveyTownController
+    let store: CoveyTownsStore
+    let placeableID: string
+    let location: PlaceableLocation
+    beforeEach(() => {
+      town = createTownForTesting()
+      store = CoveyTownsStore.getInstance()
+      placeableID = nanoid()
+      const xIndex = randomInt(100)
+      const yIndex = randomInt(100)
+      location = { xIndex: xIndex, yIndex: yIndex }
+    })
+    describe('addPlaceable', () => {
+      it('Should fail if townID does not exist, and pass back error string', async () => {
+        const responce = store.addPlaceable(nanoid(), town.townUpdatePassword, placeableID, location)
+        expect(responce).not.toBe(undefined)
+        expect(responce?.length).toBeGreaterThan(0)
+      }) 
+      it ('Should check the password before adding placeable, and pass back error string', async () => {
+        const responce = store.addPlaceable(town.coveyTownID, nanoid(), placeableID, location)
+        expect(responce).not.toBe(undefined)
+        expect(responce?.length).toBeGreaterThan(0)
+      })
+      it ('Should return undefined on a succesful addition', () => {
+        const responce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(responce).toBe(undefined)
+      })
+      it ('Should fail if there is already a placeable at the given location, and pass back error string', async () => {
+        const firstResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(firstResponce).toBe(undefined)
+        const secondResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(secondResponce).not.toBe(undefined)
+        expect(secondResponce?.length).toBeGreaterThan(0)
+      })
+    })
+    describe('deletePlaceable', () => {
+      it('Should fail if townID does not exist', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const responce = store.deletePlaceable(nanoid(), town.townUpdatePassword, location)
+        expect(responce).not.toBe(undefined)
+        expect(responce?.length).toBeGreaterThan(0)
+      }) 
+      it ('Should check the password before deleting placeable', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const responce = store.deletePlaceable(town.coveyTownID, nanoid(), location)
+        expect(responce).not.toBe(undefined)
+        expect(responce?.length).toBeGreaterThan(0)
+      })
+      it ('Should fail if there is not a placeable at the given location, and pass back error string', async () => {
+        const responce = store.deletePlaceable(nanoid(), town.townUpdatePassword, location)
+        expect(responce).not.toBe(undefined)
+        expect(responce?.length).toBeGreaterThan(0)
+      })
+      it ('Should return undefined on a succesful deletion', async () => {
+        const responce = store.deletePlaceable(town.coveyTownID, town.townUpdatePassword, location)
+        expect(responce).toBe(undefined)
+      })
+      it ('Should fail after repeated calls of deletion', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const firstResponce = store.deletePlaceable(town.coveyTownID, town.coveyTownID, location)
+        expect(firstResponce).toBe(undefined)
+      
+        const secondResponce = store.deletePlaceable(town.coveyTownID, town.townUpdatePassword, location)
+        expect(secondResponce).not.toBe(undefined)
+        expect(secondResponce?.length).toBeGreaterThan(0)
+      })
+    })
+    describe('getPlaceable', async () => {
+      const placeable = new Placeable(placeableID, location)
+      const placeableInfo = {coveyTownID: town.coveyTownID, placeableID: placeable.placeableID, placeableName: placeable.name, location: placeable.location}
+      const emptyInfo: PlaceableInfo = {
+        coveyTownID: town.coveyTownID,
+        placeableID: Placeable.EMPTY_PLACEABLE_ID,
+        placeableName: Placeable.EMPTY_PLACEABLE_NAME,
+        location: location
+      }
+      it('Should fail if townID does not exist', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const getResponce = store.getPlaceable(nanoid(), location)
+        expect(getResponce).toBe(undefined)
+      })
+      it('Should return the same placeable that was just added if succesful', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(placeableInfo)
+      })
+      it('Should return the same placeable on repeated calls with no modifiers called', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+        
+        const firstResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(firstResponce).toBe(placeableInfo)
+        const secondResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(secondResponce).toBe(placeableInfo)
+        expect(firstResponce).toBe(secondResponce)
+      })
+      it('Should return the default placeable if no placable has been added at the location', async () => {
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(emptyInfo)
+      })
+      it('Should return the original placeable if a failed added was called', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const secondAddResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, nanoid(), location)
+        expect(secondAddResponce).not.toBe(undefined)
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(placeableInfo)
+      })
+      it('Should return the default placeable that was just deleted if succesful', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const secondAddResponce = store.deletePlaceable(town.coveyTownID, town.townUpdatePassword, location)
+        expect(secondAddResponce).toBe(undefined)
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(emptyInfo)
+      })
+      it('Should return the original placeable if a failed delete was called - wrong password', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const secondAddResponce = store.deletePlaceable(town.coveyTownID, nanoid(), location)
+        expect(secondAddResponce).not.toBe(undefined)
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(placeableInfo)
+      })
+      it('Should return the original placeable if a failed delete was called - wrong id', async () => {
+        const addResponce = store.addPlaceable(town.coveyTownID, town.townUpdatePassword, placeableID, location)
+        expect(addResponce).toBe(undefined)
+
+        const secondAddResponce = store.deletePlaceable(nanoid(), town.townUpdatePassword, location)
+        expect(secondAddResponce).not.toBe(undefined)
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location)
+        expect(getResponce).toBe(placeableInfo)
+      })
+    })
+  })
 });
 
