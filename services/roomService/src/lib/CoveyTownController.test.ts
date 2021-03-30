@@ -155,6 +155,74 @@ describe('CoveyTownController', () => {
       }
     })
   })
+  describe('getPlaceableAt', () => {
+    let townName: string
+    let townController: CoveyTownController
+    let player: Player
+    let placedLocation: PlaceableLocation
+    let placeableID: string
+    let placeableInfo: PlaceableInfo
+    let emptyInfo: PlaceableInfo
+
+    beforeEach(async () => {
+      townName = `FriendlyNameTest-${nanoid()}`;
+      townController = new CoveyTownController(townName, false);
+      player = new Player('test player');
+      await townController.addPlayer(player);
+      const xIndex = randomInt(100)
+      const yIndex = randomInt(100)
+      placedLocation = { xIndex, yIndex }
+      placeableID = nanoid()
+      const placeable = new Placeable(placeableID, placedLocation)
+      placeableInfo = { coveyTownID: townController.coveyTownID, placeableID: placeable.placeableID, placeableName: placeable.name, location: placeable.location}
+      emptyInfo = { coveyTownID: townController.coveyTownID, placeableID: Placeable.EMPTY_PLACEABLE_ID, placeableName: Placeable.EMPTY_PLACEABLE_NAME, location: placedLocation }
+    })
+
+    it('should return the default placeable info when get is called where there is no placeable', async () => {
+      const firstResponce = townController.getPlaceableAt(placedLocation)
+      expect(firstResponce).toBe(emptyInfo)
+    })
+    it('should return the specific placeable after a succesful addPlaceable call', async () => {
+      const addResponce = townController.addPlaceable(player, placeableID, placedLocation)
+      expect(addResponce).toBe(undefined)
+
+      const firstResponce = townController.getPlaceableAt(placedLocation)
+      expect(firstResponce).toBe(placeableInfo)
+    })
+    it('should return the same info after successive calls with no modifiers call inbetween', () => {
+      const addResponce = townController.addPlaceable(player, placeableID, placedLocation)
+      expect(addResponce).toBe(undefined)
+
+      const firstResponce = townController.getPlaceableAt(placedLocation)
+      expect(firstResponce).toBe(placeableInfo)
+
+      const secondResponce = townController.getPlaceableAt(placedLocation)
+      expect(secondResponce).toBe(placeableInfo)
+      expect(firstResponce).toBe(secondResponce)
+
+    })
+    it('Should return the original placeable if a failed added was called', async () => {
+      const addResponce = townController.addPlaceable(player, placeableID, placedLocation)
+      expect(addResponce).toBe(undefined)
+
+      const secondAddResponce = townController.addPlaceable(player, nanoid(), placedLocation)
+      expect(secondAddResponce).not.toBe(undefined)
+
+      const getResponce = townController.getPlaceableAt(placedLocation)
+      expect(getResponce).toBe(placeableInfo)
+    })
+    it('should return the default placeable info after a successful delete', async () => {
+      const addResponce = townController.addPlaceable(player, placeableID, placedLocation)
+      expect(addResponce).toBe(undefined)
+
+      const secondAddResponce = townController.deletePlaceable(player, placedLocation)
+      expect(secondAddResponce).toBe(undefined)
+
+      const getResponce = townController.getPlaceableAt(placedLocation)
+      expect(getResponce).toBe(emptyInfo)
+
+    })
+  })
   describe('town listeners and events', () => {
     let testingTown: CoveyTownController;
     const mockListeners = [mock<CoveyTownListener>(),
