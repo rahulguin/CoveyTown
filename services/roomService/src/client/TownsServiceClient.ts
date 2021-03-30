@@ -95,6 +95,70 @@ export type CoveyTownInfo = {
   maximumOccupancy: number
 };
 
+/**
+ * payload sent by the client to add a placeable to a town
+ */
+ export interface PlaceableAddRequest {
+  coveyTownID: string,
+  coveyTownPassword: string,
+  placeableID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * Response from the server for a PlaceableAddRequest
+ */
+export interface PlaceableAddResponse {
+  placeableID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * represents a location on the map based on indecies of tiles
+ */
+export interface PlaceableLocation {
+  xIndex: number
+  yIndex: number
+}
+
+/**
+ * Payload sent by the client to delete a placeable from a town
+ */
+export interface PlaceableDeleteRequest {
+  coveyTownID: string,
+  coveyTownPassword: string,
+  location: PlaceableLocation
+}
+
+/**
+ * Payload sent by the client to retrive placeables from a town
+ */
+export interface PlaceableListRequest {
+  coveyTownID: string,
+}
+
+/**
+ * Payload sent by the client to retrive a placeable from a specific location in a town
+ */
+export interface PlaceableGetRequest {
+  coveyTownID: string,
+  location: PlaceableLocation
+}
+
+export interface PlaceableInfo {
+  coveyTownID: string,
+  placeableID: string,
+  placeableName: string,
+  location: PlaceableLocation
+}
+
+/**
+ * Responce from the server for a list of placeables
+ */
+export interface PlaceableListResponce {
+  placeables: PlaceableInfo[]
+}
+
 export default class TownsServiceClient {
   private _axios: AxiosInstance;
 
@@ -142,6 +206,21 @@ export default class TownsServiceClient {
 
   async joinTown(requestData: TownJoinRequest): Promise<TownJoinResponse> {
     const responseWrapper = await this._axios.post('/sessions', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.post('/placeable', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async deletePlaceable(requestData: PlaceableDeleteRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.post('/placeable', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.post(`/placeable`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
