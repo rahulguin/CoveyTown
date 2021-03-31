@@ -263,6 +263,7 @@ class CoveyGameScene extends Phaser.Scene {
       }
     });
 
+    /* Box object taken from tileMapJSON. Adding immovable property to the box object */
     const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
     let boxImage;
     boxes.forEach(box => {
@@ -271,8 +272,6 @@ class CoveyGameScene extends Phaser.Scene {
         boxImage.setDisplaySize(50,50)
         boxImage.setImmovable(true);
         boxImage.body.setAllowGravity(false);
-        // boxImage.body.allowGravity = false;
-        
       }
     });
 
@@ -298,10 +297,6 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24);
-    if(boxImage){
-      this.physics.add.collider(sprite, boxImage);
-    }
-    
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
       color: '#000000',
@@ -312,6 +307,11 @@ class CoveyGameScene extends Phaser.Scene {
       sprite,
       label
     };
+
+    /* Player and box object should collide. Blocks path of the player */
+    if(boxImage){
+      this.physics.add.collider(sprite, boxImage);
+    }
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
