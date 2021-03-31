@@ -264,12 +264,15 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
     const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
-    // this.physics.world.enable(boxes);
-    // const sprite1 = boxes as Phaser.GameObjects.Sprite;
+    let boxImage;
     boxes.forEach(box => {
       if(box.x && box.y){
-        const boxImage = this.add.image(box.x, box.y, 'box');
+        boxImage = this.physics.add.image(box.x, box.y, 'box');
         boxImage.setDisplaySize(50,50)
+        boxImage.setImmovable(true);
+        boxImage.body.setAllowGravity(false);
+        // boxImage.body.allowGravity = false;
+        
       }
     });
 
@@ -295,6 +298,10 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24);
+    if(boxImage){
+      this.physics.add.collider(sprite, boxImage);
+    }
+    
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
       color: '#000000',
