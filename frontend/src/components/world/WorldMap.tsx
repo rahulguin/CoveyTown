@@ -42,6 +42,7 @@ class CoveyGameScene extends Phaser.Scene {
   preload() {
     // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
+    this.load.image('box', '/assets/placeable/treeObject.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
   }
@@ -247,7 +248,7 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
                                   // the map
       }
     );
@@ -262,7 +263,17 @@ class CoveyGameScene extends Phaser.Scene {
       }
     });
 
-
+    /* Box object taken from tileMapJSON. Adding immovable property to the box object */
+    const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
+    let boxImage;
+    boxes.forEach(box => {
+      if(box.x && box.y){
+        boxImage = this.physics.add.image(box.x, box.y, 'box');
+        boxImage.setDisplaySize(50,50)
+        boxImage.setImmovable(true);
+        boxImage.body.setAllowGravity(false);
+      }
+    });
 
     const cursorKeys = this.input.keyboard.createCursorKeys();
     this.cursors.push(cursorKeys);
@@ -278,9 +289,6 @@ class CoveyGameScene extends Phaser.Scene {
       'left': Phaser.Input.Keyboard.KeyCodes.K,
       'right': Phaser.Input.Keyboard.KeyCodes.L
     }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
-
-
-
 
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
@@ -299,6 +307,11 @@ class CoveyGameScene extends Phaser.Scene {
       sprite,
       label
     };
+
+    /* Player and box object should collide. Blocks path of the player */
+    if(boxImage){
+      this.physics.add.collider(sprite, boxImage);
+    }
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
