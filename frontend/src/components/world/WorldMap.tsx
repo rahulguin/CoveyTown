@@ -42,6 +42,7 @@ class CoveyGameScene extends Phaser.Scene {
   preload() {
     // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
+    this.load.image('box', '/assets/placeable/treeObject.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
   }
@@ -247,7 +248,7 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
                                   // the map
       }
     );
@@ -262,7 +263,15 @@ class CoveyGameScene extends Phaser.Scene {
       }
     });
 
-
+    const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
+    // this.physics.world.enable(boxes);
+    // const sprite1 = boxes as Phaser.GameObjects.Sprite;
+    boxes.forEach(box => {
+      if(box.x && box.y){
+        const boxImage = this.add.image(box.x, box.y, 'box');
+        boxImage.setDisplaySize(50,50)
+      }
+    });
 
     const cursorKeys = this.input.keyboard.createCursorKeys();
     this.cursors.push(cursorKeys);
@@ -278,9 +287,6 @@ class CoveyGameScene extends Phaser.Scene {
       'left': Phaser.Input.Keyboard.KeyCodes.K,
       'right': Phaser.Input.Keyboard.KeyCodes.L
     }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
-
-
-
 
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
