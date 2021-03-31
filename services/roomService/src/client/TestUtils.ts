@@ -4,11 +4,18 @@ import {Socket as ServerSocket} from 'socket.io';
 
 import {AddressInfo} from 'net';
 import http from 'http';
-import { UserLocation } from '../CoveyTypes';
+import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 
 export type RemoteServerPlayer = {
   location: UserLocation, _userName: string, _id: string
 };
+
+export type RemoteServerPlaceable = {
+  townID: string
+  location: PlaceableLocation,
+  _placeableName: string,
+  _placeableID: string
+}
 const createdSocketClients: Socket[] = [];
 
 /**
@@ -45,6 +52,8 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
   playerMoved: Promise<RemoteServerPlayer>,
   newPlayerJoined: Promise<RemoteServerPlayer>,
   playerDisconnected: Promise<RemoteServerPlayer>,
+  placeableAdded: Promise<RemoteServerPlaceable>,
+  placeableDelete: Promise<RemoteServerPlaceable>,
 } {
   const address = server.address() as AddressInfo;
   const socket = io(`http://localhost:${address.port}`, {
@@ -76,6 +85,16 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
       resolve(player);
     });
   });
+  const placeableAddPromise = new Promise<RemoteServerPlaceable>((resolve) => {
+    socket.on('placeableAdd', (placeable: RemoteServerPlaceable) => {
+      resolve(placeable)
+    });
+  });
+  const placeableDeletePromise = new Promise<RemoteServerPlaceable>((resolve) => {
+    socket.on('placeableDelete', (placeable: RemoteServerPlaceable) => {
+      resolve(placeable)
+    });
+  });
   createdSocketClients.push(socket);
   return {
     socket,
@@ -84,6 +103,8 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
     playerMoved: playerMovedPromise,
     newPlayerJoined: newPlayerPromise,
     playerDisconnected: playerDisconnectPromise,
+    placeableAdded: placeableAddPromise,
+    placeableDelete: placeableDeletePromise
   };
 }
 export function setSessionTokenAndTownID(coveyTownID: string, sessionToken: string, socket: ServerSocket):void {

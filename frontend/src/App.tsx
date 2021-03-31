@@ -142,6 +142,10 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'disconnect':
       state.socket?.disconnect();
       return defaultAppState();
+    case 'placeableAdded':
+      do something
+    case 'placeableDeleted':
+      do something
     default:
       throw new Error('Unexpected state request');
   }

@@ -135,11 +135,29 @@ export default function addTownRoutes(http: Server, app: Express): void {
   /**
    * Deletes a placeable from a town
    */
-   app.delete(`/placeables/:townID/:townPassword`, async (req, res) => {
+   app.delete(`/placeables/:townID`, async (req, res) => {
     try {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
-        coveyTownPassword: req.params.townPassword,
+        coveyTownPassword: req.body.townPassword,
+        location: req.body.location
+      });
+      res.status(StatusCodes.OK)
+        .json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({
+        message: 'Internal server error, please see log in server for more details'
+      })
+    }
+  })
+
+  app.get(`/placeables/:townID`, async (req, res) => {
+    try {
+      const result = await getPlaceableHandler({
+        coveyTownID: req.params.townID,
+        coveyTownPassword: req.body.townPassword,
         location: req.body.location
       });
       res.status(StatusCodes.OK)
