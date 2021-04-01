@@ -45,6 +45,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
+    this.load.image('clickMe','/assets/atlas/clickMe.png');
   }
 
   updatePlayersLocations(players: Player[]) {
@@ -210,7 +211,6 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-  // this  is to create
   create() {
     const map = this.make.tilemap({ key: 'map' });
 
@@ -265,7 +265,7 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
 
-    var buttonTest=this.physics.add.sprite(500,1220.50130935754,"atlas");
+    var buttonTest=this.physics.add.sprite(500,1220.50130935754,"clickMe").setScale(0.1);
     buttonTest.setInteractive();
     buttonTest.on('pointerdown', () => {
       const buttonText = this.add.text(550, 1100, "HELLO THERE! Do you want \nto add \nan object?", {
@@ -280,7 +280,22 @@ class CoveyGameScene extends Phaser.Scene {
       );
       yesButton.setInteractive();
       yesButton.on('pointerdown', () => { 
-        yesButton.on('pointerdown', () => {destroyText();});
+        yesButton.on('pointerdown', () => {
+          destroyText();
+          const optionButton = this.add.text(650, 1095, 'Below are the options:',{
+            color: '#FF7000',
+            backgroundColor: '#FFF000',
+          });
+          const ticTacToeOption = this.add.text(650, 1110, '1. Tic-Tac-Toe',{
+            color: '#FF7000',
+            backgroundColor: '#FFF000',
+          });
+          const speakerOption = this.add.text(650, 1125, '2. Speaker',{
+            color: '#FF7000',
+            backgroundColor: '#FFF000',
+          });
+
+        });
 
       });
 
