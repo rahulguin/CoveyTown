@@ -16,6 +16,7 @@ export type RemoteServerPlaceable = {
   _placeableName: string,
   _placeableID: string
 }
+
 const createdSocketClients: Socket[] = [];
 
 /**

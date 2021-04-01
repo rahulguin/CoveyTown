@@ -477,11 +477,5 @@ describe('CoveyTownController', () => {
         }
       });
     });
-    describe('addPlaceable', () => {
-      it('should error if object is already place at location', async () => {
-  
-      })
-      it('')
-    })
   });
 });
