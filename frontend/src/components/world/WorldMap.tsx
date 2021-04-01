@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import { Button } from '@chakra-ui/react';
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
 class CoveyGameScene extends Phaser.Scene {
@@ -259,6 +260,41 @@ class CoveyGameScene extends Phaser.Scene {
           color: '#FFFFFF',
           backgroundColor: '#000000',
         })
+      }
+    });
+
+
+    var buttonTest=this.physics.add.sprite(500,1220.50130935754,"atlas");
+    buttonTest.setInteractive();
+    buttonTest.on('pointerdown', () => {
+      const buttonText = this.add.text(550, 1100, "HELLO THERE! Do you want \nto add \nan object?", {
+        color: '#FF7000',
+        backgroundColor: '#F0000',
+      });
+      const yesButton = this.add.text(550, 1155, 'Yes', 
+      {
+        color: '#FF7000',
+        backgroundColor: '#FFF000',
+      }
+      );
+      yesButton.setInteractive();
+      yesButton.on('pointerdown', () => { 
+        yesButton.on('pointerdown', () => {destroyText();});
+
+      });
+
+      const noButton = this.add.text(600, 1155, 'No',{
+        color: '#FF7000',
+        backgroundColor: '#FFF000',
+      });
+      noButton.setInteractive();
+      noButton.on('pointerdown', () => { noButton.on('pointerdown', () => {destroyText()}); });
+
+      function destroyText() {
+        yesButton.destroy();
+        noButton.destroy();
+        buttonText.destroy();
+        
       }
     });
 
