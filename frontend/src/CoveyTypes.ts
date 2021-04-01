@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import Player, { UserLocation } from './classes/Player';
-import Placeable form ''
+import Placeable from './classes/Placeable';
 import TownsServiceClient from './classes/TownsServiceClient';
 
 export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved' | 'objectAdded' | 'objectRemoved';
