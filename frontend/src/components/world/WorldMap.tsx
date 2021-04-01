@@ -181,6 +181,11 @@ class CoveyGameScene extends Phaser.Scene {
           break;
       }
 
+      if ((this.cursors.find(keySet => keySet.space?.isDown))) {
+        this.player.sprite.setVelocityY(-350);
+        this.player.sprite.play('jump', true);
+      }
+
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       this.player.sprite.body.velocity.normalize()
         .scale(speed);
@@ -250,6 +255,7 @@ class CoveyGameScene extends Phaser.Scene {
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
         // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
                                   // the map
+
       }
     );
 
@@ -275,6 +281,9 @@ class CoveyGameScene extends Phaser.Scene {
       }
     });
 
+
+
+
     const cursorKeys = this.input.keyboard.createCursorKeys();
     this.cursors.push(cursorKeys);
     this.cursors.push(this.input.keyboard.addKeys({
@@ -296,7 +305,80 @@ class CoveyGameScene extends Phaser.Scene {
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
-      .setOffset(0, 24);
+      .setOffset(0, 24)
+      .setInteractive();
+
+    sprite.on('pointerdown', () => {
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Hey! Do you want \nto add \nan object here?", {
+        color: '#FF7000',
+        backgroundColor: '#F0000',
+      });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const yesButton = this.add.text(this.lastLocation.x, this.lastLocation.y + 55, 'Yes',
+        {
+          color: '#FF7000',
+          backgroundColor: '#FFF000',
+        }
+      );
+      yesButton.setInteractive();
+
+
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      yesButton.on('pointerdown', () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const boxSprite = this.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
+          .setInteractive()
+          .setDisplaySize(50,50);
+
+        this.physics.add.collider(sprite, boxSprite);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const noButton = this.add.text(this.lastLocation.x + 150, this.lastLocation.y + 55, 'No',{
+        color: '#FF7000',
+        backgroundColor: '#FFF000',
+      });
+      noButton.setInteractive();
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      noButton.on('pointerdown', () => {destroyText()});
+
+      function destroyText() {
+        yesButton.destroy();
+        noButton.destroy();
+        buttonText.destroy();
+
+      }
+
+    });
+
+    sprite.on('pointerout', () => {
+
+      sprite.clearTint();
+
+    });
+
+    sprite.on('pointerup', () => {
+
+      sprite.clearTint();
+
+    });
+
+
+
+
+
+
+
+
+
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
       color: '#000000',
@@ -425,7 +507,10 @@ class CoveyGameScene extends Phaser.Scene {
       // sprites....
       this.players.forEach((p) => this.updatePlayerLocation(p));
     }
+
   }
+
+
 
   pause() {
     this.paused = true;
