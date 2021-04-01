@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io-client';
 import Player, { UserLocation } from './classes/Player';
+import Placeable form ''
 import TownsServiceClient from './classes/TownsServiceClient';
 
 export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved' | 'objectAdded' | 'objectRemoved';
@@ -28,6 +29,7 @@ export type CoveyAppState = {
   emitMovement: (location: UserLocation) => void,
   socket: Socket | null,
   apiClient: TownsServiceClient,
+  placeables: Placeable[]
 };
 
 export type PlaceableLocation = { xIndex: number, yIndex: number }
