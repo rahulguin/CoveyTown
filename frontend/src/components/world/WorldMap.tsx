@@ -210,6 +210,7 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+  // this  is to create
   create() {
     const map = this.make.tilemap({ key: 'map' });
 
