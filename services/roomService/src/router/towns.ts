@@ -10,7 +10,7 @@ import {
   townSubscriptionHandler,
   townUpdateHandler,
   addPlaceableHandler,
-  deletePlaceableHandler
+  deletePlaceableHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -119,57 +119,57 @@ export default function addTownRoutes(http: Server, app: Express): void {
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
         placeableID: req.body.placeableID,
-        location: req.body.location
+        location: req.body.location,
       });
       res.status(StatusCodes.OK)
         .json(result);
     } catch (err) {
       logError(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({
-        message: 'Internal server error, please see log in server for more details'
-      })
+        .json({
+          message: 'Internal server error, please see log in server for more details',
+        });
     }
-  })
+  });
 
   /**
    * Deletes a placeable from a town
    */
-   app.delete(`/placeables/:townID`, async (req, res) => {
+  app.delete('/placeables/:townID', async (req, res) => {
     try {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.townPassword,
-        location: req.body.location
+        location: req.body.location,
       });
       res.status(StatusCodes.OK)
         .json(result);
     } catch (err) {
       logError(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({
-        message: 'Internal server error, please see log in server for more details'
-      })
+        .json({
+          message: 'Internal server error, please see log in server for more details',
+        });
     }
-  })
+  });
 
-  app.get(`/placeables/:townID`, async (req, res) => {
+  app.get('/placeables/:townID', async (req, res) => {
     try {
       const result = await getPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.townPassword,
-        location: req.body.location
+        location: req.body.location,
       });
       res.status(StatusCodes.OK)
         .json(result);
     } catch (err) {
       logError(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({
-        message: 'Internal server error, please see log in server for more details'
-      })
+        .json({
+          message: 'Internal server error, please see log in server for more details',
+        });
     }
-  })
+  });
 
   const socketServer = new io.Server(http, { cors: { origin: '*' } });
   socketServer.on('connection', townSubscriptionHandler);

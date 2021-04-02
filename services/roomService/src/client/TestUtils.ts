@@ -15,7 +15,7 @@ export type RemoteServerPlaceable = {
   location: PlaceableLocation,
   _placeableName: string,
   _placeableID: string
-}
+};
 const createdSocketClients: Socket[] = [];
 
 /**
@@ -87,12 +87,12 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
   });
   const placeableAddPromise = new Promise<RemoteServerPlaceable>((resolve) => {
     socket.on('placeableAdd', (placeable: RemoteServerPlaceable) => {
-      resolve(placeable)
+      resolve(placeable);
     });
   });
   const placeableDeletePromise = new Promise<RemoteServerPlaceable>((resolve) => {
     socket.on('placeableDelete', (placeable: RemoteServerPlaceable) => {
-      resolve(placeable)
+      resolve(placeable);
     });
   });
   createdSocketClients.push(socket);
@@ -104,7 +104,7 @@ export function createSocketClient(server: http.Server, sessionToken: string, co
     newPlayerJoined: newPlayerPromise,
     playerDisconnected: playerDisconnectPromise,
     placeableAdded: placeableAddPromise,
-    placeableDelete: placeableDeletePromise
+    placeableDelete: placeableDeletePromise,
   };
 }
 export function setSessionTokenAndTownID(coveyTownID: string, sessionToken: string, socket: ServerSocket):void {

@@ -98,7 +98,7 @@ export type CoveyTownInfo = {
 /**
  * payload sent by the client to add a placeable to a town
  */
- export interface PlaceableAddRequest {
+export interface PlaceableAddRequest {
   coveyTownID: string,
   coveyTownPassword: string,
   placeableID: string,
@@ -220,7 +220,7 @@ export default class TownsServiceClient {
   }
 
   async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
-    const responseWrapper = await this._axios.post(`/placeable`, requestData);
+    const responseWrapper = await this._axios.post('/placeable', requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

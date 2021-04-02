@@ -7,7 +7,7 @@ export type UserLocation = {
 };
 export type CoveyTownList = { friendlyName: string; coveyTownID: string; currentOccupancy: number; maximumOccupancy: number; placeableArray: placeableArray }[];
 
-export type PlaceableLocation = { xIndex: number, yIndex: number }
+export type PlaceableLocation = { xIndex: number, yIndex: number };
 
-export type PlaceableSpecification = { placeableID: string, placeableLocation: PlaceableLocation }
+export type PlaceableSpecification = { placeableID: string, placeableLocation: PlaceableLocation };
 

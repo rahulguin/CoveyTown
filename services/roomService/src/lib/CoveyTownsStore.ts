@@ -76,7 +76,7 @@ export default class CoveyTownsStore {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       // currently provides a dummy player that can then later be swapped out for permissions funciton
-      const addResponce = existingTown.addPlaceable(new Player('dummy'), placeableID, placeableLocation)
+      const addResponce = existingTown.addPlaceable(new Player('dummy'), placeableID, placeableLocation);
       return addResponce;
     }
     return 'Invalid room information: Double check that the room exists and password is correct';
@@ -86,7 +86,7 @@ export default class CoveyTownsStore {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       // currently provides a dummy player that can then later be swapped out for permissions funciton
-      const deleteResponce = existingTown.deletePlaceable(new Player('dummy'), placeableLocation)
+      const deleteResponce = existingTown.deletePlaceable(new Player('dummy'), placeableLocation);
       return deleteResponce;
     }
     return 'Invalid room information: Double check that the room exists and password is correct';
@@ -95,7 +95,7 @@ export default class CoveyTownsStore {
   getPlaceable(coveyTownID: string, placeableLocation: PlaceableLocation): PlaceableInfo | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown) {
-      const deleteResponce = existingTown.getPlaceableAt(placeableLocation)
+      const deleteResponce = existingTown.getPlaceableAt(placeableLocation);
       return deleteResponce;
     }
     return undefined;

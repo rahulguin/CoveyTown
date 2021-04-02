@@ -83,7 +83,7 @@ export interface TownUpdateRequest {
 /**
  * payload sent by the client to add a placeable to a town
  */
- export interface PlaceableAddRequest {
+export interface PlaceableAddRequest {
   coveyTownID: string,
   coveyTownPassword: string,
   placeableID: string,
@@ -227,29 +227,29 @@ export async function townUpdateHandler(requestData: TownUpdateRequest): Promise
 export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.placeableID, requestData.location);
-  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location)
+  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
     // if the string is undefined then addPlaceable was sucessful
-    isOK: success? false : true,
+    isOK: !success,
     // if the string is defind then returns the placeable that should be located there
     response: placeableAt,
     // the message returned is the message to be recieved
-    message: success
-  }
+    message: success,
+  };
 }
 
 export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.location);
-  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location)
+  const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
     // if the string is undefined then deletePlaceable was sucessful
-    isOK: success? false : true,
+    isOK: !success,
     // returns the placeable that should be located there
     response: placeableAt,
     // the message returned is the message to be recieved
-    message: success
-  }
+    message: success,
+  };
 }
 
 
@@ -275,10 +275,10 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.disconnect(true);
     },
     onPlaceableAdded(placeable: Placeable) {
-      socket.emit('placeableAdded', placeable)
+      socket.emit('placeableAdded', placeable);
     },
     onPlaceableDeleted(placeable: Placeable) {
-      socket.emit('placeableDeleted', placeable)
+      socket.emit('placeableDeleted', placeable);
     },
   };
 }

@@ -18,6 +18,7 @@ export default class CoveyTownController {
   get capacity(): number {
     return this._capacity;
   }
+
   set isPubliclyListed(value: boolean) {
     this._isPubliclyListed = value;
   }
@@ -158,77 +159,77 @@ export default class CoveyTownController {
     this._listeners.forEach((listener) => listener.onTownDestroyed());
   }
 
-    /**
+  /**
      * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
      * 
      * @param player the player that made the request to add the placeable
      * @param placeableID the id assocaited of the placeable that is wanting to be added
      * @param location the location the player is wanting to add the placeable
      */
-     addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): string | undefined {
-       // check that player is able to add placeables (could be changed to be password instead of player)
+  addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): string | undefined {
+    // check that player is able to add placeables (could be changed to be password instead of player)
 
-       // check that placeable can get added 
-       const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
-       if (conflictingPlacement !== undefined) {
-         // this means there was a conflict with placement
-         return 'cannot add: placeable already at specified location'
-       }
-
-       // add placeable at that location
-       // will need to be updated to create the specific object wanted
-       const addedPlaceable = new Placeable(placeableID, location)
-       this._placeables.push(addedPlaceable)
-
-       // then for all listeners to this room notify them that an placeable was added
-        this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
-        return undefined
+    // check that placeable can get added 
+    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
+    if (conflictingPlacement !== undefined) {
+      // this means there was a conflict with placement
+      return 'cannot add: placeable already at specified location';
     }
 
-    /**
+    // add placeable at that location
+    // will need to be updated to create the specific object wanted
+    const addedPlaceable = new Placeable(placeableID, location);
+    this._placeables.push(addedPlaceable);
+
+    // then for all listeners to this room notify them that an placeable was added
+    this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
+    return undefined;
+  }
+
+  /**
      * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added. 
      * returns a string that describes why the placeable couldn't be deleted or undefined if it was deleted
      * @param player the player the made the request to delete the placeable
      * @param location the location the player is wanting to delete the placeable from
      */
-    deletePlaceable(player: Player, location: PlaceableLocation): string | undefined {
-      // check that player is able to delete placeables (could be changed to be password instead of player)
+  deletePlaceable(player: Player, location: PlaceableLocation): string | undefined {
+    // check that player is able to delete placeables (could be changed to be password instead of player)
 
-      // check that placeable can be deleted from here 
-      const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
-      if (conflictingPlacement === undefined) {
-        // this means there was nothing to be deleted from here
-        return 'cannot delete: no placeable to delete at specifed location'
-      }
-      else {
-        // removes the placeable from the list of placebles
-        this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
-
-        // for all listeners notifies them that the object was deleted
-        this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
-
-        return undefined
-      }
+    // check that placeable can be deleted from here 
+    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
+    if (conflictingPlacement === undefined) {
+      // this means there was nothing to be deleted from here
+      return 'cannot delete: no placeable to delete at specifed location';
     }
+      
+    // removes the placeable from the list of placebles
+    this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
 
-    getPlaceableAt(location: PlaceableLocation): PlaceableInfo {
-      const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
-      if (conflictingPlacement === undefined) {
-        return {
-          coveyTownID: this._coveyTownID,
-          placeableID: Placeable.EMPTY_PLACEABLE_ID,
-          placeableName: Placeable.EMPTY_PLACEABLE_NAME,
-          location: location
-        }
-      }
-      else {
-        return {
-          coveyTownID: this._coveyTownID,
-          placeableID: conflictingPlacement.placeableID,
-          placeableName: conflictingPlacement.name,
-          location: conflictingPlacement.location
-        }
-      }
+    // for all listeners notifies them that the object was deleted
+    this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
+
+    return undefined;
+      
+  }
+
+  getPlaceableAt(location: PlaceableLocation): PlaceableInfo {
+    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+    if (conflictingPlacement === undefined) {
+      return {
+        coveyTownID: this._coveyTownID,
+        placeableID: Placeable.EMPTY_PLACEABLE_ID,
+        placeableName: Placeable.EMPTY_PLACEABLE_NAME,
+        location,
+      };
+    }
+      
+    return {
+      coveyTownID: this._coveyTownID,
+      placeableID: conflictingPlacement.placeableID,
+      placeableName: conflictingPlacement.name,
+      location: conflictingPlacement.location,
+    };
+      
      
-    }
+  }
 }

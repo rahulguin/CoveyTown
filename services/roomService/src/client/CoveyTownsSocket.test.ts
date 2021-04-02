@@ -3,12 +3,12 @@ import CORS from 'cors';
 import http from 'http';
 import { nanoid, random } from 'nanoid';
 import { AddressInfo } from 'net';
+import { randomInt } from 'crypto';
 import * as TestUtils from './TestUtils';
 
 import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 import TownsServiceClient from './TownsServiceClient';
 import addTownRoutes from '../router/towns';
-import { randomInt } from 'crypto';
 
 type TestTownData = {
   friendlyName: string, coveyTownID: string,
@@ -132,17 +132,17 @@ describe('TownServiceApiSocket', () => {
     await Promise.all([socketDisconnected, disconnectPromise2]);
   });
   it('Informs all players when a placeable is added', async () => {
-    const town = await createTownForTesting()
+    const town = await createTownForTesting();
     const joinData = await apiClient.joinTown({coveyTownID: town.coveyTownID, userName: nanoid()});
     const joinData2 = await apiClient.joinTown({coveyTownID: town.coveyTownID, userName: nanoid()});
-    const placeableIdAdded = nanoid()
-    const placeablePlacedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) }
-    const { socketConnected, placeableAdded } = TestUtils.createSocketClient(server, joinData.coveySessionToken, town.coveyTownID)
-    const { socketConnected: connectPromise2, placeableAdded: placeableAdded2 } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID)
-    await Promise.all([socketConnected, connectPromise2])
-    const placeableInfo = { coveyTownID: town.coveyTownID, coveyTownPassword: town.townUpdatePassword, placeableID: placeableIdAdded, location: placeablePlacedLocation }
-    await apiClient.addPlaceable(placeableInfo)
-    expect((await placeableAdded)).toBe(placeableInfo)
-    expect((await placeableAdded2)).toBe(placeableInfo)
-  })
+    const placeableIdAdded = nanoid();
+    const placeablePlacedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
+    const { socketConnected, placeableAdded } = TestUtils.createSocketClient(server, joinData.coveySessionToken, town.coveyTownID);
+    const { socketConnected: connectPromise2, placeableAdded: placeableAdded2 } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
+    await Promise.all([socketConnected, connectPromise2]);
+    const placeableInfo = { coveyTownID: town.coveyTownID, coveyTownPassword: town.townUpdatePassword, placeableID: placeableIdAdded, location: placeablePlacedLocation };
+    await apiClient.addPlaceable(placeableInfo);
+    expect((await placeableAdded)).toBe(placeableInfo);
+    expect((await placeableAdded2)).toBe(placeableInfo);
+  });
 });
