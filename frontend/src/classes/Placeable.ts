@@ -4,7 +4,9 @@
 export default class Placeable {
 
     private readonly _placeableID: string;
+
     private _location: PlaceableLocation
+
     private readonly _name: string
 
     public sprite?: Phaser.GameObjects.Sprite;

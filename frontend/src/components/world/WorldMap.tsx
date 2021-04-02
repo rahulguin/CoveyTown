@@ -76,14 +76,6 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-  addDynamicWorld(placeables: Placeable[]) {
-    const map = this.cache.tilemap.get('map') 
-    const worldLayer: Phaser.Tilemaps.DynamicTilemapLayer = map.getLayer('World')
-
-    placeables.forEach(placeable => {
-      worldLayer.putTileAt(placeable)
-    });
-  }
 
 
   updatePlayerLocation(player: Player) {
