@@ -1,10 +1,15 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import Player from '../types/Player';
-import { CoveyTownList, PlaceableLocation, PlaceableSpecification, UserLocation } from '../CoveyTypes';
-import CoveyTownListener from '../types/CoveyTownListener';
+import {
+  CoveyTownList,
+  PlaceableLocation,
+  PlaceableSpecification,
+  UserLocation,
+} from '../CoveyTypes';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
+import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
+import Player from '../types/Player';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -84,53 +89,45 @@ export interface TownUpdateRequest {
  * payload sent by the client to add a placeable to a town
  */
 export interface PlaceableAddRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  placeableID: string,
-  location: PlaceableLocation
+  coveyTownID: string;
+  coveyTownPassword: string;
+  placeableID: string;
+  location: PlaceableLocation;
 }
 
 export interface PlaceableAddResponse {
-  placeableID: string,
-  location: PlaceableLocation
-}
-
-/**
- * represents a location on the map basedon pixels
- */
-export interface PlaceableLocation {
-  xIndex: number
-  yInxed: number
+  placeableID: string;
+  location: PlaceableLocation;
 }
 
 /**
  * Payload sent by the client to delete a placeable from a town
  */
 export interface PlaceableDeleteRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  location: PlaceableLocation
+  coveyTownID: string;
+  coveyTownPassword: string;
+  location: PlaceableLocation;
 }
 
 /**
  * Payload sent by the client to retrive placeables from a town
  */
 export interface PlaceableListRequest {
-  coveyTownID: string,
+  coveyTownID: string;
 }
 
 export interface PlaceableInfo {
-  coveyTownID: string,
-  placeableID: string,
-  placeableName: string,
-  location: PlaceableLocation
+  coveyTownID: string;
+  placeableID: string;
+  placeableName: string;
+  location: PlaceableLocation;
 }
 
 /**
  * Responce from the server for a list of placeables
  */
 export interface PlaceableListResponce {
-  placeables: PlaceableInfo[]
+  placeables: PlaceableInfo[];
 }
 
 /**
@@ -150,7 +147,9 @@ export interface ResponseEnvelope<T> {
  *
  * @param requestData an object representing the player's request
  */
-export async function townJoinHandler(requestData: TownJoinRequest): Promise<ResponseEnvelope<TownJoinResponse>> {
+export async function townJoinHandler(
+  requestData: TownJoinRequest,
+): Promise<ResponseEnvelope<TownJoinResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
 
   const coveyTownController = townsStore.getControllerForTown(requestData.coveyTownID);
@@ -184,7 +183,9 @@ export async function townListHandler(): Promise<ResponseEnvelope<TownListRespon
   };
 }
 
-export async function townCreateHandler(requestData: TownCreateRequest): Promise<ResponseEnvelope<TownCreateResponse>> {
+export async function townCreateHandler(
+  requestData: TownCreateRequest,
+): Promise<ResponseEnvelope<TownCreateResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
   if (requestData.friendlyName.length === 0) {
     return {
@@ -202,31 +203,51 @@ export async function townCreateHandler(requestData: TownCreateRequest): Promise
   };
 }
 
-export async function townDeleteHandler(requestData: TownDeleteRequest): Promise<ResponseEnvelope<Record<string, null>>> {
+export async function townDeleteHandler(
+  requestData: TownDeleteRequest,
+): Promise<ResponseEnvelope<Record<string, null>>> {
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deleteTown(requestData.coveyTownID, requestData.coveyTownPassword);
   return {
     isOK: success,
     response: {},
-    message: !success ? 'Invalid password. Please double check your town update password.' : undefined,
+    message: !success
+      ? 'Invalid password. Please double check your town update password.'
+      : undefined,
   };
 }
 
-export async function townUpdateHandler(requestData: TownUpdateRequest): Promise<ResponseEnvelope<Record<string, null>>> {
+export async function townUpdateHandler(
+  requestData: TownUpdateRequest,
+): Promise<ResponseEnvelope<Record<string, null>>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.updateTown(requestData.coveyTownID, requestData.coveyTownPassword, requestData.friendlyName, requestData.isPubliclyListed);
+  const success = townsStore.updateTown(
+    requestData.coveyTownID,
+    requestData.coveyTownPassword,
+    requestData.friendlyName,
+    requestData.isPubliclyListed,
+  );
   return {
     isOK: success,
     response: {},
-    message: !success ? 'Invalid password or update values specified. Please double check your town update password.' : undefined,
+    message: !success
+      ? 'Invalid password or update values specified. Please double check your town update password.'
+      : undefined,
   };
 }
 
 // methods for adding, deleting, and listing placeabless
 
-export async function addPlaceableHandler(requestData: PlaceableAddRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
+export async function addPlaceableHandler(
+  requestData: PlaceableAddRequest,
+): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.addPlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.placeableID, requestData.location);
+  const success = townsStore.addPlaceable(
+    requestData.coveyTownID,
+    requestData.coveyTownPassword,
+    requestData.placeableID,
+    requestData.location,
+  );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
     // if the string is undefined then addPlaceable was sucessful
@@ -238,9 +259,15 @@ export async function addPlaceableHandler(requestData: PlaceableAddRequest): Pro
   };
 }
 
-export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest): Promise<ResponseEnvelope<PlaceableInfo>> {
+export async function deletePlaceableHandler(
+  requestData: PlaceableDeleteRequest,
+): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const success = townsStore.deletePlaceable(requestData.coveyTownID, requestData.coveyTownPassword, requestData.location);
+  const success = townsStore.deletePlaceable(
+    requestData.coveyTownID,
+    requestData.coveyTownPassword,
+    requestData.location,
+  );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
     // if the string is undefined then deletePlaceable was sucessful
@@ -251,7 +278,6 @@ export async function deletePlaceableHandler(requestData: PlaceableDeleteRequest
     message: success,
   };
 }
-
 
 /**
  * An adapter between CoveyTownController's event interface (CoveyTownListener)
@@ -293,8 +319,7 @@ export function townSubscriptionHandler(socket: Socket): void {
   // For each player, the session token should be the same string returned by joinTownHandler
   const { token, coveyTownID } = socket.handshake.auth as { token: string; coveyTownID: string };
 
-  const townController = CoveyTownsStore.getInstance()
-    .getControllerForTown(coveyTownID);
+  const townController = CoveyTownsStore.getInstance().getControllerForTown(coveyTownID);
 
   // Retrieve our metadata about this player from the TownController
   const s = townController?.getSessionByToken(token);
@@ -325,7 +350,11 @@ export function townSubscriptionHandler(socket: Socket): void {
 
   // Register and even listener for the client socket: if the client adds a placeable, inform the CoveyTownController
   socket.on('addPlaceable', (placeableAddData: PlaceableSpecification) => {
-    townController.addPlaceable(s.player, placeableAddData.placeableID, placeableAddData.placeableLocation);
+    townController.addPlaceable(
+      s.player,
+      placeableAddData.placeableID,
+      placeableAddData.placeableLocation,
+    );
   });
 
   // Register and even listener for the client socket: if the client deletes aa placeable, inform the CoveyTownController

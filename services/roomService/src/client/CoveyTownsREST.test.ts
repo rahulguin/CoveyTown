@@ -4,8 +4,6 @@ import http from 'http';
 import { nanoid } from 'nanoid';
 import assert from 'assert';
 import { AddressInfo } from 'net';
-
-import { AddressContext } from 'twilio/lib/rest/api/v2010/account/address';
 import { randomInt } from 'crypto';
 import TownsServiceClient, { PlaceableInfo, PlaceableLocation, TownListResponse } from './TownsServiceClient';
 import addTownRoutes from '../router/towns';
@@ -254,7 +252,7 @@ describe('TownsServiceAPIREST', () => {
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: nanoid(),
           placeableID,
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0}
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect id');
       } catch (err) {
@@ -271,7 +269,7 @@ describe('TownsServiceAPIREST', () => {
           coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
           coveyTownID: pubTown1.coveyTownID,
           placeableID,
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0};
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
       } catch (err) {
@@ -283,36 +281,36 @@ describe('TownsServiceAPIREST', () => {
     it('Returns expected placeableInfo when succesfully added', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const placedLocation = {xIndex: 0, yIndex: 0};
-      const placeable: Placeable = new Placeable(placeableID, placedLocation);
-      const addResponce: PlaceableInfo = await apiClient.addPlaceable({
-        coveyTownPassword: pubTown1.townUpdatePassword,
-        coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: placedLocation,
-      });
-      const placedInfo: PlaceableInfo = {
-        coveyTownID: pubTown1.coveyTownID,
-        placeableID: placeable.placeableID,
-        placeableName: placeable.name,
-        location: placeable.location };
-      expect(addResponce).toBe(placedInfo);
-    });
+      const placedLocation = {xIndex: 0, yIndex: 0}
+      const placeable: Placeable = new Placeable(placeableID, placedLocation)
+        const addResponce: PlaceableInfo = await apiClient.addPlaceable({
+          coveyTownPassword: pubTown1.townUpdatePassword,
+          coveyTownID: pubTown1.coveyTownID,
+          placeableID: placeableID,
+          location: placedLocation
+        });
+        const placedInfo: PlaceableInfo = {
+          coveyTownID: pubTown1.coveyTownID,
+           placeableID: placeable.placeableID,
+            placeableName: placeable.name,
+             location: placeable.location }
+        expect(addResponce).toBe(placedInfo)
+    })
     it('Throws an error when addPlacaeable is called at a location that already has a placeable', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      await apiClient.addPlaceable({
-        coveyTownPassword: pubTown1.townUpdatePassword,
-        coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: {xIndex: 0, yIndex: 0},
-      });
+        await apiClient.addPlaceable({
+          coveyTownPassword: pubTown1.townUpdatePassword,
+          coveyTownID: pubTown1.coveyTownID,
+          placeableID: placeableID,
+          location: {xIndex: 0, yIndex: 0}
+        });
       try {
         await apiClient.addPlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
           placeableID: `${placeableID}*`,
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0}
         });
         fail('Expected an error to be thrown by addPlaceable when called where there was already a placeable');
       } catch (err) {
@@ -324,45 +322,45 @@ describe('TownsServiceAPIREST', () => {
     it('allows multiple placeables with the same ID at different locations', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const firstPlacedLocation = {xIndex: 0, yIndex: 0};
-      const firstPlaceable: Placeable = new Placeable(placeableID, firstPlacedLocation);
-      const secondPlacedLocation = {xIndex: 0, yIndex: 0};
-      const secondPlaceable: Placeable = new Placeable(placeableID, secondPlacedLocation);
+      const firstPlacedLocation = {xIndex: 0, yIndex: 0}
+      const firstPlaceable: Placeable = new Placeable(placeableID, firstPlacedLocation)
+      const secondPlacedLocation = {xIndex: 0, yIndex: 0}
+      const secondPlaceable: Placeable = new Placeable(placeableID, secondPlacedLocation)
       const firstAdd = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: {xIndex: 0, yIndex: 0},
+        placeableID: placeableID,
+        location: {xIndex: 0, yIndex: 0}
       });
       const firstPlacedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
-        placeableID: firstPlaceable.placeableID,
-        placeableName: firstPlaceable.name,
-        location: firstPlaceable.location };
-      expect(firstAdd).toBe(firstPlacedInfo);
+          placeableID: firstPlaceable.placeableID,
+          placeableName: firstPlaceable.name,
+            location: firstPlaceable.location }
+      expect(firstAdd).toBe(firstPlacedInfo)
 
       const secondAdd = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: {xIndex: 0, yIndex: 0},
+        placeableID: placeableID,
+        location: {xIndex: 0, yIndex: 0}
       });
       const secondPlacedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
         placeableID: secondPlaceable.placeableID,
         placeableName: secondPlaceable.name,
-        location: secondPlaceable.location };
-      expect(secondAdd).toBe(secondPlacedInfo);
-      expect(firstAdd).not.toBe(secondPlacedInfo);
+        location: secondPlaceable.location }
+      expect(secondAdd).toBe(secondPlacedInfo)
+      expect(firstAdd).not.toBe(secondPlacedInfo)
 
 
-    });
-  });
+    })
+  })
   describe('CoveyTownDeletePlaceableAPI', () => {
-    let placeableID: string;
+    let placeableID: string
     beforeEach(() => {
-      placeableID = nanoid();
-    });
+      placeableID = nanoid()
+    })
     it('Throws an error if the town does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
@@ -370,7 +368,7 @@ describe('TownsServiceAPIREST', () => {
         await apiClient.deletePlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: nanoid(),
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0}
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect id');
       } catch (err) {
@@ -382,18 +380,18 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the password is incorrect', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const placedLocation: PlaceableLocation = {xIndex: 0, yIndex: 0};
+      const placedLocation: PlaceableLocation = {xIndex: 0, yIndex: 0}
       await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: placedLocation,
+        placeableID: placeableID,
+        location: placedLocation
       });
       try {
         await apiClient.deletePlaceable({
           coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
           coveyTownID: pubTown1.coveyTownID,
-          location: placedLocation,
+          location: placedLocation
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
       } catch (err) {
@@ -405,36 +403,36 @@ describe('TownsServiceAPIREST', () => {
     it('Should return the empty placeableInfo on successful delete', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const placedLocation = {xIndex: 0, yIndex: 0};
-      const placeable: Placeable = new Placeable(placeableID, placedLocation);
+      const placedLocation = {xIndex: 0, yIndex: 0}
+      const placeable: Placeable = new Placeable(placeableID, placedLocation)
 
       const addResponce: PlaceableInfo = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        placeableID,
-        location: placedLocation,
+        placeableID: placeableID,
+        location: placedLocation
       });
       const placedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
         placeableID: placeable.placeableID,
         placeableName: placeable.name,
-        location: placeable.location,
-      };
-      expect(addResponce).toBe(placedInfo);
+        location: placeable.location
+      }
+      expect(addResponce).toBe(placedInfo)
 
       const deleteResponce: PlaceableInfo = await apiClient.deletePlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        location: placedLocation,
+        location: placedLocation
       });
       const deletedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
-        location: placeable.location,
-      };
-      expect(deleteResponce).toBe(deletedInfo);
-    });
+        location: placeable.location
+      }
+      expect(deleteResponce).toBe(deletedInfo)
+    })
     it('should throw an error if there is nothing to delete', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
@@ -442,7 +440,7 @@ describe('TownsServiceAPIREST', () => {
         await apiClient.deletePlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0}
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
       } catch (err) {
@@ -450,26 +448,26 @@ describe('TownsServiceAPIREST', () => {
         // TODO this should really check to make sure it's the *right* error, but we didn't specify
         // the format of the exception :(
       }
-    });
-  });
+    })
+  })
 
   async function addPlaceableToTown(town: TestTownData, placedLocation: PlaceableLocation): Promise<PlaceableInfo> {
-    const placeableID = nanoid();
-    const placeable: Placeable = new Placeable(placeableID, placedLocation);
+    const placeableID = nanoid()
+    const placeable: Placeable = new Placeable(placeableID, placedLocation)
     await apiClient.addPlaceable({
       coveyTownPassword: town.townUpdatePassword,
       coveyTownID: town.coveyTownID,
-      placeableID,
-      location: placedLocation,
+      placeableID: placeableID,
+      location: placedLocation
     });
     const placedInfo: PlaceableInfo = {
-      coveyTownID: town.coveyTownID,
-      placeableID: placeable.placeableID,
-      placeableName: placeable.name,
-      location: placeable.location,
-    }; 
+        coveyTownID: town.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: placeable.location
+    } 
 
-    return placedInfo;
+    return placedInfo
   }
   describe('CoveyTownGetPlaceableAPI', () => {
 
@@ -477,7 +475,7 @@ describe('TownsServiceAPIREST', () => {
       try {
         await apiClient.getPlaceable({
           coveyTownID: nanoid(),
-          location: {xIndex: 0, yIndex: 0},
+          location: {xIndex: 0, yIndex: 0}
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect id');
       } catch (err) {
@@ -487,77 +485,77 @@ describe('TownsServiceAPIREST', () => {
       }
     });
     it('should be able to get placeable info for a public town', async () => {
-      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) }
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation)
 
-      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
-      expect(getResponce).toBe(addedPlacableInfo);
-    });
+      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
+      expect(getResponce).toBe(addedPlacableInfo)
+    })
     it('should be able to get placeable info for a private town', async () => {
-      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) }
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation)
 
-      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
-      expect(getResponce).toBe(addedPlacableInfo);
+      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
+      expect(getResponce).toBe(addedPlacableInfo)
 
-    });
+    })
     it('should return the default placeable if nothing has been added there', async () => {
-      const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) }
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const emptyPlaceableInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
-        location: placedLocation,
-      };
+        location: placedLocation
+      }
 
-      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
-      expect(getResponce).toBe(emptyPlaceableInfo);
-    });
+      const getResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
+      expect(getResponce).toBe(emptyPlaceableInfo)
+    })
     it('should return the default placeable after a sucessful delete', async () => {
-      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) }
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation)
 
-      const firstGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
-      expect(firstGetResponce).toBe(addedPlacableInfo);
+      const firstGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
+      expect(firstGetResponce).toBe(addedPlacableInfo)
 
       await apiClient.deletePlaceable({
         coveyTownID: pubTown1.coveyTownID,
         coveyTownPassword: pubTown1.townUpdatePassword,
-        location: placedLocation});
+        location: placedLocation})
 
-      const secondGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
+      const secondGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
 
 
       const emptyPlaceableInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
-        location: placedLocation,
-      };
+        location: placedLocation
+      }
 
-      expect(secondGetResponce).toBe(emptyPlaceableInfo);
-    });
+      expect(secondGetResponce).toBe(emptyPlaceableInfo)
+    })
     it('should return the same thing after repeated calls with no modifiers called inbetween', async () => {
-      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const placedLocation: PlaceableLocation= { xIndex: randomInt(100), yIndex: randomInt(100) }
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation)
 
-      const firstGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
-      expect(firstGetResponce).toBe(addedPlacableInfo);
+      const firstGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
+      expect(firstGetResponce).toBe(addedPlacableInfo)
 
-      const secondGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation});
+      const secondGetResponce = await apiClient.getPlaceable({ coveyTownID: pubTown1.coveyTownID, location: placedLocation})
 
-      expect(secondGetResponce).toBe(addedPlacableInfo);
-      expect(secondGetResponce).toBe(firstGetResponce);
-    });
-  });
+      expect(secondGetResponce).toBe(addedPlacableInfo)
+      expect(secondGetResponce).toBe(firstGetResponce)
+    })
+  })
 });
