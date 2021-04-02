@@ -1,4 +1,4 @@
-import { PlaceableLocation } from '../CoveyTypes';
+
 
 
 export default class Placeable {
@@ -39,5 +39,7 @@ export default class Placeable {
 
 
 }
+
+export type PlaceableLocation = { xIndex: number, yIndex: number }
 
 export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, location: PlaceableLocation }

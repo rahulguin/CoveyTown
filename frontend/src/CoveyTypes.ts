@@ -31,7 +31,3 @@ export type CoveyAppState = {
   apiClient: TownsServiceClient,
   placeables: Placeable[]
 };
-
-export type PlaceableLocation = { xIndex: number, yIndex: number }
-
-export type PlaceableSpecification = { objectID: string, objectLocation: PlaceableLocation }
