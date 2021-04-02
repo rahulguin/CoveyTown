@@ -1,4 +1,3 @@
-import { PlaceableLocation } from '../CoveyTypes';
 import Placeable from './Placeable';
 import Player from './Player';
 
@@ -38,5 +37,4 @@ export default interface CoveyTownListener {
    * Called when an object gets deleted from the town
    */
   onPlaceableDeleted(placeableDeleted: Placeable): void;
-
 }

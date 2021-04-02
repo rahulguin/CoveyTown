@@ -58,7 +58,7 @@ export function createSocketClient(
   newPlayerJoined: Promise<RemoteServerPlayer>;
   playerDisconnected: Promise<RemoteServerPlayer>;
   placeableAdded: Promise<RemoteServerPlaceable>;
-  placeableDelete: Promise<RemoteServerPlaceable>;
+  placeableDeleted: Promise<RemoteServerPlaceable>;
 } {
   const address = server.address() as AddressInfo;
   const socket = io(`http://localhost:${address.port}`, {
@@ -110,7 +110,7 @@ export function createSocketClient(
     newPlayerJoined: newPlayerPromise,
     playerDisconnected: playerDisconnectPromise,
     placeableAdded: placeableAddPromise,
-    placeableDelete: placeableDeletePromise,
+    placeableDeleted: placeableDeletePromise,
   };
 }
 export function setSessionTokenAndTownID(

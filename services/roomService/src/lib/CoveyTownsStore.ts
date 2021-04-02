@@ -1,7 +1,6 @@
-import CoveyTownController from './CoveyTownController';
-import { CoveyTownList, PlaceableLocation } from '../CoveyTypes';
-import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
+import { CoveyTownList, PlaceableInfo, PlaceableLocation } from '../CoveyTypes';
 import Player from '../types/Player';
+import CoveyTownController from './CoveyTownController';
 
 function passwordMatches(provided: string, expected: string): boolean {
   if (provided === expected) {
@@ -30,7 +29,8 @@ export default class CoveyTownsStore {
   }
 
   getTowns(): CoveyTownList {
-    return this._towns.filter(townController => townController.isPubliclyListed)
+    return this._towns
+      .filter(townController => townController.isPubliclyListed)
       .map(townController => ({
         coveyTownID: townController.coveyTownID,
         friendlyName: townController.friendlyName,
@@ -45,7 +45,12 @@ export default class CoveyTownsStore {
     return newTown;
   }
 
-  updateTown(coveyTownID: string, coveyTownPassword: string, friendlyName?: string, makePublic?: boolean): boolean {
+  updateTown(
+    coveyTownID: string,
+    coveyTownPassword: string,
+    friendlyName?: string,
+    makePublic?: boolean,
+  ): boolean {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       if (friendlyName !== undefined) {
@@ -72,17 +77,30 @@ export default class CoveyTownsStore {
     return false;
   }
 
-  addPlaceable(coveyTownID: string, coveyTownPassword: string, placeableID: string, placeableLocation: PlaceableLocation): string | undefined {
+  addPlaceable(
+    coveyTownID: string,
+    coveyTownPassword: string,
+    placeableID: string,
+    placeableLocation: PlaceableLocation,
+  ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       // currently provides a dummy player that can then later be swapped out for permissions funciton
-      const addResponce = existingTown.addPlaceable(new Player('dummy'), placeableID, placeableLocation);
+      const addResponce = existingTown.addPlaceable(
+        new Player('dummy'),
+        placeableID,
+        placeableLocation,
+      );
       return addResponce;
     }
     return 'Invalid room information: Double check that the room exists and password is correct';
   }
 
-  deletePlaceable(coveyTownID: string, coveyTownPassword: string, placeableLocation: PlaceableLocation): string | undefined {
+  deletePlaceable(
+    coveyTownID: string,
+    coveyTownPassword: string,
+    placeableLocation: PlaceableLocation,
+  ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
       // currently provides a dummy player that can then later be swapped out for permissions funciton
@@ -92,7 +110,10 @@ export default class CoveyTownsStore {
     return 'Invalid room information: Double check that the room exists and password is correct';
   }
 
-  getPlaceable(coveyTownID: string, placeableLocation: PlaceableLocation): PlaceableInfo | undefined {
+  getPlaceable(
+    coveyTownID: string,
+    placeableLocation: PlaceableLocation,
+  ): PlaceableInfo | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown) {
       const deleteResponce = existingTown.getPlaceableAt(placeableLocation);
@@ -100,5 +121,4 @@ export default class CoveyTownsStore {
     }
     return undefined;
   }
-
 }

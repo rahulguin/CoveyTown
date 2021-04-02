@@ -1,6 +1,4 @@
-import { nanoid } from 'nanoid';
-import { PlaceableLocation, UserLocation } from '../CoveyTypes';
-
+import { PlaceableLocation } from '../CoveyTypes';
 
 export default class Placeable {
   private readonly _placeableID: string;
@@ -20,15 +18,15 @@ export default class Placeable {
   }
 
   get location(): PlaceableLocation {
-    return this._location; 
+    return this._location;
   }
 
-  set location(newLocation: PlaceableLocation){
+  set location(newLocation: PlaceableLocation) {
     this._location = newLocation;
   }
 
   get placeableID(): string {
-    return this._placeableID; 
+    return this._placeableID;
   }
 
   get EMPTY_PLACEABLE_ID(): string {
@@ -42,6 +40,4 @@ export default class Placeable {
   get name(): string {
     return this._name;
   }
-
-
 }

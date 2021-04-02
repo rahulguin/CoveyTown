@@ -1,11 +1,7 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import {
-  CoveyTownList,
-  PlaceableLocation,
-  PlaceableSpecification,
-  UserLocation,
-} from '../CoveyTypes';
+import { PlaceableGetRequest } from '../client/TownsServiceClient';
+import { CoveyTownList, PlaceableLocation, UserLocation } from '../CoveyTypes';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
@@ -236,7 +232,7 @@ export async function townUpdateHandler(
   };
 }
 
-// methods for adding, deleting, and listing placeabless
+// methods for adding, deleting, getting, and listing placeabless
 
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
@@ -276,6 +272,21 @@ export async function deletePlaceableHandler(
     response: placeableAt,
     // the message returned is the message to be recieved
     message: success,
+  };
+}
+
+export async function getPlaceableHandler(
+  requestData: PlaceableGetRequest,
+): Promise<ResponseEnvelope<PlaceableInfo>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const placeable = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
+  return {
+    // if the string is undefined then getPlaceable was unsuccessful
+    isOK: placeable !== undefined,
+    // returns the placeable that should be located there
+    response: placeable,
+    // the message returned is the message to be recieved
+    message: !placeable ? undefined : 'Invalid town id given',
   };
 }
 
@@ -346,19 +357,5 @@ export function townSubscriptionHandler(socket: Socket): void {
   // location, inform the CoveyTownController
   socket.on('playerMovement', (movementData: UserLocation) => {
     townController.updatePlayerLocation(s.player, movementData);
-  });
-
-  // Register and even listener for the client socket: if the client adds a placeable, inform the CoveyTownController
-  socket.on('addPlaceable', (placeableAddData: PlaceableSpecification) => {
-    townController.addPlaceable(
-      s.player,
-      placeableAddData.placeableID,
-      placeableAddData.placeableLocation,
-    );
-  });
-
-  // Register and even listener for the client socket: if the client deletes aa placeable, inform the CoveyTownController
-  socket.on('deletePlaceable', (placeableDeleteData: PlaceableLocation) => {
-    townController.deletePlaceable(s.player, placeableDeleteData);
   });
 }

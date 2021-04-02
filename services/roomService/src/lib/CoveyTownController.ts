@@ -1,12 +1,11 @@
 import { customAlphabet, nanoid } from 'nanoid';
-import { PlaceableLocation, UserLocation } from '../CoveyTypes';
+import { PlaceableInfo, PlaceableLocation, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
+import Placeable from '../types/Placeable';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
-import TwilioVideo from './TwilioVideo';
 import IVideoClient from './IVideoClient';
-import Placeable from '../types/Placeable';
-import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
+import TwilioVideo from './TwilioVideo';
 
 const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
@@ -15,7 +14,6 @@ const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
  * can occur (e.g. joining a town, moving, leaving a town)
  */
 export default class CoveyTownController {
-
   get capacity(): number {
     return this._capacity;
   }
@@ -77,7 +75,7 @@ export default class CoveyTownController {
   private _placeables: Placeable[] = [];
 
   constructor(friendlyName: string, isPubliclyListed: boolean) {
-    this._coveyTownID = (process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID());
+    this._coveyTownID = process.env.DEMO_TOWN_ID === friendlyName ? friendlyName : friendlyNanoID();
     this._capacity = 50;
     this._townUpdatePassword = nanoid(24);
     this._isPubliclyListed = isPubliclyListed;
@@ -97,10 +95,13 @@ export default class CoveyTownController {
     this._players.push(newPlayer);
 
     // Create a video token for this user to join this town
-    theSession.videoToken = await this._videoClient.getTokenForTown(this._coveyTownID, newPlayer.id);
+    theSession.videoToken = await this._videoClient.getTokenForTown(
+      this._coveyTownID,
+      newPlayer.id,
+    );
 
     // Notify other players that this player has joined
-    this._listeners.forEach((listener) => listener.onPlayerJoined(newPlayer));
+    this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
 
     return theSession;
   }
@@ -111,9 +112,9 @@ export default class CoveyTownController {
    * @param session PlayerSession to destroy
    */
   destroySession(session: PlayerSession): void {
-    this._players = this._players.filter((p) => p.id !== session.player.id);
-    this._sessions = this._sessions.filter((s) => s.sessionToken !== session.sessionToken);
-    this._listeners.forEach((listener) => listener.onPlayerDisconnected(session.player));
+    this._players = this._players.filter(p => p.id !== session.player.id);
+    this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
+    this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
   }
 
   /**
@@ -123,7 +124,7 @@ export default class CoveyTownController {
    */
   updatePlayerLocation(player: Player, location: UserLocation): void {
     player.updateLocation(location);
-    this._listeners.forEach((listener) => listener.onPlayerMoved(player));
+    this._listeners.forEach(listener => listener.onPlayerMoved(player));
   }
 
   /**
@@ -143,7 +144,7 @@ export default class CoveyTownController {
    * with addTownListener, or otherwise will be a no-op
    */
   removeTownListener(listener: CoveyTownListener): void {
-    this._listeners = this._listeners.filter((v) => v !== listener);
+    this._listeners = this._listeners.filter(v => v !== listener);
   }
 
   /**
@@ -153,25 +154,31 @@ export default class CoveyTownController {
    * @param token
    */
   getSessionByToken(token: string): PlayerSession | undefined {
-    return this._sessions.find((p) => p.sessionToken === token);
+    return this._sessions.find(p => p.sessionToken === token);
   }
 
   disconnectAllPlayers(): void {
-    this._listeners.forEach((listener) => listener.onTownDestroyed());
+    this._listeners.forEach(listener => listener.onTownDestroyed());
   }
 
   /**
-     * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
-     * 
-     * @param player the player that made the request to add the placeable
-     * @param placeableID the id assocaited of the placeable that is wanting to be added
-     * @param location the location the player is wanting to add the placeable
-     */
-  addPlaceable(player: Player, placeableID: string, location: PlaceableLocation): string | undefined {
+   * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
+   *
+   * @param player the player that made the request to add the placeable
+   * @param placeableID the id assocaited of the placeable that is wanting to be added
+   * @param location the location the player is wanting to add the placeable
+   */
+  addPlaceable(
+    player: Player,
+    placeableID: string,
+    location: PlaceableLocation,
+  ): string | undefined {
     // check that player is able to add placeables (could be changed to be password instead of player)
 
-    // check that placeable can get added 
-    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
+    // check that placeable can get added
+    const conflictingPlacement: Placeable | undefined = this._placeables.find(
+      (placeable: Placeable) => placeable.location === location,
+    );
     if (conflictingPlacement !== undefined) {
       // this means there was a conflict with placement
       return 'cannot add: placeable already at specified location';
@@ -183,38 +190,43 @@ export default class CoveyTownController {
     this._placeables.push(addedPlaceable);
 
     // then for all listeners to this room notify them that an placeable was added
-    this._listeners.forEach((listener) => listener.onPlaceableAdded(addedPlaceable));
+    this._listeners.forEach(listener => listener.onPlaceableAdded(addedPlaceable));
     return undefined;
   }
 
   /**
-     * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added. 
-     * returns a string that describes why the placeable couldn't be deleted or undefined if it was deleted
-     * @param player the player the made the request to delete the placeable
-     * @param location the location the player is wanting to delete the placeable from
-     */
+   * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added.
+   * returns a string that describes why the placeable couldn't be deleted or undefined if it was deleted
+   * @param player the player the made the request to delete the placeable
+   * @param location the location the player is wanting to delete the placeable from
+   */
   deletePlaceable(player: Player, location: PlaceableLocation): string | undefined {
     // check that player is able to delete placeables (could be changed to be password instead of player)
 
-    // check that placeable can be deleted from here 
-    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location === location);
+    // check that placeable can be deleted from here
+    const conflictingPlacement: Placeable | undefined = this._placeables.find(
+      (placeable: Placeable) => placeable.location === location,
+    );
     if (conflictingPlacement === undefined) {
       // this means there was nothing to be deleted from here
       return 'cannot delete: no placeable to delete at specifed location';
     }
-      
+
     // removes the placeable from the list of placebles
-    this._placeables = this._placeables.filter((placeable: Placeable) => placeable.location !== location);
+    this._placeables = this._placeables.filter(
+      (placeable: Placeable) => placeable.location !== location,
+    );
 
     // for all listeners notifies them that the object was deleted
-    this._listeners.forEach((listener) => listener.onPlaceableDeleted(conflictingPlacement));
+    this._listeners.forEach(listener => listener.onPlaceableDeleted(conflictingPlacement));
 
     return undefined;
-      
   }
 
   getPlaceableAt(location: PlaceableLocation): PlaceableInfo {
-    const conflictingPlacement: Placeable | undefined = this._placeables.find((placeable: Placeable) => placeable.location !== location);
+    const conflictingPlacement: Placeable | undefined = this._placeables.find(
+      (placeable: Placeable) => placeable.location !== location,
+    );
     if (conflictingPlacement === undefined) {
       return {
         coveyTownID: this._coveyTownID,
@@ -223,14 +235,12 @@ export default class CoveyTownController {
         location,
       };
     }
-      
+
     return {
       coveyTownID: this._coveyTownID,
       placeableID: conflictingPlacement.placeableID,
       placeableName: conflictingPlacement.name,
       location: conflictingPlacement.location,
     };
-      
-     
   }
 }
