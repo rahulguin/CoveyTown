@@ -164,12 +164,12 @@ export default class CoveyTownController {
   /**
    * Adds a placeable to this CoveyTown, checking that the player can add placeables and this placeable can be added at this specified location.
    *
-   * @param player the player that made the request to add the placeable
+   * @param _player the player that made the request to add the placeable
    * @param placeableID the id assocaited of the placeable that is wanting to be added
    * @param location the location the player is wanting to add the placeable
    */
   addPlaceable(
-    player: Player,
+    _player: Player,
     placeableID: string,
     location: PlaceableLocation,
   ): string | undefined {
@@ -187,7 +187,7 @@ export default class CoveyTownController {
     // add placeable at that location
     // will need to be updated to create the specific object wanted
     const addedPlaceable = new Placeable(placeableID, location);
-    this._placeables.push(addedPlaceable);
+    this._placeables = this._placeables.concat([addedPlaceable]);
 
     // then for all listeners to this room notify them that an placeable was added
     this._listeners.forEach(listener => listener.onPlaceableAdded(addedPlaceable));
@@ -197,10 +197,10 @@ export default class CoveyTownController {
   /**
    * deltes a placeable form this CoveyTown, checking that the player can delete placeables and this placeable can be added.
    * returns a string that describes why the placeable couldn't be deleted or undefined if it was deleted
-   * @param player the player the made the request to delete the placeable
+   * @param _player the player the made the request to delete the placeable
    * @param location the location the player is wanting to delete the placeable from
    */
-  deletePlaceable(player: Player, location: PlaceableLocation): string | undefined {
+  deletePlaceable(_player: Player, location: PlaceableLocation): string | undefined {
     // check that player is able to delete placeables (could be changed to be password instead of player)
 
     // check that placeable can be deleted from here
@@ -225,7 +225,7 @@ export default class CoveyTownController {
 
   getPlaceableAt(location: PlaceableLocation): PlaceableInfo {
     const conflictingPlacement: Placeable | undefined = this._placeables.find(
-      (placeable: Placeable) => placeable.location !== location,
+      (placeable: Placeable) => placeable.location === location,
     );
     if (conflictingPlacement === undefined) {
       return {
