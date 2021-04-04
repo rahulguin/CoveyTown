@@ -232,7 +232,7 @@ export default class CoveyTownController {
 
     // removes the placeable from the list of placebles
     this._placeables = this._placeables.filter(
-      (placeable: Placeable) => placeable.location !== location,
+      (placeable: Placeable) => !CoveyTownController.compareLocation(placeable.location, location),
     );
 
     // for all listeners notifies them that the object was deleted

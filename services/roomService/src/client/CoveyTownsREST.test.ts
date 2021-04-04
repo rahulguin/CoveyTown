@@ -494,7 +494,7 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation);
 
       const getResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -506,7 +506,7 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation);
 
       const getResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -535,7 +535,7 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation);
 
       const firstGetResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -567,7 +567,7 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const addedPlacableInfo = addPlaceableToTown(pubTown1, placedLocation);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation);
 
       const firstGetResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,

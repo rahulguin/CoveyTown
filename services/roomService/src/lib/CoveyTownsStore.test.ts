@@ -258,7 +258,6 @@ describe('CoveyTownsStore', () => {
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
       location = { xIndex, yIndex };
-      console.log(town !== undefined);
     });
     describe('addPlaceable', () => {
       it('Should fail if townID does not exist, and pass back error string', async () => {
