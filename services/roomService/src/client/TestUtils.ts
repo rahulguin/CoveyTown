@@ -92,12 +92,12 @@ export function createSocketClient(
     });
   });
   const placeableAddPromise = new Promise<RemoteServerPlaceable>(resolve => {
-    socket.on('placeableAdd', (placeable: RemoteServerPlaceable) => {
+    socket.on('placeableAdded', (placeable: RemoteServerPlaceable) => {
       resolve(placeable);
     });
   });
   const placeableDeletePromise = new Promise<RemoteServerPlaceable>(resolve => {
-    socket.on('placeableDelete', (placeable: RemoteServerPlaceable) => {
+    socket.on('placeableDeleted', (placeable: RemoteServerPlaceable) => {
       resolve(placeable);
     });
   });

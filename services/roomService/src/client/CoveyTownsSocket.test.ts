@@ -249,9 +249,14 @@ describe('TownServiceApiSocket', () => {
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
+    const placeableResponceInfo = {
+      _name: 'dummy name',
+      _placeableID: placeableIdAdded,
+      _location: placeablePlacedLocation,
+    };
     await apiClient.addPlaceable(placeableInfo);
-    expect(await placeableAdded).toBe(placeableInfo);
-    expect(await placeableAdded2).toBe(placeableInfo);
+    expect(await placeableAdded).toStrictEqual(placeableResponceInfo);
+    expect(await placeableAdded2).toStrictEqual(placeableResponceInfo);
   });
   it('Informs all players when a placeable is deleted', async () => {
     const town = await createTownForTesting();
@@ -284,11 +289,16 @@ describe('TownServiceApiSocket', () => {
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
+    const placeableResponceInfo = {
+      _name: 'dummy name',
+      _placeableID: placeableIdAdded,
+      _location: placeablePlacedLocation,
+    };
     await apiClient.addPlaceable(placeableInfo);
-    expect(await placeableAdded).toBe(placeableInfo);
-    expect(await placeableAdded2).toBe(placeableInfo);
+    expect(await placeableAdded).toStrictEqual(placeableResponceInfo);
+    expect(await placeableAdded2).toStrictEqual(placeableResponceInfo);
     await apiClient.deletePlaceable(placeableInfo);
-    expect(await placeableDeleted).toBe(placeableInfo);
-    expect(await placeableDeleted).toBe(placeableInfo);
+    expect(await placeableDeleted).toStrictEqual(placeableResponceInfo);
+    expect(await placeableDeleted).toStrictEqual(placeableResponceInfo);
   });
 });

@@ -209,7 +209,9 @@ export default class CoveyTownController {
     this._placeables = this._placeables.concat([addedPlaceable]);
 
     // then for all listeners to this room notify them that an placeable was added
-    this._listeners.forEach(listener => listener.onPlaceableAdded(addedPlaceable));
+    this._listeners.forEach(listener => {
+      listener.onPlaceableAdded(addedPlaceable);
+    });
     return undefined;
   }
 
