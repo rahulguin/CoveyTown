@@ -295,23 +295,24 @@ describe('TownsServiceAPIREST', () => {
         placeableName: placeable.name,
         location: placeable.location,
       };
-      expect(addResponce).toBe(placedInfo);
+      expect(addResponce).toStrictEqual(placedInfo);
     });
     it('Throws an error when addPlacaeable is called at a location that already has a placeable', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
+      const placedLocation = { xIndex: 0, yIndex: 0 };
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
         placeableID,
-        location: { xIndex: 0, yIndex: 0 },
+        location: placedLocation,
       });
       try {
         await apiClient.addPlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
           placeableID: `${placeableID}*`,
-          location: { xIndex: 0, yIndex: 0 },
+          location: placedLocation,
         });
         fail(
           'Expected an error to be thrown by addPlaceable when called where there was already a placeable',
@@ -325,7 +326,7 @@ describe('TownsServiceAPIREST', () => {
     it('allows multiple placeables with the same ID at different locations', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const firstPlacedLocation = { xIndex: 0, yIndex: 0 };
+      const firstPlacedLocation = { xIndex: 10, yIndex: 10 };
       const firstPlaceable: Placeable = new Placeable(placeableID, firstPlacedLocation);
       const secondPlacedLocation = { xIndex: 0, yIndex: 0 };
       const secondPlaceable: Placeable = new Placeable(placeableID, secondPlacedLocation);
@@ -333,7 +334,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
         placeableID,
-        location: { xIndex: 0, yIndex: 0 },
+        location: firstPlacedLocation,
       });
       const firstPlacedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
@@ -341,13 +342,13 @@ describe('TownsServiceAPIREST', () => {
         placeableName: firstPlaceable.name,
         location: firstPlaceable.location,
       };
-      expect(firstAdd).toBe(firstPlacedInfo);
+      expect(firstAdd).toStrictEqual(firstPlacedInfo);
 
       const secondAdd = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
         placeableID,
-        location: { xIndex: 0, yIndex: 0 },
+        location: secondPlacedLocation,
       });
       const secondPlacedInfo: PlaceableInfo = {
         coveyTownID: pubTown1.coveyTownID,
@@ -355,8 +356,8 @@ describe('TownsServiceAPIREST', () => {
         placeableName: secondPlaceable.name,
         location: secondPlaceable.location,
       };
-      expect(secondAdd).toBe(secondPlacedInfo);
-      expect(firstAdd).not.toBe(secondPlacedInfo);
+      expect(secondAdd).toStrictEqual(secondPlacedInfo);
+      expect(firstAdd).not.toStrictEqual(secondPlacedInfo);
     });
   });
   describe('CoveyTownDeletePlaceableAPI', () => {
@@ -421,7 +422,7 @@ describe('TownsServiceAPIREST', () => {
         placeableName: placeable.name,
         location: placeable.location,
       };
-      expect(addResponce).toBe(placedInfo);
+      expect(addResponce).toStrictEqual(placedInfo);
 
       const deleteResponce: PlaceableInfo = await apiClient.deletePlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
@@ -434,7 +435,7 @@ describe('TownsServiceAPIREST', () => {
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location: placeable.location,
       };
-      expect(deleteResponce).toBe(deletedInfo);
+      expect(deleteResponce).toStrictEqual(deletedInfo);
     });
     it('should throw an error if there is nothing to delete', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
@@ -499,7 +500,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
-      expect(getResponce).toBe(addedPlacableInfo);
+      expect(getResponce).toStrictEqual(addedPlacableInfo);
     });
     it('should be able to get placeable info for a private town', async () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
@@ -511,7 +512,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
-      expect(getResponce).toBe(addedPlacableInfo);
+      expect(getResponce).toStrictEqual(addedPlacableInfo);
     });
     it('should return the default placeable if nothing has been added there', async () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
@@ -528,7 +529,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
-      expect(getResponce).toBe(emptyPlaceableInfo);
+      expect(getResponce).toStrictEqual(emptyPlaceableInfo);
     });
     it('should return the default placeable after a sucessful delete', async () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
@@ -540,7 +541,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
-      expect(firstGetResponce).toBe(addedPlacableInfo);
+      expect(firstGetResponce).toStrictEqual(addedPlacableInfo);
 
       await apiClient.deletePlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -560,7 +561,7 @@ describe('TownsServiceAPIREST', () => {
         location: placedLocation,
       };
 
-      expect(secondGetResponce).toBe(emptyPlaceableInfo);
+      expect(secondGetResponce).toStrictEqual(emptyPlaceableInfo);
     });
     it('should return the same thing after repeated calls with no modifiers called inbetween', async () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
@@ -572,15 +573,15 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
-      expect(firstGetResponce).toBe(addedPlacableInfo);
+      expect(firstGetResponce).toStrictEqual(addedPlacableInfo);
 
       const secondGetResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
         location: placedLocation,
       });
 
-      expect(secondGetResponce).toBe(addedPlacableInfo);
-      expect(secondGetResponce).toBe(firstGetResponce);
+      expect(secondGetResponce).toStrictEqual(addedPlacableInfo);
+      expect(secondGetResponce).toStrictEqual(firstGetResponce);
     });
   });
 });

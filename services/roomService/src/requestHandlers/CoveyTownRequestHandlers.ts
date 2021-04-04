@@ -247,10 +247,10 @@ export async function addPlaceableHandler(
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
     // if the string is undefined then addPlaceable was sucessful
-    isOK: !success,
-    // if the string is defind then returns the placeable that should be located there
+    isOK: success === undefined,
+    // returns the placeable that is at the location (regardless of failure)
     response: placeableAt,
-    // the message returned is the message to be recieved
+    // the message returned is the message to be recieved about an error (given undefined if the add was successful)
     message: success,
   };
 }

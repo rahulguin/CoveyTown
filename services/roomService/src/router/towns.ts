@@ -105,7 +105,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   /**
    * Adds a placeable to a town
    */
-  app.post('/placeables/:townID', async (req, res) => {
+  app.post('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
@@ -125,11 +125,11 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   /**
    * Deletes a placeable from a town
    */
-  app.delete('/placeables/:townID', async (req, res) => {
+  app.delete('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
-        coveyTownPassword: req.body.townPassword,
+        coveyTownPassword: req.body.coveyTownPassword,
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);
@@ -141,11 +141,13 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.get('/placeables/:townID', async (req, res) => {
+  /**
+   * Gets a placeable from a specific location in the town
+   */
+  app.get('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
       const result = await getPlaceableHandler({
         coveyTownID: req.params.townID,
-        coveyTownPassword: req.body.townPassword,
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);

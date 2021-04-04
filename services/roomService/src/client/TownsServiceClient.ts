@@ -220,17 +220,26 @@ export default class TownsServiceClient {
   }
 
   async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
-    const responseWrapper = await this._axios.post('/placeable', requestData);
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(
+      `/placeables/${requestData.coveyTownID}`,
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper, false);
   }
 
   async deletePlaceable(requestData: PlaceableDeleteRequest): Promise<PlaceableInfo> {
-    const responseWrapper = await this._axios.post('/placeable', requestData);
-    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<PlaceableInfo>>(
+      `/placeables/${requestData.coveyTownID}`,
+      { data: requestData },
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper, false);
   }
 
   async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
-    const responseWrapper = await this._axios.post('/placeable', requestData);
+    const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(
+      `/placeables/${requestData.coveyTownID}`,
+      { data: requestData },
+    );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 }
