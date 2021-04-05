@@ -25,6 +25,7 @@ import { Callback } from './components/VideoCall/VideoFrontend/types';
 import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
+import Placeable, { ServerPlaceable } from './classes/Placeable';
 
 type CoveyAppUpdate =
   | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, socket: Socket, players: Player[], emitMovement: (location: UserLocation) => void } }
@@ -33,6 +34,8 @@ type CoveyAppUpdate =
   | { action: 'playerDisconnect'; player: Player }
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
+  | { action: 'placeableAdded'; addedPlaceable: Placeable }
+  | { action: 'placeableDeleted'; deletedPlaceable: Placeable }
   ;
 
 function defaultAppState(): CoveyAppState {
@@ -52,6 +55,7 @@ function defaultAppState(): CoveyAppState {
     emitMovement: () => {
     },
     apiClient: new TownsServiceClient(),
+    placeables: []
   };
 }
 function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyAppState {
@@ -68,6 +72,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     apiClient: state.apiClient,
+    placeables: state.placeables
   };
 
   function calculateNearbyPlayers(players: Player[], currentLocation: UserLocation) {
@@ -140,6 +145,12 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'disconnect':
       state.socket?.disconnect();
       return defaultAppState();
+    case 'placeableAdded':
+      nextState.placeables = nextState.placeables.concat([update.addedPlaceable])
+      break;
+    case 'placeableDeleted':
+      nextState.placeables = nextState.placeables.filter((placeable) => placeable.location !== update.deletedPlaceable.location)
+      break;
     default:
       throw new Error('Unexpected state request');
   }
@@ -177,10 +188,17 @@ async function GameController(initData: TownJoinResponse,
   socket.on('disconnect', () => {
     dispatchAppUpdate({ action: 'disconnect' });
   });
+  socket.on('placeableAdded', (addedPlaceable: ServerPlaceable) => {
+    dispatchAppUpdate({ action: 'placeableAdded', addedPlaceable: Placeable.fromServerPlaceable(addedPlaceable)})
+  });
+  socket.on('placeableDeleted', (deletedPlaceable: ServerPlaceable) => {
+    dispatchAppUpdate({ action: 'placeableDeleted', deletedPlaceable: Placeable.fromServerPlaceable(deletedPlaceable)})
+  });
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);
     dispatchAppUpdate({ action: 'weMoved', location });
   };
+
 
   dispatchAppUpdate({
     action: 'doConnect',

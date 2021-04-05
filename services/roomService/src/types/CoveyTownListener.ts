@@ -1,3 +1,4 @@
+import Placeable from './Placeable';
 import Player from './Player';
 
 /**
@@ -26,4 +27,14 @@ export default interface CoveyTownListener {
    * Called when a town is destroyed, causing all players to disconnect
    */
   onTownDestroyed(): void;
+
+  /**
+   * Called when an object gets added to the town
+   */
+  onPlaceableAdded(addedPlaceable: Placeable): void;
+
+  /**
+   * Called when an object gets deleted from the town
+   */
+  onPlaceableDeleted(placeableDeleted: Placeable): void;
 }
