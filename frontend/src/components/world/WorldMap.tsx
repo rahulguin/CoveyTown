@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-import Placeable from '../../classes/Placeable';
 
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -435,7 +434,7 @@ class CoveyGameScene extends Phaser.Scene {
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
-    emitMovement, players, placeables, apiClient
+    emitMovement, players, placeables
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   useEffect(() => {
@@ -455,7 +454,6 @@ export default function WorldMap(): JSX.Element {
     const game = new Phaser.Game(config);
     if (video) {
       const newGameScene = new CoveyGameScene(video, emitMovement);
-      newGameScene.addDynamicWorld(placeables)
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -468,7 +466,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement]);
+  }, [video, emitMovement, placeables]);
 
   const deepPlayers = JSON.stringify(players);
   useEffect(() => {
