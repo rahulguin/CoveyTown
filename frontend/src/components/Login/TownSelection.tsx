@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from "react-router-dom"
 import assert from "assert";
 import {
   Box,
@@ -11,18 +12,22 @@ import {
   Input,
   Stack,
   Table,
+  Text,
   TableCaption,
   Tbody,
   Td,
   Th,
+  Image,
   Thead,
   Tr,
-  useToast
+  HStack,
+  useToast, Divider, Center
 } from '@chakra-ui/react';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 import Video from '../../classes/Video/Video';
 import { CoveyTownInfo, TownJoinResponse, } from '../../classes/TownsServiceClient';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+
 
 interface TownSelectionProps {
   doLogin: (initData: TownJoinResponse) => Promise<boolean>
@@ -138,80 +143,187 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
 
   return (
     <>
-      <form>
-        <Stack>
-          <Box p="4" borderWidth="1px" borderRadius="lg">
-            <Heading as="h2" size="lg">Select a username</Heading>
-
-            <FormControl>
-              <FormLabel htmlFor="name">Name</FormLabel>
+      <Center height="20px">
+        <Divider orientation="vertical" />
+      </Center>
+      <Flex
+        backgroundImage="url('http://clipart-library.com/img/1151995.png')"
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
+        align="center"
+        justify={{ base: "center", md: "space-around"}}
+        direction={{ base: "column-reverse", md: "row" }}
+        minH="70vh"
+        px={8}
+        mb={16}
+      >
+        <Stack
+          spacing={4}
+          w={{ base: "80%", md: "40%" }}
+          align={["center", "center", "flex-start", "flex-start"]}
+        >
+          <Heading
+            as="h1"
+            size="xl"
+            fontWeight="bold"
+            color="primary.800"
+            textAlign={["center", "center", "left", "left"]}
+          >
+            Select a cool Username!
+          </Heading>
+          <Heading
+            as="h2"
+            size="md"
+            color="primary.800"
+            opacity="0.8"
+            fontWeight="normal"
+            lineHeight={1.5}
+            textAlign={["center", "center", "left", "left"]}
+          >
+            <FormControl width="200%">
+              <FormLabel htmlFor="name" />
               <Input autoFocus name="name" placeholder="Your name"
                      value={userName}
+                     background="white"
                      onChange={event => setUserName(event.target.value)}
               />
             </FormControl>
-          </Box>
-          <Box borderWidth="1px" borderRadius="lg">
-            <Heading p="4" as="h2" size="lg">Create a New Town</Heading>
-            <Flex p="4">
-              <Box flex="1">
-                <FormControl>
-                  <FormLabel htmlFor="townName">New Town Name</FormLabel>
-                  <Input name="townName" placeholder="New Town Name"
-                         value={newTownName}
-                         onChange={event => setNewTownName(event.target.value)}
-                  />
-                </FormControl>
-              </Box><Box>
-              <FormControl>
-                <FormLabel htmlFor="isPublic">Publicly Listed</FormLabel>
-                <Checkbox id="isPublic" name="isPublic" isChecked={newTownIsPublic}
-                          onChange={(e) => {
-                            setNewTownIsPublic(e.target.checked)
-                          }}/>
-              </FormControl>
-            </Box>
-              <Box>
-                <Button data-testid="newTownButton" onClick={handleCreate}>Create</Button>
-              </Box>
-            </Flex>
-          </Box>
-          <Heading p="4" as="h2" size="lg">-or-</Heading>
+          </Heading>
+        </Stack>
+        <Box w={{ base: "20%", sm: "10%", md: "20%" }} mb={{ base: 12, md: 0 }}>
+          <Image src="https://cdn.pixabay.com/photo/2016/04/15/18/05/computer-1331579_1280.png" size="50%" rounded="1rem" shadow="2xl" />
+        </Box>
+      </Flex>
 
+      <Flex
+        backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
+        align="center"
+        justify={{ base: "center", md: "space-around"}}
+        direction={{ base: "column-reverse", md: "row" }}
+        minH="70vh"
+        px={8}
+        mb={16}
+      >
+        <Box w={{ base: "40%", sm: "20%", md: "40%" }} mb={{ base: 12, md: 0 }}>
+          <Image src="https://img.17qq.com/images/ssasrrqx.jpeg" size="80%" rounded="1rem" shadow="2xl" />
+        </Box>
+        <Stack
+          spacing={4}
+          w={{ base: "80%", md: "40%" }}
+          align={["center", "center", "flex-start", "flex-start"]}
+        >
+          <Heading
+            as="h1"
+            size="xl"
+            fontWeight="bold"
+            color="primary.800"
+            textAlign={["center", "center", "left", "left"]}
+          >
+            Create a new Town!
+          </Heading>
+          <Heading
+            as="h2"
+            size="md"
+            color="primary.800"
+            fontWeight="normal"
+            lineHeight={1.5}
+            textAlign={["center", "center", "left", "left"]}
+          >
+            <FormControl width="200%">
+              <FormLabel htmlFor="townName" />
+              <Input name="townName" placeholder="New Town Name"
+                     value={newTownName}
+                     background="white"
+                     onChange={event => setNewTownName(event.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              &nbsp;
+              &nbsp;
+              <FormLabel htmlFor="isPublic">Publicly Listed?</FormLabel>
+              <Checkbox id="isPublic" name="isPublic" isChecked={newTownIsPublic}
+                        onChange={(e) => {
+                          setNewTownIsPublic(e.target.checked)
+                        }}/>
+            </FormControl>
+            <Button data-testid="newTownButton" colorScheme="green" variant="solid" onClick={handleCreate}>Create</Button>
+          </Heading>
+        </Stack>
+      </Flex>
+
+      <Flex
+        backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+        backgroundPosition="center"
+        backgroundRepeat="no-repeat"
+        align="center"
+        justify={{ base: "center", md: "center"}}
+        direction={{ base: "column-reverse", md: "row" }}
+        minH="70vh"
+        px={8}
+        mb={16}
+      >
+        <Stack
+          spacing={8}
+          w={{ base: "100%", md: "100%" }}
+          align={["center", "center", "center", "center"]}
+        >
+          <Heading
+            as="h1"
+            size="xl"
+            fontWeight="bold"
+            color="primary.800"
+            textAlign={["center", "center", "center", "center"]}
+          >
+            Or join an Existing Town!
+          </Heading>
           <Box borderWidth="1px" borderRadius="lg">
-            <Heading p="4" as="h2" size="lg">Join an Existing Town</Heading>
-            <Box borderWidth="1px" borderRadius="lg">
-              <Flex p="4"><FormControl>
-                <FormLabel htmlFor="townIDToJoin">Town ID</FormLabel>
-                <Input name="townIDToJoin" placeholder="ID of town to join, or select from list"
+            <Flex p="4">
+              <FormControl>
+                <FormLabel htmlFor="townIDToJoin" />
+                <Input name="townIDToJoin" placeholder="ID of town to join, or select from the list"
                        value={townIDToJoin}
+                       background="white"
                        onChange={event => setTownIDToJoin(event.target.value)}/>
               </FormControl>
-                <Button data-testid='joinTownByIDButton'
-                        onClick={() => handleJoin(townIDToJoin)}>Connect</Button>
-              </Flex>
+              &nbsp;
+              &nbsp;
+                <Button data-testid='joinTownByIDButton' colorScheme="blue"
+                      onClick={() => handleJoin(townIDToJoin)}>Connect</Button>
 
-            </Box>
-
-            <Heading p="4" as="h4" size="md">Select a public town to join</Heading>
-            <Box maxH="500px" overflowY="scroll">
-              <Table>
+            </Flex>
+            <Heading
+              as="h3"
+              size="l"
+              fontWeight="bold"
+              color="primary.800"
+              textAlign={["center", "center", "center", "center"]}
+            >
+              Select a public town to join
+            </Heading>
+            &nbsp;
+            &nbsp;
+            <Box w={{ base: "100%", sm: "80%", md: "100%" }} mb={{ base: 120, md: 0 }} maxH="500px" overflowY="scroll">
+              <Table background="blue" rounded="1rem" shadow="2xl">
                 <TableCaption placement="bottom">Publicly Listed Towns</TableCaption>
                 <Thead><Tr><Th>Room Name</Th><Th>Room ID</Th><Th>Activity</Th></Tr></Thead>
                 <Tbody>
                   {currentPublicTowns?.map((town) => (
-                    <Tr key={town.coveyTownID}><Td role='cell'>{town.friendlyName}</Td><Td
-                      role='cell'>{town.coveyTownID}</Td>
-                      <Td role='cell'>{town.currentOccupancy}/{town.maximumOccupancy}
-                        <Button onClick={() => handleJoin(town.coveyTownID)}
-                                disabled={town.currentOccupancy >= town.maximumOccupancy}>Connect</Button></Td></Tr>
+                    <Tr key={town.coveyTownID}><Td role='cell'>{town.friendlyName}</Td>
+                      <Td role='cell'>{town.coveyTownID}</Td>
+                      <Td role='cell'>{town.currentOccupancy}/{town.maximumOccupancy} </Td>
+                      <Td><Button onClick={() => handleJoin(town.coveyTownID)}
+                                  colorScheme="green"
+                                  disabled={town.currentOccupancy >= town.maximumOccupancy}>Connect</Button></Td>
+                    </Tr>
                   ))}
                 </Tbody>
               </Table>
             </Box>
           </Box>
         </Stack>
-      </form>
+      </Flex>
     </>
   );
 }
