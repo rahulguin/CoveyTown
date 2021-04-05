@@ -34,6 +34,10 @@ export default class CoveyTownController {
     return this._players;
   }
 
+  get placeables(): Placeable[] {
+    return this._placeables;
+  }
+
   get occupancy(): number {
     return this._listeners.length;
   }
