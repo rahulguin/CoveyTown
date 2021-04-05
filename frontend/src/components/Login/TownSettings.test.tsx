@@ -37,6 +37,7 @@ function wrappedTownSettings() {
   return <ChakraProvider><CoveyAppContext.Provider value={{
     nearbyPlayers: { nearbyPlayers: [] },
     players: [],
+    placeables: [],
     myPlayerID: '',
     currentTownID: '',
     currentTownFriendlyName: '',
