@@ -41,6 +41,7 @@ export interface TownCreateRequest {
   isPubliclyListed: boolean;
 }
 
+
 /**
  * Response from the server for a Town create request
  */
@@ -79,24 +80,36 @@ export interface TownUpdateRequest {
 /**
  * payload sent by the client to add an object to a town
  */
-export interface ObjectAddRequest {
+export interface PlaceableAddRequest {
   coveyTownID: string,
   coveyTownpassword: string,
   objectID: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
-export interface ObjectAddResponse {
+/**
+ * Payload sent by client to retrieve a Placeable at a location
+ */
+ export interface PlaceableGetRequest {
+  coveyTownID: string
+  placeableID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * information to describe a placeable at a location
+ */
+export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
   objectID: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
 /**
  * represents a location on the map based on index
  */
-export interface placeableLocation {
+export interface PlaceableLocation {
   xIndex: number
   yIndex: number
 }
@@ -104,21 +117,12 @@ export interface placeableLocation {
 /**
  * Payload sent by the client to delete an object from a town
  */
-export interface ObjectDeleteRequest {
+export interface PlaceableDeleteRequest {
   coveyTownID: string,
   coveyTownPassword: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
-/**
- * Payload sent by the client to delete an object from a town
- */
- export interface ObjectDeleteResponce {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  objectID: string,
-  location: placeableLocation
-}
 
 /**
  * Payload sent by the client to retrive objects from a town
@@ -131,7 +135,7 @@ export interface ObjectInfo {
   coveyTownID: string,
   objectID: string,
   objectName: string,
-  location: placeableLocation
+  location: PlaceableLocation
 }
 
 /**
@@ -211,13 +215,18 @@ export default class TownsServiceClient {
   }
 
   // API methods to handle object requests
-  async addObject(requestData: ObjectAddRequest): Promise<ObjectAddResponse> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<ObjectAddResponse>>(`/placeables/${requestData.coveyTownID}`, requestData);
+  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async deleteObject(requestData: ObjectDeleteRequest): Promise<ObjectDeleteResponce> {
-    const responseWrapper = await this._axios.delete<ResponseEnvelope<ObjectDeleteResponce>>(`/placeables/${requestData.coveyTownID}/${requestData.coveyTownPassword}`, requestData);
+  async deletePlaceable(requestData: PlaceableDeleteRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
   
