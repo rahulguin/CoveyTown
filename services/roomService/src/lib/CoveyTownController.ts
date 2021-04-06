@@ -193,13 +193,7 @@ export default class CoveyTownController {
    * @param placeableID the id assocaited of the placeable that is wanting to be added
    * @param location the location the player is wanting to add the placeable
    */
-  addPlaceable(
-    _player: Player,
-    placeableID: string,
-    location: PlaceableLocation,
-  ): string | undefined {
-    // check that player is able to add placeables (could be changed to be password instead of player)
-
+  addPlaceable(placeableID: string, location: PlaceableLocation): string | undefined {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
@@ -230,9 +224,7 @@ export default class CoveyTownController {
    * @param _player the player the made the request to delete the placeable
    * @param location the location the player is wanting to delete the placeable from
    */
-  deletePlaceable(_player: Player, location: PlaceableLocation): string | undefined {
-    // check that player is able to delete placeables (could be changed to be password instead of player)
-
+  deletePlaceable(location: PlaceableLocation): string | undefined {
     // check that placeable can be deleted from here
 
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
