@@ -7,6 +7,7 @@ import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
 import addTownRoutes from '../router/towns';
 import Placeable from '../types/Placeable';
+import { randomPlaceablesFromAllowedPlaceables } from './TestUtils';
 import TownsServiceClient, {
   PlaceableInfo,
   PlaceableLocation,
@@ -241,7 +242,7 @@ describe('TownsServiceAPIREST', () => {
   describe('CoveyTownAddPlaceableAPI', () => {
     let placeableID: string;
     beforeEach(() => {
-      placeableID = nanoid();
+      [placeableID] = randomPlaceablesFromAllowedPlaceables();
     });
 
     it('Throws an error if the town does not exist', async () => {
@@ -269,6 +270,23 @@ describe('TownsServiceAPIREST', () => {
           coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
           coveyTownID: pubTown1.coveyTownID,
           placeableID,
+          location: { xIndex: 0, yIndex: 0 },
+        });
+        fail('Expected an error to be thrown by addPlaceable when given incorrect password');
+      } catch (err) {
+        // OK, expected an error
+        // TODO this should really check to make sure it's the *right* error, but we didn't specify
+        // the format of the exception :(
+      }
+    });
+    it('Throws an error if the given placeable id is invalid', async () => {
+      const pubTown1 = await createTownForTesting(undefined, true);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      try {
+        await apiClient.addPlaceable({
+          coveyTownPassword: pubTown1.townUpdatePassword,
+          coveyTownID: pubTown1.coveyTownID,
+          placeableID: nanoid(),
           location: { xIndex: 0, yIndex: 0 },
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
@@ -363,7 +381,7 @@ describe('TownsServiceAPIREST', () => {
   describe('CoveyTownDeletePlaceableAPI', () => {
     let placeableID: string;
     beforeEach(() => {
-      placeableID = nanoid();
+      [placeableID] = randomPlaceablesFromAllowedPlaceables();
     });
     it('Throws an error if the town does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
@@ -459,7 +477,7 @@ describe('TownsServiceAPIREST', () => {
     town: TestTownData,
     placedLocation: PlaceableLocation,
   ): Promise<PlaceableInfo> {
-    const placeableID = nanoid();
+    const [placeableID] = randomPlaceablesFromAllowedPlaceables();
     const placeable: Placeable = new Placeable(placeableID, placedLocation);
     await apiClient.addPlaceable({
       coveyTownPassword: town.townUpdatePassword,

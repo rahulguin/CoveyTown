@@ -34,6 +34,10 @@ export default class CoveyTownController {
     return this._players;
   }
 
+  get placeables(): Placeable[] {
+    return this._placeables;
+  }
+
   get occupancy(): number {
     return this._listeners.length;
   }
@@ -196,6 +200,11 @@ export default class CoveyTownController {
   ): string | undefined {
     // check that player is able to add placeables (could be changed to be password instead of player)
 
+    // check that the placeable id given is one that exists
+    if (!Placeable.isAllowedPlaceable(placeableID)) {
+      // this means that the given ID is not allow
+      return 'cannot add: given id for placeable that does not exist';
+    }
     // check that placeable can get added
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement !== undefined) {
@@ -237,8 +246,9 @@ export default class CoveyTownController {
       (placeable: Placeable) => !CoveyTownController.compareLocation(placeable.location, location),
     );
 
-    // for all listeners notifies them that the object was deleted
-    this._listeners.forEach(listener => listener.onPlaceableDeleted(conflictingPlacement));
+    const placeableNow = Placeable.constructEmptyPlaceable(location);
+    // for all listeners notifies them that the object was deleted, with what is now at the location
+    this._listeners.forEach(listener => listener.onPlaceableDeleted(placeableNow));
 
     return undefined;
   }
