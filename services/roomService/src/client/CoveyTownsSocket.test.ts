@@ -245,9 +245,10 @@ describe('TownServiceApiSocket', () => {
       placeableAdded: placeableAdded2,
     } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
     await Promise.all([socketConnected, connectPromise2]);
-    const placeableInfo = {
+    const addInfo = {
       coveyTownID: town.coveyTownID,
       coveyTownPassword: town.townUpdatePassword,
+      playerID: nanoid(),
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
@@ -258,7 +259,7 @@ describe('TownServiceApiSocket', () => {
       _placeableID: placeableObject.placeableID,
       _location: placeableObject.location,
     };
-    await apiClient.addPlaceable(placeableInfo);
+    await apiClient.addPlaceable(addInfo);
     expect(await placeableAdded).toStrictEqual(placeableResponceInfo);
     expect(await placeableAdded2).toStrictEqual(placeableResponceInfo);
   });
@@ -291,6 +292,7 @@ describe('TownServiceApiSocket', () => {
     const placeableInfo = {
       coveyTownID: town.coveyTownID,
       coveyTownPassword: town.townUpdatePassword,
+      playerID: nanoid(),
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
