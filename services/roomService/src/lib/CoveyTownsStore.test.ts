@@ -582,7 +582,8 @@ describe('CoveyTownsStore', () => {
         const getResponce = store.getPlaceable(town.coveyTownID, location);
         expect(getResponce).toStrictEqual(emptyInfo);
       });
-      it('Should return the original placeable if a failed delete was called - wrong password', async () => {
+      it('Should return the original placeable if a failed delete was called - wrong password/player cant place', async () => {
+        player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
@@ -596,6 +597,27 @@ describe('CoveyTownsStore', () => {
           town.coveyTownID,
           nanoid(),
           player.id,
+          location,
+        );
+        expect(secondAddResponce).not.toBe(undefined);
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location);
+        expect(getResponce).toStrictEqual(placeableInfo);
+      });
+      it('Should return the original placeable if a failed delete was called - wrong password/ player id invalid', async () => {
+        const addResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          location,
+        );
+        expect(addResponce).toBe(undefined);
+
+        const secondAddResponce = store.deletePlaceable(
+          town.coveyTownID,
+          nanoid(),
+          nanoid(),
           location,
         );
         expect(secondAddResponce).not.toBe(undefined);
