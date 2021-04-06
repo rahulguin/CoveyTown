@@ -11,6 +11,18 @@ import CoveyTownsStore from './CoveyTownsStore';
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
 
+function randomPlaceablesFromAllowedPlaceables(numberIds = 1): string[] {
+  const placeableIDs: string[] = Array.from(Placeable.ALLOWED_PLACEABLES);
+  const returnList: string[] = [];
+  for (let i = 0; i < numberIds; i += 1) {
+    const randomIndex = Math.floor(Math.random() * placeableIDs.length);
+    returnList.push(placeableIDs[randomIndex]);
+    placeableIDs.splice(randomIndex);
+  }
+
+  return returnList;
+}
+
 function mockCoveyListener(): CoveyTownListener {
   return {
     onPlayerDisconnected(removedPlayer: Player): void {
@@ -254,7 +266,7 @@ describe('CoveyTownsStore', () => {
     beforeEach(() => {
       town = createTownForTesting();
       store = CoveyTownsStore.getInstance();
-      placeableID = nanoid();
+      [placeableID] = randomPlaceablesFromAllowedPlaceables();
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
       location = { xIndex, yIndex };
@@ -296,6 +308,16 @@ describe('CoveyTownsStore', () => {
           town.coveyTownID,
           town.townUpdatePassword,
           placeableID,
+          location,
+        );
+        expect(secondResponce).not.toBe(undefined);
+        expect(secondResponce?.length).toBeGreaterThan(0);
+      });
+      it('Should fail if given a plaeable Id that does not exist', async () => {
+        const secondResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          nanoid(),
           location,
         );
         expect(secondResponce).not.toBe(undefined);
