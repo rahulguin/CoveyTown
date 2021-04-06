@@ -80,6 +80,7 @@ export default class CoveyTownsStore {
   addPlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
+    playerID: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
@@ -99,6 +100,7 @@ export default class CoveyTownsStore {
   deletePlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
+    playerID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
