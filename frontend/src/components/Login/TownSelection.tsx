@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from "react-router-dom"
+import { Element } from 'react-scroll'
 import assert from "assert";
 import {
   Box,
@@ -146,184 +147,190 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
       <Center height="20px">
         <Divider orientation="vertical" />
       </Center>
-      <Flex
-        backgroundImage="url('http://clipart-library.com/img/1151995.png')"
-        backgroundPosition="center"
-        backgroundRepeat="no-repeat"
-        align="center"
-        justify={{ base: "center", md: "space-around"}}
-        direction={{ base: "column-reverse", md: "row" }}
-        minH="70vh"
-        px={8}
-        mb={16}
-      >
-        <Stack
-          spacing={4}
-          w={{ base: "80%", md: "40%" }}
-          align={["center", "center", "flex-start", "flex-start"]}
+      <Element id="username" name="username">
+        <Flex
+          backgroundImage="url('http://clipart-library.com/img/1151995.png')"
+          backgroundPosition="center"
+          backgroundRepeat="no-repeat"
+          align="center"
+          justify={{ base: "center", md: "space-around"}}
+          direction={{ base: "column-reverse", md: "row" }}
+          minH="70vh"
+          px={8}
+          mb={16}
         >
-          <Heading
-            as="h1"
-            size="xl"
-            fontWeight="bold"
-            color="primary.800"
-            textAlign={["center", "center", "left", "left"]}
+          <Stack
+            spacing={4}
+            w={{ base: "80%", md: "40%" }}
+            align={["center", "center", "flex-start", "flex-start"]}
           >
-            Select a cool Username!
-          </Heading>
-          <Heading
-            as="h2"
-            size="md"
-            color="primary.800"
-            opacity="0.8"
-            fontWeight="normal"
-            lineHeight={1.5}
-            textAlign={["center", "center", "left", "left"]}
-          >
-            <FormControl width="200%">
-              <FormLabel htmlFor="name" />
-              <Input autoFocus name="name" placeholder="Your name"
-                     value={userName}
-                     background="white"
-                     onChange={event => setUserName(event.target.value)}
-              />
-            </FormControl>
-          </Heading>
-        </Stack>
-        <Box w={{ base: "20%", sm: "10%", md: "20%" }} mb={{ base: 12, md: 0 }}>
-          <Image src="https://cdn.pixabay.com/photo/2016/04/15/18/05/computer-1331579_1280.png" size="50%" rounded="1rem" shadow="2xl" />
-        </Box>
-      </Flex>
-
-      <Flex
-        backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
-        backgroundPosition="center"
-        backgroundRepeat="no-repeat"
-        align="center"
-        justify={{ base: "center", md: "space-around"}}
-        direction={{ base: "column-reverse", md: "row" }}
-        minH="70vh"
-        px={8}
-        mb={16}
-      >
-        <Box w={{ base: "40%", sm: "20%", md: "40%" }} mb={{ base: 12, md: 0 }}>
-          <Image src="https://img.17qq.com/images/ssasrrqx.jpeg" size="80%" rounded="1rem" shadow="2xl" />
-        </Box>
-        <Stack
-          spacing={4}
-          w={{ base: "80%", md: "40%" }}
-          align={["center", "center", "flex-start", "flex-start"]}
-        >
-          <Heading
-            as="h1"
-            size="xl"
-            fontWeight="bold"
-            color="primary.800"
-            textAlign={["center", "center", "left", "left"]}
-          >
-            Create a new Town!
-          </Heading>
-          <Heading
-            as="h2"
-            size="md"
-            color="primary.800"
-            fontWeight="normal"
-            lineHeight={1.5}
-            textAlign={["center", "center", "left", "left"]}
-          >
-            <FormControl width="200%">
-              <FormLabel htmlFor="townName" />
-              <Input name="townName" placeholder="New Town Name"
-                     value={newTownName}
-                     background="white"
-                     onChange={event => setNewTownName(event.target.value)}
-              />
-            </FormControl>
-            <FormControl>
-              &nbsp;
-              &nbsp;
-              <FormLabel htmlFor="isPublic">Publicly Listed?</FormLabel>
-              <Checkbox id="isPublic" name="isPublic" isChecked={newTownIsPublic}
-                        onChange={(e) => {
-                          setNewTownIsPublic(e.target.checked)
-                        }}/>
-            </FormControl>
-            <Button data-testid="newTownButton" colorScheme="green" variant="solid" onClick={handleCreate}>Create</Button>
-          </Heading>
-        </Stack>
-      </Flex>
-
-      <Flex
-        backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
-        backgroundPosition="center"
-        backgroundRepeat="no-repeat"
-        align="center"
-        justify={{ base: "center", md: "center"}}
-        direction={{ base: "column-reverse", md: "row" }}
-        minH="70vh"
-        px={8}
-        mb={16}
-      >
-        <Stack
-          spacing={8}
-          w={{ base: "100%", md: "100%" }}
-          align={["center", "center", "center", "center"]}
-        >
-          <Heading
-            as="h1"
-            size="xl"
-            fontWeight="bold"
-            color="primary.800"
-            textAlign={["center", "center", "center", "center"]}
-          >
-            Or join an Existing Town!
-          </Heading>
-          <Box borderWidth="1px" borderRadius="lg">
-            <Flex p="4">
-              <FormControl>
-                <FormLabel htmlFor="townIDToJoin" />
-                <Input name="townIDToJoin" placeholder="ID of town to join, or select from the list"
-                       value={townIDToJoin}
-                       background="white"
-                       onChange={event => setTownIDToJoin(event.target.value)}/>
-              </FormControl>
-              &nbsp;
-              &nbsp;
-                <Button data-testid='joinTownByIDButton' colorScheme="blue"
-                      onClick={() => handleJoin(townIDToJoin)}>Connect</Button>
-
-            </Flex>
             <Heading
-              as="h3"
-              size="l"
+              as="h1"
+              size="xl"
+              fontWeight="bold"
+              color="primary.800"
+              textAlign={["center", "center", "left", "left"]}
+            >
+              Select a cool Username!
+            </Heading>
+            <Heading
+              as="h2"
+              size="md"
+              color="primary.800"
+              opacity="0.8"
+              fontWeight="normal"
+              lineHeight={1.5}
+              textAlign={["center", "center", "left", "left"]}
+            >
+              <FormControl width="200%">
+                <FormLabel htmlFor="name" />
+                <Input autoFocus name="name" placeholder="Your name"
+                       value={userName}
+                       background="white"
+                       onChange={event => setUserName(event.target.value)}
+                />
+              </FormControl>
+            </Heading>
+          </Stack>
+          <Box w={{ base: "20%", sm: "10%", md: "20%" }} mb={{ base: 12, md: 0 }}>
+            <Image src="https://cdn.pixabay.com/photo/2016/04/15/18/05/computer-1331579_1280.png" size="50%" rounded="1rem" shadow="2xl" />
+          </Box>
+        </Flex>
+      </Element>
+
+      <Element id="create" name="create">
+        <Flex
+          backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+          backgroundPosition="center"
+          backgroundRepeat="no-repeat"
+          align="center"
+          justify={{ base: "center", md: "space-around"}}
+          direction={{ base: "column-reverse", md: "row" }}
+          minH="70vh"
+          px={8}
+          mb={16}
+        >
+          <Box boxShadow="dark-md" rounded="1rem" w={{ base: "30%", sm: "15%", md: "30%" }} mb={{ base: 12, md: 0 }}>
+            <Image src="https://i.pinimg.com/originals/a5/2d/9b/a52d9ba54264337baa487a48141a1bcf.gif" size="80%" rounded="1rem" shadow="2xl" />
+          </Box>
+          <Stack
+            spacing={4}
+            w={{ base: "80%", md: "40%" }}
+            align={["center", "center", "flex-start", "flex-start"]}
+          >
+            <Heading
+              as="h1"
+              size="xl"
+              fontWeight="bold"
+              color="primary.800"
+              textAlign={["center", "center", "left", "left"]}
+            >
+              Create a new Town!
+            </Heading>
+            <Heading
+              as="h2"
+              size="md"
+              color="primary.800"
+              fontWeight="normal"
+              lineHeight={1.5}
+              textAlign={["center", "center", "left", "left"]}
+            >
+              <FormControl width="200%">
+                <FormLabel htmlFor="townName" />
+                <Input name="townName" placeholder="New Town Name"
+                       value={newTownName}
+                       background="white"
+                       onChange={event => setNewTownName(event.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                &nbsp;
+                &nbsp;
+                <FormLabel htmlFor="isPublic">Publicly Listed?</FormLabel>
+                <Checkbox id="isPublic" name="isPublic" isChecked={newTownIsPublic}
+                          onChange={(e) => {
+                            setNewTownIsPublic(e.target.checked)
+                          }}/>
+              </FormControl>
+              <Button data-testid="newTownButton" colorScheme="green" variant="solid" onClick={handleCreate}>Create</Button>
+            </Heading>
+          </Stack>
+        </Flex>
+      </Element>
+
+      <Element id="join" name="join">
+        <Flex
+          backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+          backgroundPosition="center"
+          backgroundRepeat="no-repeat"
+          align="center"
+          justify={{ base: "center", md: "center"}}
+          direction={{ base: "column-reverse", md: "row" }}
+          minH="70vh"
+          px={8}
+          mb={16}
+        >
+          <Stack
+            spacing={8}
+            w={{ base: "100%", md: "100%" }}
+            align={["center", "center", "center", "center"]}
+          >
+            <Heading
+              as="h1"
+              size="xl"
               fontWeight="bold"
               color="primary.800"
               textAlign={["center", "center", "center", "center"]}
             >
-              Select a public town to join
+              Or join an Existing Town!
             </Heading>
-            &nbsp;
-            &nbsp;
-            <Box w={{ base: "100%", sm: "80%", md: "100%" }} mb={{ base: 120, md: 0 }} maxH="500px" overflowY="scroll">
-              <Table background="blue" rounded="1rem" shadow="2xl">
-                <TableCaption placement="bottom">Publicly Listed Towns</TableCaption>
-                <Thead><Tr><Th>Room Name</Th><Th>Room ID</Th><Th>Activity</Th></Tr></Thead>
-                <Tbody>
-                  {currentPublicTowns?.map((town) => (
-                    <Tr key={town.coveyTownID}><Td role='cell'>{town.friendlyName}</Td>
-                      <Td role='cell'>{town.coveyTownID}</Td>
-                      <Td role='cell'>{town.currentOccupancy}/{town.maximumOccupancy} </Td>
-                      <Td><Button onClick={() => handleJoin(town.coveyTownID)}
-                                  colorScheme="green"
-                                  disabled={town.currentOccupancy >= town.maximumOccupancy}>Connect</Button></Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
+            <Box borderWidth="1px" borderRadius="lg">
+              <Flex p="4">
+                <FormControl>
+                  <FormLabel htmlFor="townIDToJoin" />
+                  <Input name="townIDToJoin" placeholder="ID of town to join, or select from the list"
+                         value={townIDToJoin}
+                         background="white"
+                         onChange={event => setTownIDToJoin(event.target.value)}/>
+                </FormControl>
+                &nbsp;
+                &nbsp;
+                <Button data-testid='joinTownByIDButton' colorScheme="blue"
+                        onClick={() => handleJoin(townIDToJoin)}>Connect</Button>
+
+              </Flex>
+              <Heading
+                as="h3"
+                size="l"
+                fontWeight="bold"
+                color="primary.800"
+                textAlign={["center", "center", "center", "center"]}
+              >
+                Select a public town to join
+              </Heading>
+              &nbsp;
+              &nbsp;
+              <Box w={{ base: "100%", sm: "80%", md: "100%" }} mb={{ base: 120, md: 0 }} maxH="500px" overflowY="scroll">
+                <Table rounded="1rem" shadow="2xl">
+                  <TableCaption placement="bottom">Publicly Listed Towns</TableCaption>
+                  <Thead><Tr><Th>Room Name</Th><Th>Room ID</Th><Th>Activity</Th></Tr></Thead>
+                  <Tbody>
+                    {currentPublicTowns?.map((town) => (
+                      <Tr key={town.coveyTownID}><Td role='cell'>{town.friendlyName}</Td>
+                        <Td role='cell'>{town.coveyTownID}</Td>
+                        <Td role='cell'>{town.currentOccupancy}/{town.maximumOccupancy} </Td>
+                        <Td><Button onClick={() => handleJoin(town.coveyTownID)}
+                                    colorScheme="green"
+                                    disabled={town.currentOccupancy >= town.maximumOccupancy}>Connect</Button></Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Box>
             </Box>
-          </Box>
-        </Stack>
-      </Flex>
+          </Stack>
+        </Flex>
+      </Element>
     </>
   );
 }
