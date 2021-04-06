@@ -4,6 +4,7 @@ import { Socket as ServerSocket } from 'socket.io';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { io, Socket } from 'socket.io-client';
 import { PlaceableLocation, UserLocation } from '../CoveyTypes';
+import Placeable from '../types/Placeable';
 
 export type RemoteServerPlayer = {
   location: UserLocation;
@@ -120,4 +121,16 @@ export function setSessionTokenAndTownID(
 ): void {
   // eslint-disable-next-line
   socket.handshake.auth = { token: sessionToken, coveyTownID };
+}
+
+export function randomPlaceablesFromAllowedPlaceables(numberIds = 1): string[] {
+  const placeableIDs: string[] = Array.from(Placeable.ALLOWED_PLACEABLES);
+  const returnList: string[] = [];
+  for (let i = 0; i < numberIds; i += 1) {
+    const randomIndex = Math.floor(Math.random() * placeableIDs.length);
+    returnList.push(placeableIDs[randomIndex]);
+    placeableIDs.splice(randomIndex);
+  }
+
+  return returnList;
 }

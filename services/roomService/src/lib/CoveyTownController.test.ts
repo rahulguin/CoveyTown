@@ -3,6 +3,7 @@ import { mock, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Socket } from 'socket.io';
 import * as TestUtils from '../client/TestUtils';
+import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
 import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 import {
   PlaceableInfo,
@@ -32,18 +33,6 @@ function generateTestLocation(): UserLocation {
     x: Math.floor(Math.random() * 100),
     y: Math.floor(Math.random() * 100),
   };
-}
-
-function randomPlaceablesFromAllowedPlaceables(numberIds = 1): string[] {
-  const placeableIDs: string[] = Array.from(Placeable.ALLOWED_PLACEABLES);
-  const returnList: string[] = [];
-  for (let i = 0; i < numberIds; i += 1) {
-    const randomIndex = Math.floor(Math.random() * placeableIDs.length);
-    returnList.push(placeableIDs[randomIndex]);
-    placeableIDs.splice(randomIndex);
-  }
-
-  return returnList;
 }
 
 describe('CoveyTownController', () => {
@@ -162,7 +151,6 @@ describe('CoveyTownController', () => {
     let player: Player;
     let placedLocation: PlaceableLocation;
     let placeableID: string;
-    let secondPlaceableID: string;
 
     beforeEach(async () => {
       townName = `FriendlyNameTest-${nanoid()}`;

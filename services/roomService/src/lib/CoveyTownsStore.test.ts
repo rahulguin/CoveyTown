@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
+import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
 import { PlaceableLocation } from '../CoveyTypes';
 import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownListener from '../types/CoveyTownListener';
@@ -10,18 +11,6 @@ import CoveyTownsStore from './CoveyTownsStore';
 
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
-
-function randomPlaceablesFromAllowedPlaceables(numberIds = 1): string[] {
-  const placeableIDs: string[] = Array.from(Placeable.ALLOWED_PLACEABLES);
-  const returnList: string[] = [];
-  for (let i = 0; i < numberIds; i += 1) {
-    const randomIndex = Math.floor(Math.random() * placeableIDs.length);
-    returnList.push(placeableIDs[randomIndex]);
-    placeableIDs.splice(randomIndex);
-  }
-
-  return returnList;
-}
 
 function mockCoveyListener(): CoveyTownListener {
   return {
