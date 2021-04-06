@@ -89,6 +89,7 @@ export interface TownUpdateRequest {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -104,6 +105,7 @@ export interface PlaceableAddResponse {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   location: PlaceableLocation;
 }
 
@@ -244,6 +246,7 @@ export async function addPlaceableHandler(
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
+    requestData.playerID,
     requestData.placeableID,
     requestData.location,
   );
@@ -265,6 +268,7 @@ export async function deletePlaceableHandler(
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
+    requestData.playerID,
     requestData.location,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);

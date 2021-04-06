@@ -110,6 +110,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
+        playerID: req.body.playerID,
         placeableID: req.body.placeableID,
         location: req.body.location,
       });
@@ -130,6 +131,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
+        playerID: req.body.playerID,
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);

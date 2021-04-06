@@ -14,6 +14,9 @@ export default class Player {
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
 
+  /** Whether or not this player has permission to add/delete placeables */
+  public canPlace: boolean;
+
   constructor(userName: string) {
     this.location = {
       x: 0,
@@ -23,6 +26,7 @@ export default class Player {
     };
     this._userName = userName;
     this._id = nanoid();
+    this.canPlace = false;
   }
 
   get userName(): string {

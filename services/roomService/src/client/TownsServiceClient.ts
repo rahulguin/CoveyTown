@@ -100,6 +100,7 @@ export type CoveyTownInfo = {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -126,6 +127,7 @@ export interface PlaceableLocation {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   location: PlaceableLocation;
 }
 
