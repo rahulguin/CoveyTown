@@ -6,7 +6,9 @@ import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
 import { PlaceableLocation, UserLocation } from '../CoveyTypes';
 import addTownRoutes from '../router/towns';
+import Placeable from '../types/Placeable';
 import * as TestUtils from './TestUtils';
+import { randomPlaceablesFromAllowedPlaceables } from './TestUtils';
 import TownsServiceClient from './TownsServiceClient';
 
 type TestTownData = {
@@ -228,12 +230,12 @@ describe('TownServiceApiSocket', () => {
       coveyTownID: town.coveyTownID,
       userName: nanoid(),
     });
-    const placeableIdAdded = nanoid();
+    const [placeableIdAdded] = randomPlaceablesFromAllowedPlaceables();
     const placeablePlacedLocation: PlaceableLocation = {
       xIndex: randomInt(100),
       yIndex: randomInt(100),
     };
-    const { socketConnected, placeableAdded } = TestUtils.createSocketClient(
+    const { socketConnected, placeableAdded } = await TestUtils.createSocketClient(
       server,
       joinData.coveySessionToken,
       town.coveyTownID,
@@ -249,10 +251,12 @@ describe('TownServiceApiSocket', () => {
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
+
+    const placeableObject = new Placeable(placeableIdAdded, placeablePlacedLocation);
     const placeableResponceInfo = {
-      _name: 'dummy name',
-      _placeableID: placeableIdAdded,
-      _location: placeablePlacedLocation,
+      _name: placeableObject.name,
+      _placeableID: placeableObject.placeableID,
+      _location: placeableObject.location,
     };
     await apiClient.addPlaceable(placeableInfo);
     expect(await placeableAdded).toStrictEqual(placeableResponceInfo);
@@ -268,7 +272,7 @@ describe('TownServiceApiSocket', () => {
       coveyTownID: town.coveyTownID,
       userName: nanoid(),
     });
-    const placeableIdAdded = nanoid();
+    const [placeableIdAdded] = randomPlaceablesFromAllowedPlaceables();
     const placeablePlacedLocation: PlaceableLocation = {
       xIndex: randomInt(100),
       yIndex: randomInt(100),
@@ -281,6 +285,7 @@ describe('TownServiceApiSocket', () => {
     const {
       socketConnected: connectPromise2,
       placeableAdded: placeableAdded2,
+      placeableDeleted: placeableDeleted2,
     } = TestUtils.createSocketClient(server, joinData2.coveySessionToken, town.coveyTownID);
     await Promise.all([socketConnected, connectPromise2]);
     const placeableInfo = {
@@ -289,16 +294,23 @@ describe('TownServiceApiSocket', () => {
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
-    const placeableResponceInfo = {
-      _name: 'dummy name',
-      _placeableID: placeableIdAdded,
-      _location: placeablePlacedLocation,
+    const placeableAddObject = new Placeable(placeableIdAdded, placeablePlacedLocation);
+    const placeableAddResponceInfo = {
+      _name: placeableAddObject.name,
+      _placeableID: placeableAddObject.placeableID,
+      _location: placeableAddObject.location,
+    };
+    const placeableDeleteObject = Placeable.constructEmptyPlaceable(placeablePlacedLocation);
+    const placeableDeleteResponceInfo = {
+      _name: placeableDeleteObject.name,
+      _placeableID: placeableDeleteObject.placeableID,
+      _location: placeableDeleteObject.location,
     };
     await apiClient.addPlaceable(placeableInfo);
-    expect(await placeableAdded).toStrictEqual(placeableResponceInfo);
-    expect(await placeableAdded2).toStrictEqual(placeableResponceInfo);
+    expect(await placeableAdded).toStrictEqual(placeableAddResponceInfo);
+    expect(await placeableAdded2).toStrictEqual(placeableAddResponceInfo);
     await apiClient.deletePlaceable(placeableInfo);
-    expect(await placeableDeleted).toStrictEqual(placeableResponceInfo);
-    expect(await placeableDeleted).toStrictEqual(placeableResponceInfo);
+    expect(await placeableDeleted).toStrictEqual(placeableDeleteResponceInfo);
+    expect(await placeableDeleted2).toStrictEqual(placeableDeleteResponceInfo);
   });
 });

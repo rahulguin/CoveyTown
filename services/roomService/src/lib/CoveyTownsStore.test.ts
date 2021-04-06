@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
+import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
 import { PlaceableLocation } from '../CoveyTypes';
 import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownListener from '../types/CoveyTownListener';
@@ -254,7 +255,7 @@ describe('CoveyTownsStore', () => {
     beforeEach(() => {
       town = createTownForTesting();
       store = CoveyTownsStore.getInstance();
-      placeableID = nanoid();
+      [placeableID] = randomPlaceablesFromAllowedPlaceables();
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
       location = { xIndex, yIndex };
@@ -296,6 +297,16 @@ describe('CoveyTownsStore', () => {
           town.coveyTownID,
           town.townUpdatePassword,
           placeableID,
+          location,
+        );
+        expect(secondResponce).not.toBe(undefined);
+        expect(secondResponce?.length).toBeGreaterThan(0);
+      });
+      it('Should fail if given a plaeable Id that does not exist', async () => {
+        const secondResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          nanoid(),
           location,
         );
         expect(secondResponce).not.toBe(undefined);
