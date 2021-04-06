@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
+import { ServerPlaceable } from './Placeable';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -27,6 +28,8 @@ export interface TownJoinResponse {
   providerVideoToken: string;
   /** List of players currently in this town * */
   currentPlayers: ServerPlayer[];
+  /** List of placeabels currently in this town */
+  currentPlaceables: ServerPlaceable[];
   /** Friendly name of this town * */
   friendlyName: string;
   /** Is this a private town? * */
@@ -40,6 +43,7 @@ export interface TownCreateRequest {
   friendlyName: string;
   isPubliclyListed: boolean;
 }
+
 
 /**
  * Response from the server for a Town create request
@@ -77,6 +81,75 @@ export interface TownUpdateRequest {
 }
 
 /**
+ * payload sent by the client to add an object to a town
+ */
+export interface PlaceableAddRequest {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * Payload sent by client to retrieve a Placeable at a location
+ */
+ export interface PlaceableGetRequest {
+  coveyTownID: string
+  placeableID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * information to describe a placeable at a location
+ */
+export interface PlaceableInfo {
+  coveyTownID: string,
+  coveyTownpassword: string,
+  objectID: string,
+  location: PlaceableLocation
+}
+
+/**
+ * represents a location on the map based on index
+ */
+export interface PlaceableLocation {
+  xIndex: number
+  yIndex: number
+}
+
+/**
+ * Payload sent by the client to delete an object from a town
+ */
+export interface PlaceableDeleteRequest {
+  coveyTownID: string,
+  coveyTownPassword: string,
+  location: PlaceableLocation
+}
+
+
+/**
+ * Payload sent by the client to retrive objects from a town
+ */
+export interface ObjectListRequest {
+  coveyTownID: string,
+}
+
+export interface ObjectInfo {
+  coveyTownID: string,
+  objectID: string,
+  objectName: string,
+  location: PlaceableLocation
+}
+
+/**
+ * Responce from the server for a list of objects
+ */
+export interface ObjectListResponce {
+  objects: ObjectInfo[]
+}
+
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {
@@ -84,6 +157,8 @@ export interface ResponseEnvelope<T> {
   message?: string;
   response?: T;
 }
+
+
 
 export type CoveyTownInfo = {
   friendlyName: string;
@@ -141,5 +216,31 @@ export default class TownsServiceClient {
     const responseWrapper = await this._axios.post('/sessions', requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
+
+  // API methods to handle object requests
+  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async deletePlaceable(requestData: PlaceableDeleteRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+  
+    // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
+    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects${requestData.coveyTownID}`, requestData);
+    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    // }
+  
+    // async avaliableObject(): Promise<ObjectListResponce> {
+    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
+    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+    // }
 
 }
