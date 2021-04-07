@@ -729,6 +729,28 @@ describe('TownsServiceAPIREST', () => {
         expect(playersPermission).toBe(specification.canPlace);
       });
     }
+    /**
+     * sets all the given players (associated with the id) permission to be true for the town
+     * @param townID the id of the town to set the playerIDs true in
+     * @param townPassword the password of the town inorder to be able to set them equal
+     * @param playerIDs the list of player ids that should be set to true
+     */
+    async function setAllPermissionsTrue(
+      townID: string,
+      townPassword: string,
+      playerIDs: string[],
+    ): Promise<void> {
+      const permissions: PlayerUpdateSpecifications = { specifications: [] };
+      playerIDs.forEach(playerID => {
+        permissions.specifications.push({ playerID, canPlace: true });
+      });
+      await apiClient.updatePlayerPermissions({
+        coveyTownID: townID,
+        coveyTownPassword: townPassword,
+        updates: permissions,
+      });
+      await checkCorrectPermissions(townID, permissions);
+    }
     let firstPlayer: string;
     let secondPlayer: string;
     beforeEach(() => {
@@ -739,7 +761,8 @@ describe('TownsServiceAPIREST', () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const permissions: PlayerUpdateSpecifications = {
+      await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
+      let permissions: PlayerUpdateSpecifications = {
         specifications: [{ playerID, canPlace: true }],
       };
       try {
@@ -750,15 +773,19 @@ describe('TownsServiceAPIREST', () => {
         });
         fail('should have error for incorrect townID');
       } catch (err) {
+        permissions = {
+          specifications: [{ playerID, canPlace: true }],
+        };
         // check that no permissions were change
-        fail('finish chekcing values didnt change ');
+        await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
       }
     });
     it('should error if given invalid password', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const permissions: PlayerUpdateSpecifications = {
+      await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
+      let permissions: PlayerUpdateSpecifications = {
         specifications: [{ playerID, canPlace: true }],
       };
       try {
@@ -769,15 +796,19 @@ describe('TownsServiceAPIREST', () => {
         });
         fail('should have error for incorrect password');
       } catch (err) {
+        permissions = {
+          specifications: [{ playerID, canPlace: true }],
+        };
         // check that no permissions were change
-        fail('finish chekcing values didnt change ');
+        await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
       }
     });
     it('should do nothing if given the empty list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const permissions: PlayerUpdateSpecifications = {
+      await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
+      let permissions: PlayerUpdateSpecifications = {
         specifications: [],
       };
       apiClient.updatePlayerPermissions({
@@ -785,8 +816,11 @@ describe('TownsServiceAPIREST', () => {
         coveyTownPassword: pubTown1.townUpdatePassword,
         updates: permissions,
       });
+      permissions = {
+        specifications: [{ playerID, canPlace: true }],
+      };
       // check that no permissions were change
-      fail('finish chekcing values didnt change ');
+      await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
     });
     it('should update all the players ids that are in the list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
@@ -807,6 +841,7 @@ describe('TownsServiceAPIREST', () => {
       // check that there were no ids returned as not existing (should get caught by error but double checking)
       expect(updateResponce).toBe(undefined);
       // check that the players values are now as expected
+      await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
     });
     it('should not update any players whose id do not appear in the list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
@@ -814,20 +849,13 @@ describe('TownsServiceAPIREST', () => {
       const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
       const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
       // sets the values so it is known what it was before the update
-      let permissions: PlayerUpdateSpecifications = {
-        specifications: [
-          { playerID: firstPlayerID, canPlace: true },
-          { playerID: secondPlayerID, canPlace: true },
-        ],
-      };
-      apiClient.updatePlayerPermissions({
-        coveyTownID: pubTown1.coveyTownID,
-        coveyTownPassword: pubTown1.townUpdatePassword,
-        updates: permissions,
-      });
+      await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [
+        firstPlayerID,
+        secondPlayerID,
+      ]);
       // check that the players values are now as expected
 
-      permissions = {
+      let permissions = {
         specifications: [{ playerID: firstPlayerID, canPlace: false }],
       };
       apiClient.updatePlayerPermissions({
@@ -835,18 +863,28 @@ describe('TownsServiceAPIREST', () => {
         coveyTownPassword: pubTown1.townUpdatePassword,
         updates: permissions,
       });
+      permissions = {
+        specifications: [
+          { playerID: firstPlayerID, canPlace: false },
+          { playerID: secondPlayerID, canPlace: true },
+        ],
+      };
       // check that the players values are now as expected
-      fail('add code that checks these conditions');
+      await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
     });
     it('should error if given a player id that does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
       const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [
+        firstPlayerID,
+        secondPlayerID,
+      ]);
       // sets the values so it is known what it was before the update
       let permissions: PlayerUpdateSpecifications = {
         specifications: [
-          { playerID: firstPlayerID, canPlace: true },
+          { playerID: firstPlayerID, canPlace: false },
           { playerID: secondPlayerID, canPlace: true },
           { playerID: nanoid(), canPlace: true },
         ],
@@ -860,11 +898,11 @@ describe('TownsServiceAPIREST', () => {
       } catch (err) {
         permissions = {
           specifications: [
-            { playerID: firstPlayerID, canPlace: true },
+            { playerID: firstPlayerID, canPlace: false },
             { playerID: secondPlayerID, canPlace: true },
           ],
         };
-        // check that now permissions were changed
+        // check that no permissions were changed
         await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
       }
     });
