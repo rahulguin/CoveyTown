@@ -292,7 +292,7 @@ describe('CoveyTownController', () => {
       expect(playerOneFalse.canPlace).toBe(true);
       expect(playerTwoFalse.canPlace).toBe(false);
     });
-    it('should return a list of missing ids if given player ids that do not match, and not update any values', async () => {
+    it('should return a set (list with no duplcates) of missing ids if given player ids that do not match, and not update any values', async () => {
       const specifications: PlayerPermissionSpecification[] = [];
       const sneakyPlayer1: string = nanoid();
       const sneakyPlayer2: string = nanoid();
@@ -302,7 +302,8 @@ describe('CoveyTownController', () => {
       specifications.push({ playerID: playerOneFalse.id, canPlace: true });
 
       const updateResponse = townController.updatePlayerPermissions({ specifications });
-      expect(updateResponse).toContain([sneakyPlayer2, sneakyPlayer1]);
+      expect(updateResponse).toContain(sneakyPlayer2);
+      expect(updateResponse).toContain(sneakyPlayer1);
       expect(updateResponse.length).toBe(2);
 
       // checks that no values were updated since there was a player id that did not exist
@@ -311,7 +312,7 @@ describe('CoveyTownController', () => {
       expect(playerOneFalse.canPlace).toBe(false);
       expect(playerTwoFalse.canPlace).toBe(false);
     });
-    it('should error and not update any values if provided with duplicate IDs, returning a list of all duplicated ids', async () => {
+    it('should error and not update any values if provided with duplicate IDs, returning a set (list with no duplcates) of all duplicated ids', async () => {
       const specifications: PlayerPermissionSpecification[] = [];
       specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
       specifications.push({ playerID: playerTwoTrue.id, canPlace: true });
@@ -321,7 +322,8 @@ describe('CoveyTownController', () => {
       specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
 
       const updateResponse = townController.updatePlayerPermissions({ specifications });
-      expect(updateResponse).toContain([playerTwoTrue, playerOneFalse]);
+      expect(updateResponse).toContain(playerTwoTrue.id);
+      expect(updateResponse).toContain(playerOneFalse.id);
       expect(updateResponse.length).toBe(2);
 
       // checks that no values were updated

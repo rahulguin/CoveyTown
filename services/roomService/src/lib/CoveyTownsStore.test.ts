@@ -781,7 +781,8 @@ describe('CoveyTownsStore', () => {
         town.townUpdatePassword,
         { specifications },
       );
-      expect(updateResponse).toContain([sneakyPlayer2, sneakyPlayer1]);
+      expect(updateResponse).toContain(sneakyPlayer1);
+      expect(updateResponse).toContain(sneakyPlayer2);
       expect(updateResponse.length).toBe(2);
 
       // checks that no values were updated
@@ -804,7 +805,8 @@ describe('CoveyTownsStore', () => {
         town.townUpdatePassword,
         { specifications },
       );
-      expect(updateResponse).toContain([playerTwoTrue, playerOneFalse]);
+      expect(updateResponse).toContain(playerOneFalse.id);
+      expect(updateResponse).toContain(playerTwoTrue.id);
       expect(updateResponse.length).toBe(2);
 
       // checks that no values were updated

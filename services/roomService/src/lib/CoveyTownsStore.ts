@@ -157,7 +157,7 @@ export default class CoveyTownsStore {
     coveyTownID: string,
     coveyTownPassword: string,
     updates: PlayerUpdateSpecifications,
-  ) {
+  ): string | string[] {
     const existingTown = this.getControllerForTown(coveyTownID);
     if (existingTown) {
       if (passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
@@ -172,7 +172,7 @@ export default class CoveyTownsStore {
   getPlayersPermission(townID: string, playerID: string): boolean | undefined {
     const existingTown = this.getControllerForTown(townID);
     if (existingTown) {
-      const getResponce = existingTown.getPlayerPermissions(playerID);
+      const getResponce = existingTown.getPlayersPermission(playerID);
       return getResponce;
     }
     return undefined;

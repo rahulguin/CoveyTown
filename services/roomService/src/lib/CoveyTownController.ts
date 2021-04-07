@@ -269,17 +269,50 @@ export default class CoveyTownController {
     };
   }
 
-  updatePlayerPermissions(playersToUpdate: PlayerUpdateSpecifications): void {
+  private createSetOfMissingOrDuplicated(playersToUpdate: PlayerUpdateSpecifications): string[] {
+    const troubleSomeIDs = new Set<string>();
+    // set of IDs that have already been see
+    const seenIDs = new Set<string>(undefined);
+    // checks if there are any player ids missing if so adds them to the list of missing player ids
+    playersToUpdate.specifications.forEach(updateSpecification => {
+      const { playerID } = updateSpecification;
+      // checks if the player id has already been seen
+      if (seenIDs.has(playerID)) {
+        // if it hasn't adds it to the troublesome ids
+        troubleSomeIDs.add(playerID);
+      } else {
+        // if it hasnt add it to the set of seen IDs
+        seenIDs.add(playerID);
+
+        // then check if it appears in the list
+        const playerToUpdate = this._players.find(player => player.id === playerID);
+        if (!playerToUpdate) {
+          troubleSomeIDs.add(playerID);
+        }
+      }
+    });
+
+    return Array.from(troubleSomeIDs);
+  }
+
+  updatePlayerPermissions(playersToUpdate: PlayerUpdateSpecifications): string[] {
+    // f
+    const troubleSomeIDs = this.createSetOfMissingOrDuplicated(playersToUpdate);
+    // if there were missing/or duplicated ids return the ids
+    if (troubleSomeIDs.length > 0) {
+      return troubleSomeIDs;
+    }
+
+    // since none of the ids were missing update them
     playersToUpdate.specifications.forEach(updateSpecification => {
       const playerToUpdate = this._players.find(
         player => player.id === updateSpecification.playerID,
       );
       if (playerToUpdate) {
         playerToUpdate.canPlace = updateSpecification.canPlace;
-      } else {
-        // this means there was not a player by the given id so ...
       }
     });
+    return [];
   }
 
   getPlayersPermission(playerID: string): boolean | undefined {
