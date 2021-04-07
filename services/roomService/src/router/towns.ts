@@ -1,5 +1,4 @@
-import bodyParser from 'body-parser';
-import BodyParser from 'body-parser';
+import { default as bodyParser, default as BodyParser } from 'body-parser';
 import { Express } from 'express';
 import { Server } from 'http';
 import { StatusCodes } from 'http-status-codes';
@@ -14,6 +13,7 @@ import {
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
+  updatePlayerPermissionsHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -162,12 +162,27 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.post('path to be used', bodyParser.json(), async (req, res) => {
+  app.post('permissions/townID:', bodyParser.json(), async (req, res) => {
     try {
       const result = await updatePlayerPermissionsHandler({
         coveyTownID: req.params.townID,
-        coveyTownPassword: 
-        location: req.body.location,
+        coveyTownPassword: req.body.coveyTownPassword,
+        updates: req.body.updates,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.get('permissions/townID:', bodyParser.json(), async (req, res) => {
+    try {
+      const result = await getPlayersPermission({
+        coveyTownID: req.params.townID,
+        playerID: req.body.playerID,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {

@@ -162,6 +162,13 @@ export interface PlayerUpdatePermissionsRequest {
   updates: PlayerUpdateSpecifications;
 }
 /**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
+}
+/**
  * Responce from the server for a list of placeables
  */
 export interface PlaceableListResponce {
@@ -255,7 +262,15 @@ export default class TownsServiceClient {
 
   async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest) {
     const responseWrapper = await this._axios.post<ResponseEnvelope<returnvalue>>(
-      'path to be created',
+      'placeables/townID:',
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlayerPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<boolean>>(
+      'placeables/townID:',
       requestData,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);

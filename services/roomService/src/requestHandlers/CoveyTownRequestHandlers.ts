@@ -136,6 +136,13 @@ export interface PlayerUpdatePermissionsRequest {
   coveyTownPassword: string;
   updates: PlayerUpdateSpecifications;
 }
+/**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
+}
 
 /**
  * Responce from the server for a list of placeables
@@ -325,6 +332,21 @@ export async function updatePlayerPermissionsHandler(
     response: placeable,
     // the message returned is the message to be recieved
     message: !placeable ? undefined : 'Invalid town id given',
+  };
+}
+
+export async function getPlayerPermission(
+  requestData: PlayerGetPermissionRequest,
+): Promise<ResponseEnvelope<boolean>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const getResponce = townsStore.getPlayerPermission(requestData.coveyTownID, requestData.playerID);
+  return {
+    // if the responce was undefined then getPlaceable was unsuccessful
+    isOK: getResponce !== undefined,
+    // return the value placeable if defined
+    response: getResponce,
+    // error message returned if undefined
+    message: getResponce === undefined ? 'Invalid town id given' : undefined,
   };
 }
 

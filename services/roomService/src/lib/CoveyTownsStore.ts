@@ -168,4 +168,13 @@ export default class CoveyTownsStore {
     }
     return 'Invalid room information: Double check that the room exists';
   }
+
+  getPlayersPermission(townID: string, playerID: string): boolean | undefined {
+    const existingTown = this.getControllerForTown(townID);
+    if (existingTown) {
+      const getResponce = existingTown.getPlayerPermissions(playerID);
+      return getResponce;
+    }
+    return undefined;
+  }
 }

@@ -1,5 +1,10 @@
 import { customAlphabet, nanoid } from 'nanoid';
-import { PlaceableInfo, PlaceableLocation, PlayerUpdateSpecifications, UserLocation } from '../CoveyTypes';
+import {
+  PlaceableInfo,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+  UserLocation,
+} from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
 import Player from '../types/Player';
@@ -265,13 +270,23 @@ export default class CoveyTownController {
   }
 
   updatePlayerPermissions(playersToUpdate: PlayerUpdateSpecifications): void {
-    playersToUpdate.specifications.forEach((updateSpecification) => {
-      const playerToUpdate = this._players.find((player) => player.id === updateSpecification.playerID);
+    playersToUpdate.specifications.forEach(updateSpecification => {
+      const playerToUpdate = this._players.find(
+        player => player.id === updateSpecification.playerID,
+      );
       if (playerToUpdate) {
         playerToUpdate.canPlace = updateSpecification.canPlace;
       } else {
-        this means there was not a player by the given id so ...
+        // this means there was not a player by the given id so ...
       }
     });
+  }
+
+  getPlayersPermission(playerID: string): boolean | undefined {
+    const requestedPlayer = this.players.find(player => player.id === playerID);
+    if (requestedPlayer) {
+      return requestedPlayer.canPlace;
+    }
+    return undefined;
   }
 }
