@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from "react-router-dom"
 import { Element } from 'react-scroll'
 import assert from "assert";
 import {
@@ -13,7 +12,6 @@ import {
   Input,
   Stack,
   Table,
-  Text,
   TableCaption,
   Tbody,
   Td,
@@ -21,7 +19,6 @@ import {
   Image,
   Thead,
   Tr,
-  HStack,
   useToast, Divider, Center
 } from '@chakra-ui/react';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';

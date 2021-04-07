@@ -306,6 +306,10 @@ class CoveyGameScene extends Phaser.Scene {
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
+
+    let boxSprite;
+
+
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
@@ -316,7 +320,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Hey! Do you want \nto add \nan object here?", {
+      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Do you want \nto add \nan object here?", {
         color: '#FF7000',
         backgroundColor: '#F0000',
       });
@@ -330,12 +334,12 @@ class CoveyGameScene extends Phaser.Scene {
       );
       yesButton.setInteractive();
 
-
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       yesButton.on('pointerdown', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const boxSprite = this.physics.add.image(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
+
+        boxSprite = this.physics.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
@@ -343,12 +347,16 @@ class CoveyGameScene extends Phaser.Scene {
           
 
         this.physics.add.collider(sprite, boxSprite);
+        boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+
+
+
       const noButton = this.add.text(this.lastLocation.x + 150, this.lastLocation.y + 55, 'No',{
         color: '#FF7000',
         backgroundColor: '#FFF000',
@@ -365,23 +373,6 @@ class CoveyGameScene extends Phaser.Scene {
       }
 
     });
-
-    sprite.on('pointerout', () => {
-
-      sprite.clearTint();
-
-    });
-
-    sprite.on('pointerup', () => {
-
-      sprite.clearTint();
-
-    });
-
-
-
-
-
 
 
 
