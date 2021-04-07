@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import { Socket } from 'socket.io';
 import * as TestUtils from '../client/TestUtils';
 import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
-import { PlaceableLocation, UserLocation } from '../CoveyTypes';
+import { PlaceableLocation, PlayerPermissionSpecification, UserLocation } from '../CoveyTypes';
 import {
   PlaceableInfo,
   townSubscriptionHandler,
@@ -228,6 +228,70 @@ describe('CoveyTownController', () => {
 
       const getResponce = townController.getPlaceableAt(placedLocation);
       expect(getResponce).toStrictEqual(emptyInfo);
+    });
+  });
+  describe('updatePlayerPermissions', () => {
+    let townController: CoveyTownController;
+    let playerOneTrue: Player;
+    let playerTwoTrue: Player;
+    let playerOneFalse: Player;
+    let playerTwoFalse: Player;
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = new CoveyTownController(townName, false);
+      // creates two players whos default value is true
+      playerOneTrue = new Player('P1T');
+      playerOneTrue.canPlace = true;
+      playerTwoTrue = new Player('P2T');
+      playerTwoTrue.canPlace = true;
+      // creates two players whos default value is false
+      playerOneFalse = new Player('P1F');
+      playerOneFalse.canPlace = false;
+      playerTwoFalse = new Player('P2F');
+      playerTwoFalse.canPlace = false;
+      //  adds all players to the town
+      townController.addPlayer(playerOneTrue);
+      townController.addPlayer(playerTwoTrue);
+      townController.addPlayer(playerOneFalse);
+      townController.addPlayer(playerTwoFalse);
+    });
+    it('should do nothing if given the empty list', async () => {
+      townController.updatePlayerPermissions({ specifications: [] });
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should updates all the players ids that are in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerOneTrue.id, canPlace: true });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      townController.updatePlayerPermissions({ specifications });
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should not update any players whose id do not appear in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      townController.updatePlayerPermissions({ specifications });
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should handle ids that do not exist', async () => {
+      // decide on functionality and implement
+      fail;
     });
   });
   describe('town listeners and events', () => {

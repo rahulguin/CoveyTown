@@ -710,4 +710,15 @@ describe('TownsServiceAPIREST', () => {
       expect(secondGetResponce).toStrictEqual(firstGetResponce);
     });
   });
+  describe('apiClientUpdatePlayerPermissions', () => {
+    it('should error if given invalid roomID', async () => {});
+    it('should error if given invalid password', async () => {});
+    it('should do nothing if given the empty list', async () => {});
+    it('should update all the players ids that are in the list', async () => {});
+    it('should not update any players whose id do not appear in the list', async () => {});
+    it('should handle ids that do not exist', async () => {
+      // decide on functionality and implement
+      fail;
+    });
+  });
 });
