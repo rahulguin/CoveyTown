@@ -739,4 +739,53 @@ describe('CoveyTownsStore', () => {
       fail;
     });
   });
+  describe('getPlayerPermission', async () => {
+    let townController: CoveyTownController;
+    let player: Player;
+    const store = CoveyTownsStore.getInstance();
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = store.createTown(townName, true);
+      // creates two players whos default value is true
+      player = new Player('test player');
+      player.canPlace = true;
+      townController.addPlayer(player);
+    });
+    it('should return undefined if town id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(`${townController.coveyTownID}*`, player.id);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return undefind if the players id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, `${player.id}*`);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return true if the player has permission', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(getResponce).toBe(true);
+    });
+    it('should return false if the player does not ahve permission', async () => {
+      player.canPlace = false;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(getResponce).toBe(false);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - true', async () => {
+      player.canPlace = true;
+      const firstGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(firstGetResponce).toBe(true);
+      const secondGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(secondGetResponce).toBe(true);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - false', async () => {
+      player.canPlace = false;
+      const firstGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(firstGetResponce).toBe(false);
+      const secondGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(secondGetResponce).toBe(false);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+  });
 });

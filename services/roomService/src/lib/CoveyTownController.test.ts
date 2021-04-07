@@ -294,6 +294,49 @@ describe('CoveyTownController', () => {
       fail;
     });
   });
+  describe('getPlayerPermission', () => {
+    let townController: CoveyTownController;
+    let player: Player;
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = new CoveyTownController(townName, false);
+      // creates two players whos default value is true
+      player = new Player('test player');
+      player.canPlace = true;
+      townController.addPlayer(player);
+    });
+    it('should return undefind if the players id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = townController.getPlayersPermission(`${player.id}*`);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return true if the player has permission', async () => {
+      player.canPlace = true;
+      const getResponce = townController.getPlayersPermission(player.id);
+      expect(getResponce).toBe(true);
+    });
+    it('should return false if the player does not ahve permission', async () => {
+      player.canPlace = false;
+      const getResponce = townController.getPlayersPermission(player.id);
+      expect(getResponce).toBe(false);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - true', async () => {
+      player.canPlace = true;
+      const firstGetResponce = townController.getPlayersPermission(player.id);
+      expect(firstGetResponce).toBe(true);
+      const secondGetResponce = townController.getPlayersPermission(player.id);
+      expect(secondGetResponce).toBe(true);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - false', async () => {
+      player.canPlace = false;
+      const firstGetResponce = townController.getPlayersPermission(player.id);
+      expect(firstGetResponce).toBe(false);
+      const secondGetResponce = townController.getPlayersPermission(player.id);
+      expect(secondGetResponce).toBe(false);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+  });
   describe('town listeners and events', () => {
     let testingTown: CoveyTownController;
     const mockListeners = [
