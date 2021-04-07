@@ -5,6 +5,7 @@ import Express from 'express';
 import http from 'http';
 import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
+import { PlayerUpdateSpecifications } from '../CoveyTypes';
 import addTownRoutes from '../router/towns';
 import Placeable from '../types/Placeable';
 import { randomPlaceablesFromAllowedPlaceables } from './TestUtils';
@@ -711,14 +712,161 @@ describe('TownsServiceAPIREST', () => {
     });
   });
   describe('apiClientUpdatePlayerPermissions', () => {
-    it('should error if given invalid roomID', async () => {});
-    it('should error if given invalid password', async () => {});
-    it('should do nothing if given the empty list', async () => {});
-    it('should update all the players ids that are in the list', async () => {});
-    it('should not update any players whose id do not appear in the list', async () => {});
-    it('should handle ids that do not exist', async () => {
-      // decide on functionality and implement
-      fail;
+    /**
+     * helper function used to find if players have the correct permissions
+     * @param townID the town id to check for the permissions in
+     * @param expectedPermissions a list of playerID and canPlace to check against
+     */
+    async function checkCorrectPermissions(
+      townID: string,
+      expectedPermissions: PlayerUpdateSpecifications,
+    ): Promise<void> {
+      expectedPermissions.specifications.forEach(async specification => {
+        const playersPermission = await apiClient.getPlayerPermission({
+          coveyTownID: townID,
+          playerID: specification.playerID,
+        });
+        expect(playersPermission).toBe(specification.canPlace);
+      });
+    }
+    let firstPlayer: string;
+    let secondPlayer: string;
+    beforeEach(() => {
+      firstPlayer = `test player1-${nanoid()}`;
+      secondPlayer = `test player2=${nanoid()}`;
+    });
+    it('should error if given invalid roomID', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const permissions: PlayerUpdateSpecifications = {
+        specifications: [{ playerID, canPlace: true }],
+      };
+      try {
+        apiClient.updatePlayerPermissions({
+          coveyTownID: `${pubTown1.coveyTownID}*`,
+          coveyTownPassword: pubTown1.townUpdatePassword,
+          updates: permissions,
+        });
+        fail('should have error for incorrect townID');
+      } catch (err) {
+        // check that no permissions were change
+        fail('finish chekcing values didnt change ');
+      }
+    });
+    it('should error if given invalid password', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const permissions: PlayerUpdateSpecifications = {
+        specifications: [{ playerID, canPlace: true }],
+      };
+      try {
+        apiClient.updatePlayerPermissions({
+          coveyTownID: pubTown1.coveyTownID,
+          coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
+          updates: permissions,
+        });
+        fail('should have error for incorrect password');
+      } catch (err) {
+        // check that no permissions were change
+        fail('finish chekcing values didnt change ');
+      }
+    });
+    it('should do nothing if given the empty list', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const permissions: PlayerUpdateSpecifications = {
+        specifications: [],
+      };
+      apiClient.updatePlayerPermissions({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        updates: permissions,
+      });
+      // check that no permissions were change
+      fail('finish chekcing values didnt change ');
+    });
+    it('should update all the players ids that are in the list', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      const permissions: PlayerUpdateSpecifications = {
+        specifications: [
+          { playerID: firstPlayerID, canPlace: true },
+          { playerID: secondPlayerID, canPlace: false },
+        ],
+      };
+      const updateResponce = apiClient.updatePlayerPermissions({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        updates: permissions,
+      });
+      // check that there were no ids returned as not existing (should get caught by error but double checking)
+      expect(updateResponce).toBe(undefined);
+      // check that the players values are now as expected
+    });
+    it('should not update any players whose id do not appear in the list', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      // sets the values so it is known what it was before the update
+      let permissions: PlayerUpdateSpecifications = {
+        specifications: [
+          { playerID: firstPlayerID, canPlace: true },
+          { playerID: secondPlayerID, canPlace: true },
+        ],
+      };
+      apiClient.updatePlayerPermissions({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        updates: permissions,
+      });
+      // check that the players values are now as expected
+
+      permissions = {
+        specifications: [{ playerID: firstPlayerID, canPlace: false }],
+      };
+      apiClient.updatePlayerPermissions({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        updates: permissions,
+      });
+      // check that the players values are now as expected
+      fail('add code that checks these conditions');
+    });
+    it('should error if given a player id that does not exist', async () => {
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      // sets the values so it is known what it was before the update
+      let permissions: PlayerUpdateSpecifications = {
+        specifications: [
+          { playerID: firstPlayerID, canPlace: true },
+          { playerID: secondPlayerID, canPlace: true },
+          { playerID: nanoid(), canPlace: true },
+        ],
+      };
+      try {
+        apiClient.updatePlayerPermissions({
+          coveyTownID: pubTown1.coveyTownID,
+          coveyTownPassword: pubTown1.townUpdatePassword,
+          updates: permissions,
+        });
+      } catch (err) {
+        permissions = {
+          specifications: [
+            { playerID: firstPlayerID, canPlace: true },
+            { playerID: secondPlayerID, canPlace: true },
+          ],
+        };
+        // check that now permissions were changed
+        await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
+      }
     });
   });
 });

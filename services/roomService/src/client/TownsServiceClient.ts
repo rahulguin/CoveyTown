@@ -261,7 +261,7 @@ export default class TownsServiceClient {
   }
 
   async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest) {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<returnvalue>>(
+    const responseWrapper = await this._axios.post<ResponseEnvelope<string[]>>(
       'placeables/townID:',
       requestData,
     );
