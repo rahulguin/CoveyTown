@@ -265,14 +265,17 @@ class CoveyGameScene extends Phaser.Scene {
 
     /* Box object taken from tileMapJSON. Adding immovable property to the box object */
     const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
+    const boxX = 445.48494238827;
+    const boxY = 1220.339298184358;
     let boxImage;
     boxes.forEach(box => {
-      if(box.x && box.y){
-        boxImage = this.physics.add.image(box.x, box.y, 'box');
+      // if(box.x && box.y){
+        // boxImage = this.physics.add.image(box.x, box.y, 'box');
+        boxImage = this.physics.add.image(boxX, boxY, 'box');
         boxImage.setDisplaySize(50,50)
         boxImage.setImmovable(true);
         boxImage.body.setAllowGravity(false);
-      }
+      // }
     });
 
     const cursorKeys = this.input.keyboard.createCursorKeys();
