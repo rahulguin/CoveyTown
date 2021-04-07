@@ -335,9 +335,12 @@ class CoveyGameScene extends Phaser.Scene {
       yesButton.on('pointerdown', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const boxSprite = this.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
+        const boxSprite = this.physics.add.image(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
           .setInteractive()
           .setDisplaySize(50,50);
+        boxSprite.setImmovable(true);
+        boxSprite.body.setAllowGravity(false);
+          
 
         this.physics.add.collider(sprite, boxSprite);
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
