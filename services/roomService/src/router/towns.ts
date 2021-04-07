@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser';
 import BodyParser from 'body-parser';
 import { Express } from 'express';
 import { Server } from 'http';
@@ -150,6 +151,22 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     try {
       const result = await getPlaceableHandler({
         coveyTownID: req.params.townID,
+        location: req.body.location,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.post('path to be used', bodyParser.json(), async (req, res) => {
+    try {
+      const result = await updatePlayerPermissionsHandler({
+        coveyTownID: req.params.townID,
+        coveyTownPassword: 
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);

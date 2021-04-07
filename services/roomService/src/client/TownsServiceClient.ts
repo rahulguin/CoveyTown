@@ -1,6 +1,6 @@
 import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { UserLocation } from '../CoveyTypes';
+import { PlayerUpdateSpecifications, UserLocation } from '../CoveyTypes';
 
 export type ServerPlayer = { _id: string; _userName: string; location: UserLocation };
 
@@ -154,6 +154,14 @@ export interface PlaceableInfo {
 }
 
 /**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
+/**
  * Responce from the server for a list of placeables
  */
 export interface PlaceableListResponce {
@@ -241,6 +249,14 @@ export default class TownsServiceClient {
     const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(
       `/placeables/${requestData.coveyTownID}`,
       { data: requestData },
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest) {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<returnvalue>>(
+      'path to be created',
+      requestData,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }

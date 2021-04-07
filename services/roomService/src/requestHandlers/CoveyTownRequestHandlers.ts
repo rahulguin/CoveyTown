@@ -1,7 +1,12 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
 import { PlaceableGetRequest } from '../client/TownsServiceClient';
-import { CoveyTownList, PlaceableLocation, UserLocation } from '../CoveyTypes';
+import {
+  CoveyTownList,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+  UserLocation,
+} from '../CoveyTypes';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
@@ -124,6 +129,15 @@ export interface PlaceableInfo {
 }
 
 /**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
+
+/**
  * Responce from the server for a list of placeables
  */
 export interface PlaceableListResponce {
@@ -237,8 +251,6 @@ export async function townUpdateHandler(
   };
 }
 
-// methods for adding, deleting, getting, and listing placeabless
-
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
@@ -287,6 +299,25 @@ export async function getPlaceableHandler(
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
   const townsStore = CoveyTownsStore.getInstance();
   const placeable = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
+  return {
+    // if the string is undefined then getPlaceable was unsuccessful
+    isOK: placeable !== undefined,
+    // returns the placeable that should be located there
+    response: placeable,
+    // the message returned is the message to be recieved
+    message: !placeable ? undefined : 'Invalid town id given',
+  };
+}
+
+export async function updatePlayerPermissionsHandler(
+  requestData: PlayerUpdatePermissionsRequest,
+): Promise<ResponseEnvelope<type>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const sucessful = townsStore.updatePlayerPermissions(
+    requestData.coveyTownID,
+    requestData.coveyTownPassword,
+    requestData.updates,
+  );
   return {
     // if the string is undefined then getPlaceable was unsuccessful
     isOK: placeable !== undefined,
