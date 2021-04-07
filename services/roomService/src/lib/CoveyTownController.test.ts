@@ -256,7 +256,8 @@ describe('CoveyTownController', () => {
       townController.addPlayer(playerTwoFalse);
     });
     it('should do nothing if given the empty list', async () => {
-      townController.updatePlayerPermissions({ specifications: [] });
+      const updateResponse = townController.updatePlayerPermissions({ specifications: [] });
+      expect(updateResponse).toStrictEqual([]);
 
       expect(playerOneTrue.canPlace).toBe(true);
       expect(playerTwoTrue.canPlace).toBe(true);
@@ -270,7 +271,8 @@ describe('CoveyTownController', () => {
       specifications.push({ playerID: playerOneFalse.id, canPlace: true });
       specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
 
-      townController.updatePlayerPermissions({ specifications });
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toStrictEqual([]);
 
       expect(playerOneTrue.canPlace).toBe(true);
       expect(playerTwoTrue.canPlace).toBe(false);
@@ -282,16 +284,51 @@ describe('CoveyTownController', () => {
       specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
       specifications.push({ playerID: playerOneFalse.id, canPlace: true });
 
-      townController.updatePlayerPermissions({ specifications });
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toStrictEqual([]);
 
       expect(playerOneTrue.canPlace).toBe(true);
       expect(playerTwoTrue.canPlace).toBe(false);
       expect(playerOneFalse.canPlace).toBe(true);
       expect(playerTwoFalse.canPlace).toBe(false);
     });
-    it('should handle ids that do not exist', async () => {
-      // decide on functionality and implement
-      fail;
+    it('should return a list of missing ids if given player ids that do not match, and not update any values', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      const sneakyPlayer1: string = nanoid();
+      const sneakyPlayer2: string = nanoid();
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer1, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer2, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toContain([sneakyPlayer2, sneakyPlayer1]);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated since there was a player id that did not exist
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should error and not update any values if provided with duplicate IDs, returning a list of all duplicated ids', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toContain([playerTwoTrue, playerOneFalse]);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
     });
   });
   describe('getPlayerPermission', () => {
