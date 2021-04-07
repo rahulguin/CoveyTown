@@ -1,4 +1,9 @@
-import { CoveyTownList, PlaceableInfo, PlaceableLocation } from '../CoveyTypes';
+import {
+  CoveyTownList,
+  PlaceableInfo,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+} from '../CoveyTypes';
 import Player from '../types/Player';
 import CoveyTownController from './CoveyTownController';
 
@@ -12,6 +17,13 @@ function passwordMatches(provided: string, expected: string): boolean {
   return false;
 }
 
+/**
+ * checks that the provided password is correct or that the given player has permission to place
+ * @param providedPassword the password to compare
+ * @param town the town to check all this information with
+ * @param requestingPlayer the player requesting to add a placeable (in the case of undefined just checks if the password is correct)
+ * @returns if the password is correct or the player is defined and has permission
+ */
 function correctPasswordOrPermission(
   providedPassword: string,
   town: CoveyTownController,
@@ -139,5 +151,21 @@ export default class CoveyTownsStore {
       return deleteResponce;
     }
     return undefined;
+  }
+
+  updatePlayerPermissions(
+    coveyTownID: string,
+    coveyTownPassword: string,
+    updates: PlayerUpdateSpecifications,
+  ) {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown) {
+      if (passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
+        const updateResponce = existingTown.updatePlayerPermissions(updates);
+        return updateResponce;
+      }
+      return 'Incorrect password: please double check that you have the password correct';
+    }
+    return 'Invalid room information: Double check that the room exists';
   }
 }
