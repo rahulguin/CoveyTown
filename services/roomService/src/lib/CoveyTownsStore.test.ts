@@ -344,8 +344,41 @@ describe('CoveyTownsStore', () => {
           town.coveyTownID,
           town.townUpdatePassword,
           player.id,
-          nanoid(),
+          placeableID,
           location,
+        );
+        expect(secondResponce).not.toBe(undefined);
+        expect(secondResponce?.length).toBeGreaterThan(0);
+      });
+      it('Should fail if given undefined location - entirely null', async () => {
+        const secondResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          undefined,
+        );
+        expect(secondResponce).not.toBe(undefined);
+        expect(secondResponce?.length).toBeGreaterThan(0);
+      });
+      it('Should fail if given undefined location - null xIndex', async () => {
+        const secondResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          { xIndex: undefined, yIndex: location.yIndex },
+        );
+        expect(secondResponce).not.toBe(undefined);
+        expect(secondResponce?.length).toBeGreaterThan(0);
+      });
+      it('should fail if given undefiend location - null yIndex', async () => {
+        const secondResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          { xIndex: location.xIndex, yIndex: undefined },
         );
         expect(secondResponce).not.toBe(undefined);
         expect(secondResponce?.length).toBeGreaterThan(0);
@@ -843,7 +876,7 @@ describe('CoveyTownsStore', () => {
       const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
       expect(getResponce).toBe(true);
     });
-    it('should return false if the player does not ahve permission', async () => {
+    it('should return false if the player does not have permission', async () => {
       player.canPlace = false;
       const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
       expect(getResponce).toBe(false);

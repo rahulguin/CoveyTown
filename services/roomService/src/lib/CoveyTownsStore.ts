@@ -5,6 +5,7 @@ import {
   PlayerUpdateSpecifications,
 } from '../CoveyTypes';
 import Player from '../types/Player';
+import { isDefined } from '../Utils';
 import CoveyTownController from './CoveyTownController';
 
 function passwordMatches(provided: string, expected: string): boolean {
@@ -112,6 +113,15 @@ export default class CoveyTownsStore {
       // checks that the player has permission to add or they have provided a valid password
       const requestingPlayer = existingTown.players.find(player => player.id === playerID);
       if (correctPasswordOrPermission(coveyTownPassword, existingTown, requestingPlayer)) {
+        if (
+          !(
+            isDefined(placeableLocation) &&
+            isDefined(placeableLocation.xIndex) &&
+            isDefined(placeableLocation.yIndex)
+          )
+        ) {
+          return 'Invalid Location: the location to add the placeable must be defined';
+        }
         const addResponce = existingTown.addPlaceable(placeableID, placeableLocation);
         return addResponce;
       }
