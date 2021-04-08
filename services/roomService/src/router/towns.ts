@@ -58,6 +58,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.get('/towns', BodyParser.json(), async (_req, res) => {
     try {
+      
       const result = await townListHandler();
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
@@ -107,6 +108,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.post('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
+      console.log('in towns townid: ', req.params.townID);
+      console.log('in towns pswd: ', req.body.coveyTownPassword);
+      console.log('in towns placeable id: ', req.body.placeableID);
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,

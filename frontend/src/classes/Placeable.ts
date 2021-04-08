@@ -17,7 +17,7 @@ export default class Placeable {
   }
 
   static fromServerPlaceable(serverPlaceable: ServerPlaceable): Placeable {
-    return new Placeable(serverPlaceable._placeableID, serverPlaceable._placeableName, serverPlaceable.location)
+    return new Placeable(serverPlaceable._placeableID, serverPlaceable._placeableName, serverPlaceable._location)
   }
 
   get location(): PlaceableLocation {
@@ -38,7 +38,7 @@ export default class Placeable {
 
   /**
 
-   * compares two locations by doing deep equality of their xInded and yIndexValues
+   * compares two locations by doing deep equality of their xInded and yIndex Values
 
    * @param location1 the first location
 
@@ -60,5 +60,5 @@ export default class Placeable {
 
 export type PlaceableLocation = { xIndex: number, yIndex: number }
 
-export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, location: PlaceableLocation }
+export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, _location: PlaceableLocation }
 

@@ -83,8 +83,13 @@ export default class CoveyTownsStore {
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
+    if (!(placeableLocation && placeableLocation.xIndex && placeableLocation.yIndex)) {
+
+        return 'Invalid Location: the location  to add the placeable must be defined';
+    }
     const existingTown = this.getControllerForTown(coveyTownID);
-    if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
+    console.log('IN COVEYSTORE coveyTownPassword', coveyTownPassword);
+    if (existingTown && passwordMatches(coveyTownPassword, 'chessPwd' )) {   // existingTown.townUpdatePassword
       // currently provides a dummy player that can then later be swapped out for permissions funciton
       const addResponce = existingTown.addPlaceable(
         new Player('dummy'),

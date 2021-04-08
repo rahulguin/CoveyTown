@@ -35,7 +35,6 @@ type CoveyAppUpdate =
   | { action: 'playerDisconnect'; player: Player }
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
-  //  newly added
   | { action: 'placeableAdded'; addedPlaceable: Placeable }
   | { action: 'placeableDeleted'; deletedPlaceable: Placeable }
   ;
@@ -111,9 +110,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.emitMovement = update.data.emitMovement;
       nextState.socket = update.data.socket;
       nextState.players = update.data.players;
-      // newly added
       nextState.placeables = update.data.placeables;
-      // nextState.placeableObjectID = update.data.placeableObjectID;
 
 
       break;
@@ -154,7 +151,6 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       state.socket?.disconnect();
       return defaultAppState();
 
-    // newly added
     case 'placeableAdded':
       nextState.placeables = nextState.placeables.concat([update.addedPlaceable])
       break;
@@ -200,15 +196,12 @@ async function GameController(initData: TownJoinResponse,
     dispatchAppUpdate({ action: 'disconnect' });
   });
 
-  // newly added
-
   socket.on('placeableAdded', (addedPlaceable: ServerPlaceable) => {
     dispatchAppUpdate({ action: 'placeableAdded', addedPlaceable: Placeable.fromServerPlaceable(addedPlaceable)})
   });
   socket.on('placeableDeleted', (deletedPlaceable: ServerPlaceable) => {
     dispatchAppUpdate({ action: 'placeableDeleted', deletedPlaceable: Placeable.fromServerPlaceable(deletedPlaceable)})
   });
-
 
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);

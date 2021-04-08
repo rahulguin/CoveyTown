@@ -240,6 +240,8 @@ export async function townUpdateHandler(
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
+  console.log('in req handler :coveyTownPassword is ', requestData.coveyTownPassword);
+
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
@@ -315,6 +317,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.disconnect(true);
     },
     onPlaceableAdded(placeable: Placeable) {
+      // eslint-disable-next-line 
+      console.log('in reqst handlers, placeable location:',  placeable.location.xIndex);
+      console.log('in reqst handlers, placeable name:',  placeable.name);
       socket.emit('placeableAdded', placeable);
     },
     onPlaceableDeleted(placeable: Placeable) {

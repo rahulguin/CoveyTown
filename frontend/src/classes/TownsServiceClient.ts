@@ -89,8 +89,8 @@ export interface TownUpdateRequest {
  */
 export interface PlaceableAddRequest {
   coveyTownID: string,
-  coveyTownpassword: string,
-  objectID: string,
+  coveyTownPassword: string,
+  placeableID: string,
   location: PlaceableLocation
 }
 
@@ -231,6 +231,8 @@ export default class TownsServiceClient {
 
   // API methods to handle object requests
   async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+    // eslint-disable-next-line 
+    console.log('pswd in service client: ', requestData.coveyTownPassword);
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
