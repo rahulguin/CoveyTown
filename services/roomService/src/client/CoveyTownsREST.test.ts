@@ -73,7 +73,7 @@ describe('TownsServiceAPIREST', () => {
         coveyTownPassword,
         updates: { specifications: [{ playerID, canPlace: hasPermission }] },
       });
-      const getResponse = apiClient.getPlayersPermission({ coveyTownID: townID, playerID });
+      const getResponse = await apiClient.getPlayersPermission({ coveyTownID: townID, playerID });
       expect(getResponse).toBe(hasPermission);
     }
 
@@ -797,7 +797,7 @@ describe('TownsServiceAPIREST', () => {
       firstPlayer = `test player1-${nanoid()}`;
       secondPlayer = `test player2=${nanoid()}`;
     });
-    it('should error if given invalid roomID', async () => {
+    it('should error if given invalid town ID', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
@@ -806,7 +806,7 @@ describe('TownsServiceAPIREST', () => {
         specifications: [{ playerID, canPlace: true }],
       };
       try {
-        apiClient.updatePlayerPermissions({
+        await apiClient.updatePlayerPermissions({
           coveyTownID: `${pubTown1.coveyTownID}*`,
           coveyTownPassword: pubTown1.townUpdatePassword,
           updates: permissions,
@@ -879,7 +879,7 @@ describe('TownsServiceAPIREST', () => {
         updates: permissions,
       });
       // check that there were no ids returned as not existing (should get caught by error but double checking)
-      expect(updateResponce).toBe({});
+      expect(updateResponce).toStrictEqual([]);
       // check that the players values are now as expected
       await checkCorrectPermissions(pubTown1.coveyTownID, permissions);
     });
@@ -938,7 +938,7 @@ describe('TownsServiceAPIREST', () => {
       } catch (err) {
         permissions = {
           specifications: [
-            { playerID: firstPlayerID, canPlace: false },
+            { playerID: firstPlayerID, canPlace: true },
             { playerID: secondPlayerID, canPlace: true },
           ],
         };
@@ -1051,12 +1051,12 @@ describe('TownsServiceAPIREST', () => {
         coveyTownID: pubTown1.coveyTownID,
         playerID,
       });
-      expect(firstGetResponce).toBe(true);
+      expect(firstGetResponce).toBe(false);
       const secondGetResponce = await apiClient.getPlayersPermission({
         coveyTownID: pubTown1.coveyTownID,
         playerID,
       });
-      expect(secondGetResponce).toBe(true);
+      expect(secondGetResponce).toBe(false);
       expect(firstGetResponce).toBe(secondGetResponce);
     });
   });

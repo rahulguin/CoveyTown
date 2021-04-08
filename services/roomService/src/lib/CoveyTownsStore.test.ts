@@ -344,41 +344,8 @@ describe('CoveyTownsStore', () => {
           town.coveyTownID,
           town.townUpdatePassword,
           player.id,
-          placeableID,
+          nanoid(),
           location,
-        );
-        expect(secondResponce).not.toBe(undefined);
-        expect(secondResponce?.length).toBeGreaterThan(0);
-      });
-      it('Should fail if given undefined location - entirely null', async () => {
-        const secondResponce = store.addPlaceable(
-          town.coveyTownID,
-          town.townUpdatePassword,
-          player.id,
-          placeableID,
-          undefined,
-        );
-        expect(secondResponce).not.toBe(undefined);
-        expect(secondResponce?.length).toBeGreaterThan(0);
-      });
-      it('Should fail if given undefined location - null xIndex', async () => {
-        const secondResponce = store.addPlaceable(
-          town.coveyTownID,
-          town.townUpdatePassword,
-          player.id,
-          placeableID,
-          { xIndex: undefined, yIndex: location.yIndex },
-        );
-        expect(secondResponce).not.toBe(undefined);
-        expect(secondResponce?.length).toBeGreaterThan(0);
-      });
-      it('should fail if given undefiend location - null yIndex', async () => {
-        const secondResponce = store.addPlaceable(
-          town.coveyTownID,
-          town.townUpdatePassword,
-          player.id,
-          placeableID,
-          { xIndex: location.xIndex, yIndex: undefined },
         );
         expect(secondResponce).not.toBe(undefined);
         expect(secondResponce?.length).toBeGreaterThan(0);
