@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
 import { ServerPlaceable } from './Placeable';
+import { PlayerUpdateSpecifications } from '../CoveyTypes';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -148,6 +149,23 @@ export interface ObjectListResponce {
   objects: ObjectInfo[]
 }
 
+/**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+ export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
+
+/**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
+}
+
 
 /**
  * Envelope that wraps any response from the server
@@ -232,11 +250,22 @@ export default class TownsServiceClient {
     const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
-  
-    // async getObjects(requestData: ObjectListRequest): Promise<ObjectListResponce> {
-    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects${requestData.coveyTownID}`, requestData);
-    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-    // }
+
+  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest): Promise<string[]> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<string[]>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
+      { data: requestData },
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
   
     // async avaliableObject(): Promise<ObjectListResponce> {
     //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
