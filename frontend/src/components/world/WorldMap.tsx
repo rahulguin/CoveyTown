@@ -323,26 +323,51 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Which object would you \nlike to create here?", {
-        color: '#FF7000',
-        backgroundColor: '#F0000',
+      const buttonText = this.add.text(this.lastLocation.x-140, this.lastLocation.y, "Which interactive object \nwould you like to create here?", {
+        color: '#FFFFFF',
+        // backgroundColor: '#F0000',
+        backgroundColor: '#003300',
+        padding: {
+          x: 10,
+          y: 7
+        },
+        align: 'center',
+        // strokeThickness: 3,
+        // stroke: '#FFFFFF',
+        shadow: {
+          offsetX: 5,
+          offsetY: 5,
+          color: 'red',
+          blur: 5
+        }
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const boxButton = this.add.text(this.lastLocation.x, this.lastLocation.y + 55, 'Box',
+      const boxButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 43, 'Tree',
         {
-          color: '#FF7000',
-          backgroundColor: '#FFF000',
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
         }
       );
       boxButton.setInteractive();
+      boxButton.on('pointerover', () => {
+        boxButton.setBackgroundColor('#008000')
+      })
+      boxButton.on('pointerout', () => {
+        boxButton.setBackgroundColor('#004d00')
+      })
        // eslint-disable-next-line @typescript-eslint/no-use-before-define
       boxButton.on('pointerdown', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-
-        boxSprite = this.physics.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 55,'box')
+        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'box')
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
@@ -363,20 +388,32 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const ticTacButton = this.add.text(this.lastLocation.x + 50, this.lastLocation.y + 55, 'Tic Tac Toe',
+      const ticTacButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 70, 'Tic Tac Toe',
         {
-          color: '#FF7000',
-          backgroundColor: '#FFF000',
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
         }
       );
       ticTacButton.setInteractive();
 
+      ticTacButton.on('pointerover', () => {
+        ticTacButton.setBackgroundColor('#008000')
+      })
+      ticTacButton.on('pointerout', () => {
+        ticTacButton.setBackgroundColor('#004d00')
+      })
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       ticTacButton.on('pointerdown', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
 
-        boxSprite = this.physics.add.sprite(this.lastLocation.x + 100,this.lastLocation.y + 50,'tictactoe')
+        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'tictactoe')
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
@@ -398,17 +435,30 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
 
-      const noButton = this.add.text(this.lastLocation.x + 150, this.lastLocation.y + 55, 'No',{
-        color: '#FF7000',
-        backgroundColor: '#FFF000',
+      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Cancel',{
+        color: '#FFFFFF',
+        backgroundColor: '#004d00',
+        align: 'center',
+        padding: {
+          x: 10,
+          y: 7
+        },
+        fixedWidth: 309,
       });
-      noButton.setInteractive();
+      cancelButton.setInteractive();
+
+      cancelButton.on('pointerover', () => {
+        cancelButton.setBackgroundColor('#008000')
+      })
+      cancelButton.on('pointerout', () => {
+        cancelButton.setBackgroundColor('#004d00')
+      })
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      noButton.on('pointerdown', () => {destroyText()});
+      cancelButton.on('pointerdown', () => {destroyText()});
 
       function destroyText() {
         ticTacButton.destroy();
-        noButton.destroy();
+        cancelButton.destroy();
         buttonText.destroy();
         boxButton.destroy();
       }
