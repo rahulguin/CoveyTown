@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
 import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
-import { PlaceableLocation } from '../CoveyTypes';
+import { PlaceableLocation, PlayerPermissionSpecification } from '../CoveyTypes';
 import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
@@ -251,10 +251,14 @@ describe('CoveyTownsStore', () => {
     let store: CoveyTownsStore;
     let placeableID: string;
     let location: PlaceableLocation;
+    let player: Player;
 
     beforeEach(() => {
       town = createTownForTesting();
       store = CoveyTownsStore.getInstance();
+      player = new Player('test player');
+      player.canPlace = true;
+      town.addPlayer(player);
       [placeableID] = randomPlaceablesFromAllowedPlaceables();
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
@@ -265,21 +269,52 @@ describe('CoveyTownsStore', () => {
         const responce = store.addPlaceable(
           nanoid(),
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
-      it('Should check the password before adding placeable, and pass back error string', async () => {
-        const responce = store.addPlaceable(town.coveyTownID, nanoid(), placeableID, location);
+      it('Should check the password and permission before adding placeable, and pass back error string - player doesnt have permission', async () => {
+        player.canPlace = false;
+        const responce = store.addPlaceable(
+          town.coveyTownID,
+          nanoid(),
+          player.id,
+          placeableID,
+          location,
+        );
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
-      it('Should return undefined on a succesful addition', () => {
+      it('Should check the password before adding placeable, and pass back error string - player id does not exist', async () => {
+        const responce = store.addPlaceable(
+          town.coveyTownID,
+          nanoid(),
+          nanoid(),
+          placeableID,
+          location,
+        );
+        expect(responce).not.toBe(undefined);
+        expect(responce?.length).toBeGreaterThan(0);
+      });
+      it('Should return undefined on a succesful addition - correct password', () => {
+        player.canPlace = false;
         const responce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
+          placeableID,
+          location,
+        );
+        expect(responce).toBe(undefined);
+      });
+      it('Should return undefined on a succesful addition - has permission to place', () => {
+        const responce = store.addPlaceable(
+          town.coveyTownID,
+          nanoid(),
+          player.id,
           placeableID,
           location,
         );
@@ -289,6 +324,7 @@ describe('CoveyTownsStore', () => {
         const firstResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -296,6 +332,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -306,6 +343,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           nanoid(),
           location,
         );
@@ -318,49 +356,102 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
         expect(addResponce).toBe(undefined);
 
-        const responce = store.deletePlaceable(nanoid(), town.townUpdatePassword, location);
+        const responce = store.deletePlaceable(
+          nanoid(),
+          town.townUpdatePassword,
+          player.id,
+          location,
+        );
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
-      it('Should check the password before deleting placeable', async () => {
+      it('Should check the password and permission before deleting placeable - player doesnt have permission', async () => {
+        player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
         expect(addResponce).toBe(undefined);
 
-        const responce = store.deletePlaceable(town.coveyTownID, nanoid(), location);
+        const responce = store.deletePlaceable(town.coveyTownID, nanoid(), player.id, location);
+        expect(responce).not.toBe(undefined);
+        expect(responce?.length).toBeGreaterThan(0);
+      });
+      it('Should check the password and permission before deleting placeable - player id doesnt exist', async () => {
+        const addResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          location,
+        );
+        expect(addResponce).toBe(undefined);
+
+        const responce = store.deletePlaceable(town.coveyTownID, nanoid(), nanoid(), location);
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should fail if there is not a placeable at the given location, and pass back error string', async () => {
-        const responce = store.deletePlaceable(town.coveyTownID, town.townUpdatePassword, location);
+        const responce = store.deletePlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          location,
+        );
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
-      it('Should return undefined on a succesful deletion', async () => {
+      it('Should return undefined on a succesful deletion - correct password', async () => {
+        player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
         expect(addResponce).toBe(undefined);
 
-        const responce = store.deletePlaceable(town.coveyTownID, town.townUpdatePassword, location);
+        const responce = store.deletePlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          location,
+        );
+        expect(responce).toBe(undefined);
+      });
+      it('Should return undefined on a succesful deletion - player has permission', async () => {
+        const addResponce = store.addPlaceable(
+          town.coveyTownID,
+          nanoid(),
+          player.id,
+          placeableID,
+          location,
+        );
+        expect(addResponce).toBe(undefined);
+
+        const responce = store.deletePlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          location,
+        );
         expect(responce).toBe(undefined);
       });
       it('Should fail after repeated calls of deletion', async () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -369,6 +460,7 @@ describe('CoveyTownsStore', () => {
         const firstResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           location,
         );
         expect(firstResponce).toBe(undefined);
@@ -376,6 +468,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           location,
         );
         expect(secondResponce).not.toBe(undefined);
@@ -404,6 +497,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -416,6 +510,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -428,6 +523,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -447,6 +543,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -455,7 +552,8 @@ describe('CoveyTownsStore', () => {
         const secondAddResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          nanoid(),
+          player.id,
+          placeableID,
           location,
         );
         expect(secondAddResponce).not.toBe(undefined);
@@ -467,6 +565,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -475,6 +574,7 @@ describe('CoveyTownsStore', () => {
         const secondAddResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           location,
         );
         expect(secondAddResponce).toBe(undefined);
@@ -482,16 +582,44 @@ describe('CoveyTownsStore', () => {
         const getResponce = store.getPlaceable(town.coveyTownID, location);
         expect(getResponce).toStrictEqual(emptyInfo);
       });
-      it('Should return the original placeable if a failed delete was called - wrong password', async () => {
+      it('Should return the original placeable if a failed delete was called - wrong password/player cant place', async () => {
+        player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
         expect(addResponce).toBe(undefined);
 
-        const secondAddResponce = store.deletePlaceable(town.coveyTownID, nanoid(), location);
+        const secondAddResponce = store.deletePlaceable(
+          town.coveyTownID,
+          nanoid(),
+          player.id,
+          location,
+        );
+        expect(secondAddResponce).not.toBe(undefined);
+
+        const getResponce = store.getPlaceable(town.coveyTownID, location);
+        expect(getResponce).toStrictEqual(placeableInfo);
+      });
+      it('Should return the original placeable if a failed delete was called - wrong password/ player id invalid', async () => {
+        const addResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          location,
+        );
+        expect(addResponce).toBe(undefined);
+
+        const secondAddResponce = store.deletePlaceable(
+          town.coveyTownID,
+          nanoid(),
+          nanoid(),
+          location,
+        );
         expect(secondAddResponce).not.toBe(undefined);
 
         const getResponce = store.getPlaceable(town.coveyTownID, location);
@@ -501,6 +629,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
+          player.id,
           placeableID,
           location,
         );
@@ -509,6 +638,7 @@ describe('CoveyTownsStore', () => {
         const secondAddResponce = store.deletePlaceable(
           nanoid(),
           town.townUpdatePassword,
+          player.id,
           location,
         );
         expect(secondAddResponce).not.toBe(undefined);
@@ -516,6 +646,223 @@ describe('CoveyTownsStore', () => {
         const getResponce = store.getPlaceable(town.coveyTownID, location);
         expect(getResponce).toStrictEqual(placeableInfo);
       });
+    });
+  });
+  describe('updatePlayerPermissions', () => {
+    let town: CoveyTownController;
+    let store: CoveyTownsStore;
+    let playerOneTrue: Player;
+    let playerTwoTrue: Player;
+    let playerOneFalse: Player;
+    let playerTwoFalse: Player;
+
+    beforeEach(() => {
+      town = createTownForTesting();
+      store = CoveyTownsStore.getInstance();
+      // creates two players whos default value is true
+      playerOneTrue = new Player('P1T');
+      playerOneTrue.canPlace = true;
+      playerTwoTrue = new Player('P2T');
+      playerTwoTrue.canPlace = true;
+      // creates two players whos default value is false
+      playerOneFalse = new Player('P1F');
+      playerOneFalse.canPlace = false;
+      playerTwoFalse = new Player('P2F');
+      playerTwoFalse.canPlace = false;
+
+      //  adds all players to the town
+      town.addPlayer(playerOneTrue);
+      town.addPlayer(playerTwoTrue);
+      town.addPlayer(playerOneFalse);
+      town.addPlayer(playerTwoFalse);
+    });
+    it('should error if given invalid roomID', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerOneTrue.id, canPlace: true });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = store.updatePlayerPermissions(nanoid(), town.townUpdatePassword, {
+        specifications,
+      });
+      // checks that the request returned an error string (a non empty string)
+      expect(typeof updateResponse === 'string');
+      expect(updateResponse.length).toBeGreaterThan(0);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should error if given invalid password', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerOneTrue.id, canPlace: true });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = store.updatePlayerPermissions(town.coveyTownID, nanoid(), {
+        specifications,
+      });
+      // checks that it returns and error string
+      expect(typeof updateResponse === 'string');
+      expect(updateResponse.length).toBeGreaterThan(0);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should do nothing if given the empty list', async () => {
+      const updateResponse = store.updatePlayerPermissions(
+        town.coveyTownID,
+        town.townUpdatePassword,
+        {
+          specifications: [],
+        },
+      );
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should updates all the players ids that are in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerOneTrue.id, canPlace: true });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = store.updatePlayerPermissions(
+        town.coveyTownID,
+        town.townUpdatePassword,
+        { specifications },
+      );
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should not update any players whose id do not appear in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      const updateResponse = store.updatePlayerPermissions(
+        town.coveyTownID,
+        town.townUpdatePassword,
+        { specifications },
+      );
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should not updates any values and return missing IDs, if provided with ids that do not exist in the town', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      const sneakyPlayer1: string = nanoid();
+      const sneakyPlayer2: string = nanoid();
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer1, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer2, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      const updateResponse = store.updatePlayerPermissions(
+        town.coveyTownID,
+        town.townUpdatePassword,
+        { specifications },
+      );
+      expect(updateResponse).toContain(sneakyPlayer1);
+      expect(updateResponse).toContain(sneakyPlayer2);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should error and not update any values if provided with duplicate IDs, returning a list of all duplicated ids', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = store.updatePlayerPermissions(
+        town.coveyTownID,
+        town.townUpdatePassword,
+        { specifications },
+      );
+      expect(updateResponse).toContain(playerOneFalse.id);
+      expect(updateResponse).toContain(playerTwoTrue.id);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+  });
+  describe('getPlayerPermission', () => {
+    let townController: CoveyTownController;
+    let player: Player;
+    const store = CoveyTownsStore.getInstance();
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = store.createTown(townName, true);
+      // creates two players whos default value is true
+      player = new Player('test player');
+      player.canPlace = true;
+      townController.addPlayer(player);
+    });
+    it('should return undefined if town id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(`${townController.coveyTownID}*`, player.id);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return undefind if the players id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, `${player.id}*`);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return true if the player has permission', async () => {
+      player.canPlace = true;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(getResponce).toBe(true);
+    });
+    it('should return false if the player does not have permission', async () => {
+      player.canPlace = false;
+      const getResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(getResponce).toBe(false);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - true', async () => {
+      player.canPlace = true;
+      const firstGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(firstGetResponce).toBe(true);
+      const secondGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(secondGetResponce).toBe(true);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - false', async () => {
+      player.canPlace = false;
+      const firstGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(firstGetResponce).toBe(false);
+      const secondGetResponce = store.getPlayersPermission(townController.coveyTownID, player.id);
+      expect(secondGetResponce).toBe(false);
+      expect(firstGetResponce).toBe(secondGetResponce);
     });
   });
 });

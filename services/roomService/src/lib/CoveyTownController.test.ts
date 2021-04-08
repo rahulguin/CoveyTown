@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import { Socket } from 'socket.io';
 import * as TestUtils from '../client/TestUtils';
 import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
-import { PlaceableLocation, UserLocation } from '../CoveyTypes';
+import { PlaceableLocation, PlayerPermissionSpecification, UserLocation } from '../CoveyTypes';
 import {
   PlaceableInfo,
   townSubscriptionHandler,
@@ -61,7 +61,6 @@ describe('CoveyTownController', () => {
   describe('addPlaceable', () => {
     let townName: string;
     let townController: CoveyTownController;
-    let player: Player;
     let placedLocation: PlaceableLocation;
     let placeableID: string;
     let secondPlaceableID: string;
@@ -69,79 +68,49 @@ describe('CoveyTownController', () => {
     beforeEach(async () => {
       townName = `FriendlyNameTest-${nanoid()}`;
       townController = new CoveyTownController(townName, false);
-      player = new Player('test player');
-      await townController.addPlayer(player);
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
       placedLocation = { xIndex, yIndex };
       [placeableID, secondPlaceableID] = randomPlaceablesFromAllowedPlaceables(2);
     });
     it('should return a failure string when addPlaceable is called where there is already a placeable - different ids', async () => {
-      const firstCallReturn = await townController.addPlaceable(
-        player,
-        placeableID,
-        placedLocation,
-      );
+      const firstCallReturn = await townController.addPlaceable(placeableID, placedLocation);
       expect(firstCallReturn).toBe(undefined);
 
-      const failedCallReturn = await townController.addPlaceable(
-        player,
-        secondPlaceableID,
-        placedLocation,
-      );
+      const failedCallReturn = await townController.addPlaceable(secondPlaceableID, placedLocation);
       expect(failedCallReturn).not.toBe(undefined);
       expect(failedCallReturn?.length).toBeGreaterThan(0);
     });
 
     it('should return a failure string when addPlaceable is called where there is already a placeable - same ids', async () => {
-      const firstCallReturn = await townController.addPlaceable(
-        player,
-        placeableID,
-        placedLocation,
-      );
+      const firstCallReturn = await townController.addPlaceable(placeableID, placedLocation);
       expect(firstCallReturn).toBe(undefined);
 
-      const failedCallReturn = await townController.addPlaceable(
-        player,
-        placeableID,
-        placedLocation,
-      );
+      const failedCallReturn = await townController.addPlaceable(placeableID, placedLocation);
       expect(failedCallReturn).not.toBe(undefined);
       expect(failedCallReturn?.length).toBeGreaterThan(0);
     });
     it('should return a failure string when addPlaceable is called with an id that does not exist', async () => {
-      const failedCallReturn = await townController.addPlaceable(player, nanoid(), placedLocation);
+      const failedCallReturn = await townController.addPlaceable(nanoid(), placedLocation);
       expect(failedCallReturn).not.toBe(undefined);
       expect(failedCallReturn?.length).toBeGreaterThan(0);
     });
     it('should not change what is there when addPlaceable is called where there is already a placeable', async () => {
-      const firstCallReturn = await townController.addPlaceable(
-        player,
-        placeableID,
-        placedLocation,
-      );
+      const firstCallReturn = await townController.addPlaceable(placeableID, placedLocation);
       expect(firstCallReturn).toBe(undefined);
 
-      const secondCallReturn = await townController.addPlaceable(
-        player,
-        secondPlaceableID,
-        placedLocation,
-      );
+      const secondCallReturn = await townController.addPlaceable(secondPlaceableID, placedLocation);
       expect(secondCallReturn).not.toBe(undefined);
       expect(secondCallReturn?.length).toBeGreaterThan(0);
 
       expect(townController.getPlaceableAt(placedLocation).placeableID).toBe(placeableID);
     });
     it('should return undefined after a successful call to addPlaceable', async () => {
-      const firstCallReturn = await townController.addPlaceable(
-        new Player(nanoid()),
-        placeableID,
-        placedLocation,
-      );
+      const firstCallReturn = await townController.addPlaceable(placeableID, placedLocation);
       expect(firstCallReturn).toBe(undefined);
     });
     it('should be able to see the given placeable at the specified location after a successful call to addPlaceable', async () => {
-      await townController.addPlaceable(new Player(nanoid()), placeableID, placedLocation);
+      await townController.addPlaceable(placeableID, placedLocation);
       expect(townController.getPlaceableAt(placedLocation).placeableID).toBe(placeableID);
     });
   });
@@ -163,30 +132,19 @@ describe('CoveyTownController', () => {
       [placeableID] = randomPlaceablesFromAllowedPlaceables();
     });
     it('should return a fail string when deletePlaceable is called where there is not a placeable at the given location', async () => {
-      const failedCallReturn = await townController.deletePlaceable(
-        new Player(nanoid()),
-        placedLocation,
-      );
+      const failedCallReturn = await townController.deletePlaceable(placedLocation);
       expect(failedCallReturn).not.toBe(undefined);
       expect(failedCallReturn?.length).toBeGreaterThan(0);
     });
     it('should return undefined after a successful call to deletePlaceable', async () => {
-      const addPlaceableMessage = await townController.addPlaceable(
-        new Player(nanoid()),
-        placeableID,
-        placedLocation,
-      );
+      const addPlaceableMessage = await townController.addPlaceable(placeableID, placedLocation);
       expect(addPlaceableMessage).toBe(undefined);
 
-      const failedCallReturn = townController.deletePlaceable(new Player(nanoid()), placedLocation);
+      const failedCallReturn = townController.deletePlaceable(placedLocation);
       expect(failedCallReturn).toBe(undefined);
     });
     it('should not be able to see a placeable at the specified location after a successful call to deletePlaceable', async () => {
-      const addPlaceableMessage = townController.addPlaceable(
-        new Player(nanoid()),
-        placeableID,
-        placedLocation,
-      );
+      const addPlaceableMessage = townController.addPlaceable(placeableID, placedLocation);
       expect(addPlaceableMessage).toBe(undefined);
 
       const defaultPlaceable: PlaceableInfo = {
@@ -195,14 +153,13 @@ describe('CoveyTownController', () => {
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location: placedLocation,
       };
-      townController.deletePlaceable(new Player(nanoid()), placedLocation);
+      townController.deletePlaceable(placedLocation);
       expect(townController.getPlaceableAt(placedLocation)).toStrictEqual(defaultPlaceable);
     });
   });
   describe('getPlaceableAt', () => {
     let townName: string;
     let townController: CoveyTownController;
-    let player: Player;
     let placedLocation: PlaceableLocation;
     let placeableID: string;
     let placeableInfo: PlaceableInfo;
@@ -211,8 +168,6 @@ describe('CoveyTownController', () => {
     beforeEach(async () => {
       townName = `FriendlyNameTest-${nanoid()}`;
       townController = new CoveyTownController(townName, false);
-      player = new Player('test player');
-      await townController.addPlayer(player);
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
       placedLocation = { xIndex, yIndex };
@@ -237,14 +192,14 @@ describe('CoveyTownController', () => {
       expect(firstResponce).toStrictEqual(emptyInfo);
     });
     it('should return the specific placeable after a succesful addPlaceable call', async () => {
-      const addResponce = townController.addPlaceable(player, placeableID, placedLocation);
+      const addResponce = townController.addPlaceable(placeableID, placedLocation);
       expect(addResponce).toStrictEqual(undefined);
 
       const firstResponce = townController.getPlaceableAt(placedLocation);
       expect(firstResponce).toStrictEqual(placeableInfo);
     });
     it('should return the same info after successive calls with no modifiers call inbetween', () => {
-      const addResponce = townController.addPlaceable(player, placeableID, placedLocation);
+      const addResponce = townController.addPlaceable(placeableID, placedLocation);
       expect(addResponce).toBe(undefined);
 
       const firstResponce = townController.getPlaceableAt(placedLocation);
@@ -255,24 +210,170 @@ describe('CoveyTownController', () => {
       expect(firstResponce).toStrictEqual(secondResponce);
     });
     it('Should return the original placeable if a failed added was called', async () => {
-      const addResponce = townController.addPlaceable(player, placeableID, placedLocation);
+      const addResponce = townController.addPlaceable(placeableID, placedLocation);
       expect(addResponce).toBe(undefined);
 
-      const secondAddResponce = townController.addPlaceable(player, nanoid(), placedLocation);
+      const secondAddResponce = townController.addPlaceable(nanoid(), placedLocation);
       expect(secondAddResponce).not.toBe(undefined);
 
       const getResponce = townController.getPlaceableAt(placedLocation);
       expect(getResponce).toStrictEqual(placeableInfo);
     });
     it('should return the default placeable info after a successful delete', async () => {
-      const addResponce = townController.addPlaceable(player, placeableID, placedLocation);
+      const addResponce = townController.addPlaceable(placeableID, placedLocation);
       expect(addResponce).toBe(undefined);
 
-      const secondAddResponce = townController.deletePlaceable(player, placedLocation);
+      const secondAddResponce = townController.deletePlaceable(placedLocation);
       expect(secondAddResponce).toBe(undefined);
 
       const getResponce = townController.getPlaceableAt(placedLocation);
       expect(getResponce).toStrictEqual(emptyInfo);
+    });
+  });
+  describe('updatePlayerPermissions', () => {
+    let townController: CoveyTownController;
+    let playerOneTrue: Player;
+    let playerTwoTrue: Player;
+    let playerOneFalse: Player;
+    let playerTwoFalse: Player;
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = new CoveyTownController(townName, false);
+      // creates two players whos default value is true
+      playerOneTrue = new Player('P1T');
+      playerOneTrue.canPlace = true;
+      playerTwoTrue = new Player('P2T');
+      playerTwoTrue.canPlace = true;
+      // creates two players whos default value is false
+      playerOneFalse = new Player('P1F');
+      playerOneFalse.canPlace = false;
+      playerTwoFalse = new Player('P2F');
+      playerTwoFalse.canPlace = false;
+      //  adds all players to the town
+      townController.addPlayer(playerOneTrue);
+      townController.addPlayer(playerTwoTrue);
+      townController.addPlayer(playerOneFalse);
+      townController.addPlayer(playerTwoFalse);
+    });
+    it('should do nothing if given the empty list', async () => {
+      const updateResponse = townController.updatePlayerPermissions({ specifications: [] });
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should updates all the players ids that are in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerOneTrue.id, canPlace: true });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should not update any players whose id do not appear in the list', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toStrictEqual([]);
+
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(false);
+      expect(playerOneFalse.canPlace).toBe(true);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should return a set (list with no duplcates) of missing ids if given player ids that do not match, and not update any values', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      const sneakyPlayer1: string = nanoid();
+      const sneakyPlayer2: string = nanoid();
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer1, canPlace: false });
+      specifications.push({ playerID: sneakyPlayer2, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toContain(sneakyPlayer2);
+      expect(updateResponse).toContain(sneakyPlayer1);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated since there was a player id that did not exist
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+    it('should error and not update any values if provided with duplicate IDs, returning a set (list with no duplcates) of all duplicated ids', async () => {
+      const specifications: PlayerPermissionSpecification[] = [];
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: false });
+      specifications.push({ playerID: playerTwoTrue.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: false });
+      specifications.push({ playerID: playerOneFalse.id, canPlace: true });
+      specifications.push({ playerID: playerTwoFalse.id, canPlace: false });
+
+      const updateResponse = townController.updatePlayerPermissions({ specifications });
+      expect(updateResponse).toContain(playerTwoTrue.id);
+      expect(updateResponse).toContain(playerOneFalse.id);
+      expect(updateResponse.length).toBe(2);
+
+      // checks that no values were updated
+      expect(playerOneTrue.canPlace).toBe(true);
+      expect(playerTwoTrue.canPlace).toBe(true);
+      expect(playerOneFalse.canPlace).toBe(false);
+      expect(playerTwoFalse.canPlace).toBe(false);
+    });
+  });
+  describe('getPlayerPermission', () => {
+    let townController: CoveyTownController;
+    let player: Player;
+    beforeEach(() => {
+      const townName = `FriendlyNameTest-${nanoid()}`;
+      townController = new CoveyTownController(townName, false);
+      // creates two players whos default value is true
+      player = new Player('test player');
+      player.canPlace = true;
+      townController.addPlayer(player);
+    });
+    it('should return undefind if the players id does not exist', async () => {
+      player.canPlace = true;
+      const getResponce = townController.getPlayersPermission(`${player.id}*`);
+      expect(getResponce).toBe(undefined);
+    });
+    it('should return true if the player has permission', async () => {
+      player.canPlace = true;
+      const getResponce = townController.getPlayersPermission(player.id);
+      expect(getResponce).toBe(true);
+    });
+    it('should return false if the player does not ahve permission', async () => {
+      player.canPlace = false;
+      const getResponce = townController.getPlayersPermission(player.id);
+      expect(getResponce).toBe(false);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - true', async () => {
+      player.canPlace = true;
+      const firstGetResponce = townController.getPlayersPermission(player.id);
+      expect(firstGetResponce).toBe(true);
+      const secondGetResponce = townController.getPlayersPermission(player.id);
+      expect(secondGetResponce).toBe(true);
+      expect(firstGetResponce).toBe(secondGetResponce);
+    });
+    it('should return the same thing twice in a row if no modifiers are call inbetween - false', async () => {
+      player.canPlace = false;
+      const firstGetResponce = townController.getPlayersPermission(player.id);
+      expect(firstGetResponce).toBe(false);
+      const secondGetResponce = townController.getPlayersPermission(player.id);
+      expect(secondGetResponce).toBe(false);
+      expect(firstGetResponce).toBe(secondGetResponce);
     });
   });
   describe('town listeners and events', () => {
@@ -328,7 +429,7 @@ describe('CoveyTownController', () => {
       const [placeableID] = randomPlaceablesFromAllowedPlaceables();
 
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
-      testingTown.addPlaceable(player, placeableID, { xIndex, yIndex });
+      testingTown.addPlaceable(placeableID, { xIndex, yIndex });
       mockListeners.forEach(listener => expect(listener.onPlaceableAdded).toBeCalled());
     });
     it('should not notify added listeners that a placeable has been added when addPlaceable is called with conflict', async () => {
@@ -341,7 +442,7 @@ describe('CoveyTownController', () => {
       const listenerRemoved = mockListeners[1];
       testingTown.removeTownListener(listenerRemoved);
 
-      const addResponce = testingTown.addPlaceable(player, placeableID, { xIndex, yIndex });
+      const addResponce = testingTown.addPlaceable(placeableID, { xIndex, yIndex });
       expect(addResponce).toBe(undefined);
       expect(listenerRemoved.onPlaceableAdded).not.toBeCalled();
     });
@@ -352,13 +453,13 @@ describe('CoveyTownController', () => {
       const yIndex = randomInt(100);
       const [placeableID] = randomPlaceablesFromAllowedPlaceables();
 
-      testingTown.addPlaceable(player, placeableID, { xIndex, yIndex });
+      testingTown.addPlaceable(placeableID, { xIndex, yIndex });
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
 
       const listenerRemoved = mockListeners[1];
       testingTown.removeTownListener(listenerRemoved);
 
-      testingTown.deletePlaceable(player, { xIndex, yIndex });
+      testingTown.deletePlaceable({ xIndex, yIndex });
 
       expect(listenerRemoved.onPlaceableAdded).not.toBeCalled();
     });
@@ -369,7 +470,7 @@ describe('CoveyTownController', () => {
       const yIndex = randomInt(100);
 
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
-      testingTown.deletePlaceable(player, { xIndex, yIndex });
+      testingTown.deletePlaceable({ xIndex, yIndex });
       mockListeners.forEach(listener => expect(listener.onPlaceableDeleted).not.toBeCalled());
     });
     it('should not notify removed listeners of player movement when updatePlayerLocation is called', async () => {
@@ -424,7 +525,7 @@ describe('CoveyTownController', () => {
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
       const listenerRemoved = mockListeners[1];
       testingTown.removeTownListener(listenerRemoved);
-      testingTown.addPlaceable(player, placeableID, { xIndex, yIndex });
+      testingTown.addPlaceable(placeableID, { xIndex, yIndex });
       expect(listenerRemoved.onPlaceableAdded).not.toBeCalled();
     });
     it('should not notify removed listeners of deleted placeables when deletedPlaceable is called', async () => {
@@ -434,12 +535,12 @@ describe('CoveyTownController', () => {
       const yIndex = randomInt(100);
       const [placeableID] = randomPlaceablesFromAllowedPlaceables();
 
-      testingTown.addPlaceable(player, placeableID, { xIndex, yIndex });
+      testingTown.addPlaceable(placeableID, { xIndex, yIndex });
 
       mockListeners.forEach(listener => testingTown.addTownListener(listener));
       const listenerRemoved = mockListeners[1];
       testingTown.removeTownListener(listenerRemoved);
-      testingTown.deletePlaceable(player, { xIndex, yIndex });
+      testingTown.deletePlaceable({ xIndex, yIndex });
       expect(listenerRemoved.onPlaceableDeleted).not.toBeCalled();
     });
   });
@@ -517,7 +618,7 @@ describe('CoveyTownController', () => {
           mockSocket,
         );
         townSubscriptionHandler(mockSocket);
-        const addReturn = testingTown.addPlaceable(new Player(nanoid()), placeableID, location);
+        const addReturn = testingTown.addPlaceable(placeableID, location);
         expect(addReturn).toBe(undefined);
         expect(mockSocket.emit).toBeCalledWith('placeableAdded', addedPlaceable);
       });
@@ -525,14 +626,14 @@ describe('CoveyTownController', () => {
         const [placeableID] = randomPlaceablesFromAllowedPlaceables();
         const location: PlaceableLocation = { xIndex: 5, yIndex: 5 };
         const emptyPlaceable: Placeable = Placeable.constructEmptyPlaceable(location);
-        testingTown.addPlaceable(new Player(nanoid()), placeableID, location);
+        testingTown.addPlaceable(placeableID, location);
         TestUtils.setSessionTokenAndTownID(
           testingTown.coveyTownID,
           session.sessionToken,
           mockSocket,
         );
         townSubscriptionHandler(mockSocket);
-        const deleteReturn = testingTown.deletePlaceable(new Player(nanoid()), location);
+        const deleteReturn = testingTown.deletePlaceable(location);
         expect(deleteReturn).toBe(undefined);
         expect(mockSocket.emit).toBeCalledWith('placeableDeleted', emptyPlaceable);
       });

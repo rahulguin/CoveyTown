@@ -1,7 +1,12 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
 import { PlaceableGetRequest } from '../client/TownsServiceClient';
-import { CoveyTownList, PlaceableLocation, UserLocation } from '../CoveyTypes';
+import {
+  CoveyTownList,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+  UserLocation,
+} from '../CoveyTypes';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
@@ -89,6 +94,7 @@ export interface TownUpdateRequest {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -104,6 +110,7 @@ export interface PlaceableAddResponse {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   location: PlaceableLocation;
 }
 
@@ -119,6 +126,22 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
+}
+
+/**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
+/**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
 }
 
 /**
@@ -235,8 +258,6 @@ export async function townUpdateHandler(
   };
 }
 
-// methods for adding, deleting, getting, and listing placeabless
-
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
@@ -244,6 +265,7 @@ export async function addPlaceableHandler(
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
+    requestData.playerID,
     requestData.placeableID,
     requestData.location,
   );
@@ -265,6 +287,7 @@ export async function deletePlaceableHandler(
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
+    requestData.playerID,
     requestData.location,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
@@ -290,6 +313,61 @@ export async function getPlaceableHandler(
     response: placeable,
     // the message returned is the message to be recieved
     message: !placeable ? undefined : 'Invalid town id given',
+  };
+}
+
+function updatePlayerPermissionsMessage(updateResponce: string | string[]): string | undefined {
+  if (typeof updateResponce === 'string') {
+    return updateResponce;
+  }
+  if (updateResponce.length > 0) {
+    return 'given player ids that do not exist';
+  }
+  return undefined;
+}
+function updatePlayerResponceParser(updateResponce: string | string[]): string[] {
+  if (typeof updateResponce === 'string') {
+    return [];
+  }
+  return updateResponce;
+}
+
+export async function updatePlayerPermissionsHandler(
+  requestData: PlayerUpdatePermissionsRequest,
+): Promise<ResponseEnvelope<string[]>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const updateResponce = townsStore.updatePlayerPermissions(
+    requestData.coveyTownID,
+    requestData.coveyTownPassword,
+    requestData.updates,
+  );
+  const message = updatePlayerPermissionsMessage(updateResponce);
+  const responceToReturn = updatePlayerResponceParser(updateResponce);
+  return {
+    // if the message string is undefined then getPlaceable was unsuccessful
+    isOK: message === undefined,
+    // returns the list of badIDs or the empty list if it is a string
+    response: responceToReturn,
+    // the message returned is the message to be recieved
+    message,
+  };
+}
+
+export async function getPlayersPermissionHandler(
+  requestData: PlayerGetPermissionRequest,
+): Promise<ResponseEnvelope<boolean>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const getResponce = townsStore.getPlayersPermission(
+    requestData.coveyTownID,
+    requestData.playerID,
+  );
+  return {
+    // if the responce was undefined then getPlaceable was unsuccessful
+    isOK: getResponce !== undefined,
+    // return the value placeable if defined
+    response: getResponce,
+    // error message returned if undefined
+    message: getResponce === undefined ? 'Invalid town id given' : undefined,
   };
 }
 

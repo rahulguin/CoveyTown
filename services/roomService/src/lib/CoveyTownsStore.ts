@@ -1,5 +1,11 @@
-import { CoveyTownList, PlaceableInfo, PlaceableLocation } from '../CoveyTypes';
+import {
+  CoveyTownList,
+  PlaceableInfo,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+} from '../CoveyTypes';
 import Player from '../types/Player';
+import { isDefined } from '../Utils';
 import CoveyTownController from './CoveyTownController';
 
 function passwordMatches(provided: string, expected: string): boolean {
@@ -10,6 +16,23 @@ function passwordMatches(provided: string, expected: string): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * checks that the provided password is correct or that the given player has permission to place
+ * @param providedPassword the password to compare
+ * @param town the town to check all this information with
+ * @param requestingPlayer the player requesting to add a placeable (in the case of undefined just checks if the password is correct)
+ * @returns if the password is correct or the player is defined and has permission
+ */
+function correctPasswordOrPermission(
+  providedPassword: string,
+  town: CoveyTownController,
+  requestingPlayer: Player | undefined,
+): boolean {
+  const validPassword: boolean = passwordMatches(providedPassword, town.townUpdatePassword);
+  const hasPermission: boolean = requestingPlayer?.canPlace || false;
+  return validPassword || hasPermission;
 }
 
 export default class CoveyTownsStore {
@@ -80,34 +103,52 @@ export default class CoveyTownsStore {
   addPlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
+    playerID: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
-    if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
-      // currently provides a dummy player that can then later be swapped out for permissions funciton
-      const addResponce = existingTown.addPlaceable(
-        new Player('dummy'),
-        placeableID,
-        placeableLocation,
-      );
-      return addResponce;
+    // checks that the room exists
+    if (existingTown) {
+      // checks that the player has permission to add or they have provided a valid password
+      const requestingPlayer = existingTown.players.find(player => player.id === playerID);
+      if (correctPasswordOrPermission(coveyTownPassword, existingTown, requestingPlayer)) {
+        if (
+          !(
+            isDefined(placeableLocation) &&
+            isDefined(placeableLocation.xIndex) &&
+            isDefined(placeableLocation.yIndex)
+          )
+        ) {
+          return 'Invalid Location: the location to add the placeable must be defined';
+        }
+        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation);
+        return addResponce;
+      }
+      return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
     }
-    return 'Invalid room information: Double check that the room exists and password is correct';
+    return 'Invalid room information: Double check that the room exists';
   }
 
   deletePlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
+    playerID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
-    if (existingTown && passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
-      // currently provides a dummy player that can then later be swapped out for permissions funciton
-      const deleteResponce = existingTown.deletePlaceable(new Player('dummy'), placeableLocation);
-      return deleteResponce;
+    // checks the the town id provided exists with a stored town
+    if (existingTown) {
+      // checks that the player has permission to delete or they have provided a valid passsword
+      const requestingPlayer = existingTown.players.find(player => player.id === playerID);
+      if (correctPasswordOrPermission(coveyTownPassword, existingTown, requestingPlayer)) {
+        // currently provides a dummy player that can then later be swapped out for permissions funciton
+        const deleteResponce = existingTown.deletePlaceable(placeableLocation);
+        return deleteResponce;
+      }
+      return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
     }
-    return 'Invalid room information: Double check that the room exists and password is correct';
+    return 'Invalid room information: Double check that the room exists';
   }
 
   getPlaceable(
@@ -118,6 +159,31 @@ export default class CoveyTownsStore {
     if (existingTown) {
       const deleteResponce = existingTown.getPlaceableAt(placeableLocation);
       return deleteResponce;
+    }
+    return undefined;
+  }
+
+  updatePlayerPermissions(
+    coveyTownID: string,
+    coveyTownPassword: string,
+    updates: PlayerUpdateSpecifications,
+  ): string | string[] {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown) {
+      if (passwordMatches(coveyTownPassword, existingTown.townUpdatePassword)) {
+        const updateResponce = existingTown.updatePlayerPermissions(updates);
+        return updateResponce;
+      }
+      return 'Incorrect password: please double check that you have the password correct';
+    }
+    return 'Invalid room information: Double check that the room exists';
+  }
+
+  getPlayersPermission(townID: string, playerID: string): boolean | undefined {
+    const existingTown = this.getControllerForTown(townID);
+    if (existingTown) {
+      const getResponce = existingTown.getPlayersPermission(playerID);
+      return getResponce;
     }
     return undefined;
   }
