@@ -46,6 +46,7 @@ class CoveyGameScene extends Phaser.Scene {
     // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.png');
+    this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
   }
@@ -322,26 +323,60 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Do you want \nto add \nan object here?", {
+      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Which object would you \nlike to create here?", {
         color: '#FF7000',
         backgroundColor: '#F0000',
       });
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const yesButton = this.add.text(this.lastLocation.x, this.lastLocation.y + 55, 'Yes',
+      const boxButton = this.add.text(this.lastLocation.x, this.lastLocation.y + 55, 'Box',
         {
           color: '#FF7000',
           backgroundColor: '#FFF000',
         }
       );
-      yesButton.setInteractive();
-
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      yesButton.on('pointerdown', () => {
+      boxButton.setInteractive();
+       // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      boxButton.on('pointerdown', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
 
-        boxSprite = this.physics.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
+        boxSprite = this.physics.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 55,'box')
+          .setInteractive()
+          .setDisplaySize(50,50);
+        boxSprite.setImmovable(true);
+        boxSprite.body.setAllowGravity(false); 
+        
+        this.physics.add.collider(sprite, boxSprite);
+        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
+        // boxSprite.on('pointerup', () => {
+        //   const isShown = true;
+        //   const toggle = () => {
+        //     ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+        //   };
+        //   ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
+        // });
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const ticTacButton = this.add.text(this.lastLocation.x + 50, this.lastLocation.y + 55, 'Tic Tac Toe',
+        {
+          color: '#FF7000',
+          backgroundColor: '#FFF000',
+        }
+      );
+      ticTacButton.setInteractive();
+
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      ticTacButton.on('pointerdown', () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+
+        boxSprite = this.physics.add.sprite(this.lastLocation.x + 100,this.lastLocation.y + 50,'tictactoe')
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
@@ -372,10 +407,10 @@ class CoveyGameScene extends Phaser.Scene {
       noButton.on('pointerdown', () => {destroyText()});
 
       function destroyText() {
-        yesButton.destroy();
+        ticTacButton.destroy();
         noButton.destroy();
         buttonText.destroy();
-
+        boxButton.destroy();
       }
 
     });
