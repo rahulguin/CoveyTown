@@ -317,9 +317,6 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.disconnect(true);
     },
     onPlaceableAdded(placeable: Placeable) {
-      // eslint-disable-next-line 
-      console.log('in reqst handlers, placeable location:',  placeable.location.xIndex);
-      console.log('in reqst handlers, placeable name:',  placeable.name);
       socket.emit('placeableAdded', placeable);
     },
     onPlaceableDeleted(placeable: Placeable) {

@@ -3,9 +3,9 @@ import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-// newly added
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
+// import { Constraint } from 'matter';
 
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -152,7 +152,7 @@ class CoveyGameScene extends Phaser.Scene {
 
   updatePlaceables(placeables: Placeable[]) {
 
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     console.log('placeable number ', placeables.length);
 
     if (!this.ready) {
@@ -186,12 +186,9 @@ class CoveyGameScene extends Phaser.Scene {
 
   updatePlaceable(placeable: Placeable) {
 
-    this.placeables.forEach(p => 
-    // eslint-disable-next-line 
-    console.log('xindex: ',p.location.xIndex));
     let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
     if (!myPlaceable) {
-       let { location } = placeable;
+      let { location } = placeable;
       if (!location) {
         location = {
           xIndex: 0,
@@ -207,9 +204,10 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
-          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'placeables', myPlaceable.placeableID)
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+          .setScale(0.2)
           .setSize(32, 32)
-        .setOffset(0, 24);
+          .setOffset(0, 24);
         myPlaceable.sprite = sprite;
       }
     }
@@ -346,20 +344,22 @@ class CoveyGameScene extends Phaser.Scene {
 
 
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      yesButton.on('pointerdown', async () => {
+      yesButton.on('pointerdown',  async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const boxSprite = this.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
-          .setInteractive()
-          .setDisplaySize(50,50);
-
-        this.physics.add.collider(sprite, boxSprite);
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
-        
-          // location values are hardcoded in the  method call for now.
-          await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'chessPwd',placeableID: 'chess',location: { xIndex: 1000 + 50, yIndex: 1000 + 50 }});
-        
+        const {x}  = this.game.input.mousePointer;
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        const {y}  = this.game.input.mousePointer;
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+
+        // location values are hardcoded in the  method call for now.
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'chessPwd',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -489,78 +489,6 @@ class CoveyGameScene extends Phaser.Scene {
       .setInteractive();
 
     this.placeableAddition(sprite);
-
-    // sprite.on('pointerdown', () => {
-
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Hey! Do you want \nto add \nan object here?", {
-    //     color: '#FF7000',
-    //     backgroundColor: '#F0000',
-    //   });
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   const yesButton = this.add.text(this.lastLocation.x, this.lastLocation.y + 55, 'Yes',
-    //     {
-    //       color: '#FF7000',
-    //       backgroundColor: '#FFF000',
-    //     }
-    //   );
-    //   yesButton.setInteractive();
-
-
-    //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    //   yesButton.on('pointerdown', () => {
-    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //     // @ts-ignore
-    //     const boxSprite = this.add.sprite(this.lastLocation.x + 50,this.lastLocation.y + 50,'box')
-    //       .setInteractive()
-    //       .setDisplaySize(50,50);
-
-    //     this.physics.add.collider(sprite, boxSprite);
-    //     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    //     destroyText();
-        
-    //   });
-
-    //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //   // @ts-ignore
-    //   const noButton = this.add.text(this.lastLocation.x + 150, this.lastLocation.y + 55, 'No',{
-    //     color: '#FF7000',
-    //     backgroundColor: '#FFF000',
-    //   });
-    //   noButton.setInteractive();
-    //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    //   noButton.on('pointerdown', () => {destroyText()});
-
-    //   function destroyText() {
-    //     yesButton.destroy();
-    //     noButton.destroy();
-    //     buttonText.destroy();
-
-    //   }
-
-    // });
-
-    // sprite.on('pointerout', () => {
-
-    //   sprite.clearTint();
-
-    // });
-
-    // sprite.on('pointerup', () => {
-
-    //   sprite.clearTint();
-
-    // });
-
-
-
-
-
-
-
-
 
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
@@ -750,11 +678,14 @@ export default function WorldMap(): JSX.Element {
   const deepPlayers = JSON.stringify(players);
 
   useEffect(() => {
-  // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log('players: ', players);
     gameScene?.initialise(apiClient, currentTownID);
     gameScene?.updatePlayersLocations(players);
-    
+    if(placeables) {
+      gameScene?.updatePlaceables(placeables);
+    }
+
   }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
 
   useEffect(() => {

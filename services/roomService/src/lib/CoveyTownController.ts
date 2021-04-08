@@ -93,15 +93,6 @@ export default class CoveyTownController {
    * @returns returns if the two locations are equal
    */
   static compareLocation(location1: PlaceableLocation, location2: PlaceableLocation): unknown {
-    
-    // eslint-disable-next-line 
-    console.log('xIndex of loc1 ', location1.xIndex);
-    // eslint-disable-next-line 
-    console.log('xIndex of loc2 ', location2.xIndex);
-    // eslint-disable-next-line 
-    console.log('yIndex of loc1 ', location1.yIndex);
-    // eslint-disable-next-line 
-    console.log('yIndex of loc2 ', location2.yIndex);
 
     return location1.xIndex === location2.xIndex && location1.yIndex === location2.yIndex;
   }
