@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react';
+import ReactDOM from 'react-dom';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
@@ -345,17 +346,22 @@ class CoveyGameScene extends Phaser.Scene {
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
         boxSprite.body.setAllowGravity(false); 
-
+        
         this.physics.add.collider(sprite, boxSprite);
-        boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
+        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
+        boxSprite.on('pointerup', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
+        });
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-
-
 
       const noButton = this.add.text(this.lastLocation.x + 150, this.lastLocation.y + 55, 'No',{
         color: '#FF7000',
@@ -575,6 +581,7 @@ export default function WorldMap(): JSX.Element {
   return (
     <div>
       <div id="map-container"/>
+      <div id="modal-container"/>
       <TicTacToe isShown={isShown} hide={toggle} modalContent={content} headerText={content} />
     </div>
     
