@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
+import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 
@@ -343,8 +344,7 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false);
-          
+        boxSprite.body.setAllowGravity(false); 
 
         this.physics.add.collider(sprite, boxSprite);
         boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
@@ -529,6 +529,13 @@ export default function WorldMap(): JSX.Element {
     emitMovement, players, placeables
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
+  const [modal, setModal] = useState(false);
+
+  const [isShown, setIsShown] = useState<boolean>(true);
+  const toggle = () => setIsShown(!isShown);
+  const content = 'Hey, Im a model.';
+
+
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
@@ -565,5 +572,11 @@ export default function WorldMap(): JSX.Element {
     gameScene?.updatePlayersLocations(players);
   }, [players, deepPlayers, gameScene]);
 
-  return <div id="map-container"/>;
+  return (
+    <div>
+      <div id="map-container"/>
+      <TicTacToe isShown={isShown} hide={toggle} modalContent={content} headerText={content} />
+    </div>
+    
+  );
 }
