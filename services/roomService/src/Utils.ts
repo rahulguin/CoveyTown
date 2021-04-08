@@ -15,6 +15,7 @@ export function logError(err: any): void {
   console.trace(err);
 }
 
+// eslint-disable-next-line
 export function isDefined(value: any): boolean {
   return value !== undefined;
 }
