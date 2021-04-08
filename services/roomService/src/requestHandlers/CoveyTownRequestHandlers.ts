@@ -316,30 +316,51 @@ export async function getPlaceableHandler(
   };
 }
 
+function updatePlayerPermissionsMessage(updateResponce: string | string[]): string | undefined {
+  if (typeof updateResponce === 'string') {
+    return updateResponce;
+  }
+  if (updateResponce.length > 0) {
+    return 'given player ids that do not exist';
+  }
+  return undefined;
+}
+function updatePlayerResponceParser(updateResponce: string | string[]): string[] {
+  if (typeof updateResponce === 'string') {
+    return [];
+  }
+  return updateResponce;
+}
+
 export async function updatePlayerPermissionsHandler(
   requestData: PlayerUpdatePermissionsRequest,
-): Promise<ResponseEnvelope<type>> {
+): Promise<ResponseEnvelope<string[]>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const sucessful = townsStore.updatePlayerPermissions(
+  const updateResponce = townsStore.updatePlayerPermissions(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
     requestData.updates,
   );
+  const message = updatePlayerPermissionsMessage(updateResponce);
+  const responceToReturn = updatePlayerResponceParser(updateResponce);
   return {
-    // if the string is undefined then getPlaceable was unsuccessful
-    isOK: placeable !== undefined,
-    // returns the placeable that should be located there
-    response: placeable,
+    // if the message string is undefined then getPlaceable was unsuccessful
+    isOK: message === undefined,
+    // returns the list of badIDs or the empty list if it is a string
+    response: responceToReturn,
     // the message returned is the message to be recieved
-    message: !placeable ? undefined : 'Invalid town id given',
+    message,
   };
 }
 
-export async function getPlayerPermission(
+export async function getPlayersPermissionHandler(
   requestData: PlayerGetPermissionRequest,
 ): Promise<ResponseEnvelope<boolean>> {
   const townsStore = CoveyTownsStore.getInstance();
-  const getResponce = townsStore.getPlayerPermission(requestData.coveyTownID, requestData.playerID);
+  const getResponce = townsStore.getPlayersPermission(
+    requestData.coveyTownID,
+    requestData.playerID,
+  );
   return {
     // if the responce was undefined then getPlaceable was unsuccessful
     isOK: getResponce !== undefined,

@@ -197,7 +197,7 @@ export default class TownsServiceClient {
       if (ignoreResponse) {
         return {} as T;
       }
-      assert(response.data.response);
+      assert(response.data.response !== undefined);
       return response.data.response;
     }
     throw new Error(`Error processing request: ${response.data.message}`);
@@ -260,18 +260,18 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest) {
+  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest): Promise<string[]> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<string[]>>(
-      'placeables/townID:',
+      `/towns/${requestData.coveyTownID}/permissions`,
       requestData,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async getPlayerPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<boolean>>(
-      'placeables/townID:',
-      requestData,
+  async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
+      { data: requestData },
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }

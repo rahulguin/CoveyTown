@@ -1,4 +1,4 @@
-import { default as bodyParser, default as BodyParser } from 'body-parser';
+import BodyParser from 'body-parser';
 import { Express } from 'express';
 import { Server } from 'http';
 import { StatusCodes } from 'http-status-codes';
@@ -7,6 +7,7 @@ import {
   addPlaceableHandler,
   deletePlaceableHandler,
   getPlaceableHandler,
+  getPlayersPermissionHandler,
   townCreateHandler,
   townDeleteHandler,
   townJoinHandler,
@@ -162,7 +163,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.post('permissions/townID:', bodyParser.json(), async (req, res) => {
+  app.post('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
     try {
       const result = await updatePlayerPermissionsHandler({
         coveyTownID: req.params.townID,
@@ -178,9 +179,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.get('permissions/townID:', bodyParser.json(), async (req, res) => {
+  app.get('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
     try {
-      const result = await getPlayersPermission({
+      const result = await getPlayersPermissionHandler({
         coveyTownID: req.params.townID,
         playerID: req.body.playerID,
       });
