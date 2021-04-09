@@ -21,6 +21,8 @@ export interface TownJoinRequest {
 export interface TownJoinResponse {
   /** Unique ID that represents this player * */
   coveyUserID: string;
+  /** Unique secret key that a player can use to identify themselves to the server */
+  coveyPlayerSecretKey: string;
   /** Secret token that this player should use to authenticate
    * in future requests to this service * */
   coveySessionToken: string;
@@ -100,7 +102,7 @@ export type CoveyTownInfo = {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playerID: string;
+  playersKey: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -127,7 +129,7 @@ export interface PlaceableLocation {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playerID: string;
+  playersKey: string;
   location: PlaceableLocation;
 }
 
