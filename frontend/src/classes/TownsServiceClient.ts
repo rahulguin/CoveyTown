@@ -20,6 +20,8 @@ export interface TownJoinRequest {
 export interface TownJoinResponse {
   /** Unique ID that represents this player * */
   coveyUserID: string;
+  /** Unique and secret key specific to this player they can use to prove identity to the server * */
+  coveyPlayerSecretKey: string;
   /** Secret token that this player should use to authenticate
    * in future requests to this service * */
   coveySessionToken: string;

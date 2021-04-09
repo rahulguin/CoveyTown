@@ -28,7 +28,7 @@ import Video from './classes/Video/Video';
 import Placeable, { ServerPlaceable } from './classes/Placeable';
 
 type CoveyAppUpdate =
-  | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, socket: Socket, players: Player[], placeables: Placeable[], emitMovement: (location: UserLocation) => void },  }
+  | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, mySecretKey: string, socket: Socket, players: Player[], placeables: Placeable[], emitMovement: (location: UserLocation) => void },  }
   | { action: 'addPlayer'; player: Player }
   | { action: 'playerMoved'; player: Player }
   | { action: 'playerDisconnect'; player: Player }
@@ -44,6 +44,7 @@ function defaultAppState(): CoveyAppState {
     players: [],
     placeables: [],
     myPlayerID: '',
+    mySecretKey: '',
     currentTownFriendlyName: '',
     currentTownID: '',
     currentTownIsPubliclyListed: false,
@@ -65,6 +66,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     currentTownID: state.currentTownID,
     currentTownIsPubliclyListed: state.currentTownIsPubliclyListed,
     myPlayerID: state.myPlayerID,
+    mySecretKey: state.mySecretKey,
     players: state.players,
     currentLocation: state.currentLocation,
     nearbyPlayers: state.nearbyPlayers,
@@ -163,6 +165,7 @@ async function GameController(initData: TownJoinResponse,
   dispatchAppUpdate: (update: CoveyAppUpdate) => void) {
   // Now, set up the game sockets
   const gamePlayerID = initData.coveyUserID;
+  const playerSecretKey = initData.coveyPlayerSecretKey;
   const sessionToken = initData.coveySessionToken;
   const url = process.env.REACT_APP_TOWNS_SERVICE_URL;
   assert(url);
@@ -209,6 +212,7 @@ async function GameController(initData: TownJoinResponse,
       townFriendlyName: roomName,
       townID: video.coveyTownID,
       myPlayerID: gamePlayerID,
+      mySecretKey: playerSecretKey,
       townIsPubliclyListed: video.isPubliclyListed,
       emitMovement,
       socket,

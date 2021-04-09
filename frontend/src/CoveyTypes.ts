@@ -3,7 +3,7 @@ import Player, { UserLocation } from './classes/Player';
 import Placeable from './classes/Placeable';
 import TownsServiceClient from './classes/TownsServiceClient';
 
-export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved' | 'objectAdded' | 'objectRemoved';
+export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved' | 'placeableAdded' | 'placeableRemoved';
 
 export type VideoRoom = {
   twilioID: string,
@@ -23,6 +23,7 @@ export type CoveyAppState = {
   currentTownID: string,
   currentTownIsPubliclyListed: boolean,
   myPlayerID: string,
+  mySecretKey: string,
   players: Player[],
   currentLocation: UserLocation,
   nearbyPlayers: NearbyPlayers,
