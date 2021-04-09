@@ -29,6 +29,8 @@ export interface TownJoinRequest {
 export interface TownJoinResponse {
   /** Unique ID that represents this player * */
   coveyUserID: string;
+  /** A Unique secret key that a player can use when making requests to the server to prove it is them */
+  secreteKey: string;
   /** Secret token that this player should use to authenticate
    * in future requests to this service * */
   coveySessionToken: string;
@@ -187,6 +189,7 @@ export async function townJoinHandler(
     isOK: true,
     response: {
       coveyUserID: newPlayer.id,
+      coveyPlayerSecretKey: newPlayer.secretKey,
       coveySessionToken: newSession.sessionToken,
       providerVideoToken: newSession.videoToken,
       currentPlayers: coveyTownController.players,

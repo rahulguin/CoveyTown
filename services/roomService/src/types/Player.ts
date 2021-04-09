@@ -14,6 +14,9 @@ export default class Player {
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
 
+  /** The player's secret key, to be used to verify that a specific user is making the request to the server */
+  private readonly _secretKey: string;
+
   /** Whether or not this player has permission to add/delete placeables */
   public canPlace: boolean;
 
@@ -26,6 +29,7 @@ export default class Player {
     };
     this._userName = userName;
     this._id = nanoid();
+    this._secretKey = nanoid();
     this.canPlace = false;
   }
 
@@ -35,6 +39,10 @@ export default class Player {
 
   get id(): string {
     return this._id;
+  }
+
+  get secretKey(): string {
+    return this._secretKey;
   }
 
   updateLocation(location: UserLocation): void {
