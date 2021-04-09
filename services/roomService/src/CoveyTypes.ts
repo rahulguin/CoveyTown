@@ -22,3 +22,12 @@ export interface PlaceableInfo {
   placeableName: string;
   location: PlaceableLocation;
 }
+
+export type PlayerUpdateSpecifications = {
+  specifications: PlayerPermissionSpecification[];
+};
+
+export type PlayerPermissionSpecification = {
+  playerID: string;
+  canPlace: boolean;
+};

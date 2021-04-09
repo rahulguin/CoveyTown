@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Grid, Hidden, makeStyles, Theme, } from '@material-ui/core';
+import {Grid, Hidden, makeStyles, Theme, Typography,} from '@material-ui/core';
 import { useForm } from 'react-hook-form';
 import { Button, FormControl, FormErrorMessage, FormLabel, Input, useToast, } from '@chakra-ui/react';
 import assert from 'assert';
@@ -95,12 +95,20 @@ export default function DeviceSelectionScreen({ setMediaError }: DeviceSelection
                 setMediaError={setMediaError}
               />
             </Hidden>
-            <SettingsMenu mobileButtonClass={classes.mobileButton} />
           </div>
         </Grid>
         <Grid item md={5} sm={12} xs={12}>
-          <Grid container direction="column" justify="space-between" style={{ height: '100%' }}>
+          <Grid container direction="column" justify="space-between" style={{ height: '70%' }}>
             <div>
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              &nbsp;
+              <Typography variant="h4" component="h2" align="center">
+                Check yourself out!
+              </Typography>
+              &nbsp;
+              &nbsp;
               <Hidden smDown>
                 <ToggleAudioButton
                   className={classes.deviceButton}
@@ -113,7 +121,9 @@ export default function DeviceSelectionScreen({ setMediaError }: DeviceSelection
                   setMediaError={setMediaError}
                 />
               </Hidden>
+              <SettingsMenu mobileButtonClass={classes.mobileButton} />
             </div>
+
           </Grid>
         </Grid>
       </Grid>

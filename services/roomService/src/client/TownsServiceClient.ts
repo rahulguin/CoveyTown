@@ -1,6 +1,6 @@
 import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { UserLocation } from '../CoveyTypes';
+import { PlayerUpdateSpecifications, UserLocation } from '../CoveyTypes';
 
 export type ServerPlayer = { _id: string; _userName: string; location: UserLocation };
 
@@ -99,7 +99,9 @@ export type CoveyTownInfo = {
  */
 export interface PlaceableAddRequest {
   coveyTownID: string;
-  // coveyTownPassword: string;
+
+  coveyTownPassword: string;
+  playerID: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -126,6 +128,7 @@ export interface PlaceableLocation {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
+  playerID: string;
   location: PlaceableLocation;
 }
 
@@ -151,6 +154,21 @@ export interface PlaceableInfo {
   location: PlaceableLocation;
 }
 
+/**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
+/**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
+}
 /**
  * Responce from the server for a list of placeables
  */
@@ -180,7 +198,7 @@ export default class TownsServiceClient {
       if (ignoreResponse) {
         return {} as T;
       }
-      assert(response.data.response);
+      assert(response.data.response !== undefined);
       return response.data.response;
     }
     throw new Error(`Error processing request: ${response.data.message}`);
@@ -238,6 +256,22 @@ export default class TownsServiceClient {
   async getPlaceable(requestData: PlaceableGetRequest): Promise<PlaceableInfo> {
     const responseWrapper = await this._axios.get<ResponseEnvelope<PlaceableInfo>>(
       `/placeables/${requestData.coveyTownID}`,
+      { data: requestData },
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest): Promise<string[]> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<string[]>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
       { data: requestData },
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);

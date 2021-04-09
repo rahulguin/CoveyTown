@@ -1,5 +1,10 @@
 import { customAlphabet, nanoid } from 'nanoid';
-import { PlaceableInfo, PlaceableLocation, UserLocation } from '../CoveyTypes';
+import {
+  PlaceableInfo,
+  PlaceableLocation,
+  PlayerUpdateSpecifications,
+  UserLocation,
+} from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
 import Player from '../types/Player';
@@ -196,13 +201,7 @@ export default class CoveyTownController {
    * @param placeableID the id assocaited of the placeable that is wanting to be added
    * @param location the location the player is wanting to add the placeable
    */
-  addPlaceable(
-    _player: Player,
-    placeableID: string,
-    location: PlaceableLocation,
-  ): string | undefined {
-    // check that player is able to add placeables (could be changed to be password instead of player)
-
+  addPlaceable(placeableID: string, location: PlaceableLocation): string | undefined {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
@@ -233,9 +232,7 @@ export default class CoveyTownController {
    * @param _player the player the made the request to delete the placeable
    * @param location the location the player is wanting to delete the placeable from
    */
-  deletePlaceable(_player: Player, location: PlaceableLocation): string | undefined {
-    // check that player is able to delete placeables (could be changed to be password instead of player)
-
+  deletePlaceable(location: PlaceableLocation): string | undefined {
     // check that placeable can be deleted from here
 
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
@@ -273,5 +270,59 @@ export default class CoveyTownController {
       placeableName: placeableAtLocation.name,
       location: placeableAtLocation.location,
     };
+  }
+
+  private createSetOfMissingOrDuplicated(playersToUpdate: PlayerUpdateSpecifications): string[] {
+    const troubleSomeIDs = new Set<string>();
+    // set of IDs that have already been see
+    const seenIDs = new Set<string>(undefined);
+    // checks if there are any player ids missing if so adds them to the list of missing player ids
+    playersToUpdate.specifications.forEach(updateSpecification => {
+      const { playerID } = updateSpecification;
+      // checks if the player id has already been seen
+      if (seenIDs.has(playerID)) {
+        // if it hasn't adds it to the troublesome ids
+        troubleSomeIDs.add(playerID);
+      } else {
+        // if it hasnt add it to the set of seen IDs
+        seenIDs.add(playerID);
+
+        // then check if it appears in the list
+        const playerToUpdate = this._players.find(player => player.id === playerID);
+        if (!playerToUpdate) {
+          troubleSomeIDs.add(playerID);
+        }
+      }
+    });
+
+    return Array.from(troubleSomeIDs);
+  }
+
+  updatePlayerPermissions(playersToUpdate: PlayerUpdateSpecifications): string[] {
+    // f
+    const troubleSomeIDs = this.createSetOfMissingOrDuplicated(playersToUpdate);
+    // if there were missing/or duplicated ids return the ids
+    if (troubleSomeIDs.length > 0) {
+      return troubleSomeIDs;
+    }
+
+    // since none of the ids were missing update them
+    playersToUpdate.specifications.forEach(updateSpecification => {
+      const playerToUpdate = this._players.find(
+        player => player.id === updateSpecification.playerID,
+      );
+      if (playerToUpdate) {
+        playerToUpdate.canPlace = updateSpecification.canPlace;
+      }
+    });
+    return [];
+  }
+
+  getPlayersPermission(playerID: string): boolean | undefined {
+    const requestedPlayer = this.players.find(player => player.id === playerID);
+    if (requestedPlayer) {
+      return requestedPlayer.canPlace;
+    }
+    return undefined;
   }
 }

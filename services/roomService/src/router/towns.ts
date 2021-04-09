@@ -7,12 +7,14 @@ import {
   addPlaceableHandler,
   deletePlaceableHandler,
   getPlaceableHandler,
+  getPlayersPermissionHandler,
   townCreateHandler,
   townDeleteHandler,
   townJoinHandler,
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
+  updatePlayerPermissionsHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -114,6 +116,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
+        playerID: req.body.playerID,
         placeableID: req.body.placeableID,
         location: req.body.location,
       });
@@ -134,6 +137,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
+        playerID: req.body.playerID,
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);
@@ -153,6 +157,37 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await getPlaceableHandler({
         coveyTownID: req.params.townID,
         location: req.body.location,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.post('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await updatePlayerPermissionsHandler({
+        coveyTownID: req.params.townID,
+        coveyTownPassword: req.body.coveyTownPassword,
+        updates: req.body.updates,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.get('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await getPlayersPermissionHandler({
+        coveyTownID: req.params.townID,
+        playerID: req.body.playerID,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
