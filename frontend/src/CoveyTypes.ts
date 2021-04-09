@@ -32,11 +32,4 @@ export type CoveyAppState = {
   placeables: Placeable[]
 };
 
-export type PlayerUpdateSpecifications = {
-  specifications: PlayerPermissionSpecification[];
-};
 
-export type PlayerPermissionSpecification = {
-  playerID: string;
-  canPlace: boolean;
-};

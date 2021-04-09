@@ -2,7 +2,6 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
 import { ServerPlaceable } from './Placeable';
-import { PlayerUpdateSpecifications } from '../CoveyTypes';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -183,6 +182,15 @@ export type CoveyTownInfo = {
   coveyTownID: string;
   currentOccupancy: number;
   maximumOccupancy: number
+};
+
+export type PlayerUpdateSpecifications = {
+  specifications: PlayerPermissionSpecification[];
+};
+
+export type PlayerPermissionSpecification = {
+  playerID: string;
+  canPlace: boolean;
 };
 
 export default class TownsServiceClient {
