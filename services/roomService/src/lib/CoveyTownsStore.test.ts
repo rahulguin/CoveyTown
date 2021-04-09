@@ -269,7 +269,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.addPlaceable(
           nanoid(),
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -281,7 +281,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -304,7 +304,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -314,7 +314,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -324,7 +324,7 @@ describe('CoveyTownsStore', () => {
         const firstResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -343,7 +343,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           nanoid(),
           location,
         );
@@ -356,7 +356,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -376,7 +376,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -390,7 +390,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -404,7 +404,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           location,
         );
         expect(responce).not.toBe(undefined);
@@ -415,7 +415,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -424,7 +424,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           location,
         );
         expect(responce).toBe(undefined);
@@ -433,7 +433,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -442,7 +442,7 @@ describe('CoveyTownsStore', () => {
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           location,
         );
         expect(responce).toBe(undefined);
@@ -451,7 +451,7 @@ describe('CoveyTownsStore', () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           placeableID,
           location,
         );
@@ -460,7 +460,7 @@ describe('CoveyTownsStore', () => {
         const firstResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           location,
         );
         expect(firstResponce).toBe(undefined);
@@ -468,7 +468,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          player.secretKey,
           location,
         );
         expect(secondResponce).not.toBe(undefined);

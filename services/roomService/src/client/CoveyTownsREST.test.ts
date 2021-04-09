@@ -57,13 +57,14 @@ describe('TownsServiceAPIREST', () => {
     };
   }
 
+  type PlayerForTesting = { playerID: string; playersKey: string };
   async function createPlayerForTesting(
     townID: string,
     playerName: string,
     coveyTownPassword: string | undefined = undefined,
     hasPermission = true,
-  ): Promise<string> {
-    const { coveyUserID: playerID } = await apiClient.joinTown({
+  ): Promise<PlayerForTesting> {
+    const { coveyUserID: playerID, coveyPlayerSecretKey: playersKey } = await apiClient.joinTown({
       coveyTownID: townID,
       userName: playerName,
     });
@@ -77,7 +78,7 @@ describe('TownsServiceAPIREST', () => {
       expect(getResponse).toBe(hasPermission);
     }
 
-    return playerID;
+    return { playerID, playersKey };
   }
 
   beforeAll(async () => {
@@ -274,12 +275,12 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the town does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       try {
         await apiClient.addPlaceable({
           coveyTownID: nanoid(),
           coveyTownPassword: pubTown1.townUpdatePassword,
-          playerID,
+          playersKey,
           placeableID,
           location: { xIndex: 0, yIndex: 0 },
         });
@@ -293,7 +294,7 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the password is incorrect and player does not have permission', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
@@ -303,7 +304,7 @@ describe('TownsServiceAPIREST', () => {
         await apiClient.addPlaceable({
           coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
           coveyTownID: pubTown1.coveyTownID,
-          playerID,
+          playersKey,
           placeableID,
           location: { xIndex: 0, yIndex: 0 },
         });
@@ -317,12 +318,12 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the given placeable id is invalid', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       try {
         await apiClient.addPlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
-          playerID,
+          playersKey,
           placeableID: nanoid(),
           location: { xIndex: 0, yIndex: 0 },
         });
@@ -336,7 +337,7 @@ describe('TownsServiceAPIREST', () => {
     it('Returns expected placeableInfo when succesfully added - correct password', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
@@ -347,7 +348,7 @@ describe('TownsServiceAPIREST', () => {
       const addResponce: PlaceableInfo = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -362,17 +363,18 @@ describe('TownsServiceAPIREST', () => {
     it('Returns expected placeableInfo when succesfully added - has permission', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
+        true,
       );
       const placedLocation = { xIndex: 0, yIndex: 0 };
       const placeable: Placeable = new Placeable(placeableID, placedLocation);
       const addResponce: PlaceableInfo = await apiClient.addPlaceable({
         coveyTownPassword: nanoid(),
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -388,11 +390,11 @@ describe('TownsServiceAPIREST', () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       const placedLocation = { xIndex: 0, yIndex: 0 };
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -400,7 +402,7 @@ describe('TownsServiceAPIREST', () => {
         await apiClient.addPlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
-          playerID,
+          playersKey,
           placeableID: `${placeableID}*`,
           location: placedLocation,
         });
@@ -416,7 +418,7 @@ describe('TownsServiceAPIREST', () => {
     it('allows multiple placeables with the same ID at different locations', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       const firstPlacedLocation = { xIndex: 10, yIndex: 10 };
       const firstPlaceable: Placeable = new Placeable(placeableID, firstPlacedLocation);
       const secondPlacedLocation = { xIndex: 0, yIndex: 0 };
@@ -424,7 +426,7 @@ describe('TownsServiceAPIREST', () => {
       const firstAdd = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: firstPlacedLocation,
       });
@@ -439,7 +441,7 @@ describe('TownsServiceAPIREST', () => {
       const secondAdd = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: secondPlacedLocation,
       });
@@ -463,12 +465,12 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the town does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       try {
         await apiClient.deletePlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: nanoid(),
-          playerID,
+          playersKey,
           location: { xIndex: 0, yIndex: 0 },
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect id');
@@ -481,7 +483,7 @@ describe('TownsServiceAPIREST', () => {
     it('Throws an error if the password is incorrect and player does not have permission', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
@@ -491,7 +493,7 @@ describe('TownsServiceAPIREST', () => {
       await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -499,7 +501,7 @@ describe('TownsServiceAPIREST', () => {
         await apiClient.deletePlaceable({
           coveyTownPassword: `${pubTown1.townUpdatePassword}*`,
           coveyTownID: pubTown1.coveyTownID,
-          playerID,
+          playersKey,
           location: placedLocation,
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
@@ -512,7 +514,7 @@ describe('TownsServiceAPIREST', () => {
     it('Should return the empty placeableInfo on successful delete - correct password', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
@@ -524,7 +526,7 @@ describe('TownsServiceAPIREST', () => {
       const addResponce: PlaceableInfo = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -539,7 +541,7 @@ describe('TownsServiceAPIREST', () => {
       const deleteResponce: PlaceableInfo = await apiClient.deletePlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         location: placedLocation,
       });
       const deletedInfo: PlaceableInfo = {
@@ -553,7 +555,7 @@ describe('TownsServiceAPIREST', () => {
     it('Should return the empty placeableInfo on successful delete - player has permission', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(
+      const { playersKey } = await createPlayerForTesting(
         pubTown1.coveyTownID,
         playerName,
         pubTown1.townUpdatePassword,
@@ -565,7 +567,7 @@ describe('TownsServiceAPIREST', () => {
       const addResponce: PlaceableInfo = await apiClient.addPlaceable({
         coveyTownPassword: pubTown1.townUpdatePassword,
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         placeableID,
         location: placedLocation,
       });
@@ -580,7 +582,7 @@ describe('TownsServiceAPIREST', () => {
       const deleteResponce: PlaceableInfo = await apiClient.deletePlaceable({
         coveyTownPassword: nanoid(),
         coveyTownID: pubTown1.coveyTownID,
-        playerID,
+        playersKey,
         location: placedLocation,
       });
       const deletedInfo: PlaceableInfo = {
@@ -594,12 +596,12 @@ describe('TownsServiceAPIREST', () => {
     it('should throw an error if there is nothing to delete', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       try {
         await apiClient.deletePlaceable({
           coveyTownPassword: pubTown1.townUpdatePassword,
           coveyTownID: pubTown1.coveyTownID,
-          playerID,
+          playersKey,
           location: { xIndex: 0, yIndex: 0 },
         });
         fail('Expected an error to be thrown by addPlaceable when given incorrect password');
@@ -614,14 +616,14 @@ describe('TownsServiceAPIREST', () => {
   async function addPlaceableToTown(
     town: TestTownData,
     placedLocation: PlaceableLocation,
-    playerID: string,
+    playersKey: string,
   ): Promise<PlaceableInfo> {
     const [placeableID] = randomPlaceablesFromAllowedPlaceables();
     const placeable: Placeable = new Placeable(placeableID, placedLocation);
     await apiClient.addPlaceable({
       coveyTownPassword: town.townUpdatePassword,
       coveyTownID: town.coveyTownID,
-      playerID,
+      playersKey,
       placeableID,
       location: placedLocation,
     });
@@ -656,8 +658,8 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
-      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playerID);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playersKey);
 
       const getResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -669,8 +671,8 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
-      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playerID);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playersKey);
 
       const getResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -699,8 +701,8 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
-      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playerID);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playersKey);
 
       const firstGetResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -711,7 +713,7 @@ describe('TownsServiceAPIREST', () => {
       await apiClient.deletePlaceable({
         coveyTownID: pubTown1.coveyTownID,
         coveyTownPassword: pubTown1.townUpdatePassword,
-        playerID,
+        playersKey,
         location: placedLocation,
       });
 
@@ -733,8 +735,8 @@ describe('TownsServiceAPIREST', () => {
       const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
-      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playerID);
+      const { playersKey } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, playersKey);
 
       const firstGetResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,
@@ -800,7 +802,7 @@ describe('TownsServiceAPIREST', () => {
     it('should error if given invalid town ID', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
       await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
       let permissions: PlayerUpdateSpecifications = {
         specifications: [{ playerID, canPlace: true }],
@@ -823,7 +825,7 @@ describe('TownsServiceAPIREST', () => {
     it('should error if given invalid password', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
       await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
       let permissions: PlayerUpdateSpecifications = {
         specifications: [{ playerID, canPlace: true }],
@@ -846,7 +848,7 @@ describe('TownsServiceAPIREST', () => {
     it('should do nothing if given the empty list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
       await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [playerID]);
       let permissions: PlayerUpdateSpecifications = {
         specifications: [],
@@ -865,8 +867,14 @@ describe('TownsServiceAPIREST', () => {
     it('should update all the players ids that are in the list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      const { playerID: firstPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        firstPlayer,
+      );
+      const { playerID: secondPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        secondPlayer,
+      );
       const permissions: PlayerUpdateSpecifications = {
         specifications: [
           { playerID: firstPlayerID, canPlace: true },
@@ -886,8 +894,14 @@ describe('TownsServiceAPIREST', () => {
     it('should not update any players whose id do not appear in the list', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      const { playerID: firstPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        firstPlayer,
+      );
+      const { playerID: secondPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        secondPlayer,
+      );
       // sets the values so it is known what it was before the update
       await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [
         firstPlayerID,
@@ -915,8 +929,14 @@ describe('TownsServiceAPIREST', () => {
     it('should error if given a player id that does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const firstPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, firstPlayer);
-      const secondPlayerID = await createPlayerForTesting(pubTown1.coveyTownID, secondPlayer);
+      const { playerID: firstPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        firstPlayer,
+      );
+      const { playerID: secondPlayerID } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        secondPlayer,
+      );
       await setAllPermissionsTrue(pubTown1.coveyTownID, pubTown1.townUpdatePassword, [
         firstPlayerID,
         secondPlayerID,
@@ -971,7 +991,7 @@ describe('TownsServiceAPIREST', () => {
     it('should error if given town id does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       // sets the values so it is known what it was before the update
       setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, true);
       try {
@@ -989,7 +1009,7 @@ describe('TownsServiceAPIREST', () => {
     it('should throw an error if given a player ID that does not exist', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       await setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, true);
       try {
         await apiClient.getPlayersPermission({
@@ -1006,7 +1026,7 @@ describe('TownsServiceAPIREST', () => {
     it('should return true for a player whose permission that is true', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       await setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, true);
       const getResponce = await apiClient.getPlayersPermission({
         coveyTownID: pubTown1.coveyTownID,
@@ -1017,7 +1037,7 @@ describe('TownsServiceAPIREST', () => {
     it('should return false for a player whose permission that is false', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       await setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, false);
       const getResponce = await apiClient.getPlayersPermission({
         coveyTownID: pubTown1.coveyTownID,
@@ -1028,7 +1048,7 @@ describe('TownsServiceAPIREST', () => {
     it('should return the same value twice for a player with no modifiers called inbetween - true', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       await setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, true);
       const firstGetResponce = await apiClient.getPlayersPermission({
         coveyTownID: pubTown1.coveyTownID,
@@ -1045,7 +1065,7 @@ describe('TownsServiceAPIREST', () => {
     it('should return the same value twice for a player with no modifiers called inbetween - false', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
-      const playerID = await createPlayerForTesting(pubTown1.coveyTownID, player);
+      const { playerID } = await createPlayerForTesting(pubTown1.coveyTownID, player);
       await setPlayerPermission(pubTown1.coveyTownID, pubTown1.townUpdatePassword, playerID, false);
       const firstGetResponce = await apiClient.getPlayersPermission({
         coveyTownID: pubTown1.coveyTownID,
