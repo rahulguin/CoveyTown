@@ -1,11 +1,12 @@
 import { Button, Checkbox, FormControl, FormLabel, Input, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, TableCaption, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Typography } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import Player from "../../classes/Player";
-import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../../CoveyTypes";
+import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../../classes/TownsServiceClient";
 import useCoveyAppState from "../../hooks/useCoveyAppState";
 import useMaybeVideo from "../../hooks/useMaybeVideo";
 
-function PermissionsButton(): JSX.Element {  
+export default function PermissionsButton(): JSX.Element {  
   const { isOpen, onOpen, onClose } = useDisclosure()
   const video = useMaybeVideo()
   const { players, apiClient, currentTownID } = useCoveyAppState();
@@ -28,11 +29,11 @@ function PermissionsButton(): JSX.Element {
     if(action === 'submit'){
       const updates: PlayerUpdateSpecifications = { specifications: []}
 
-      for (let [playerID, canPlace] of currentPlayersCanPlace) {
-        const playersPermission: PlayerPermissionSpecification =  { playerID, canPlace };
+      currentPlayersCanPlace?.forEach((value: boolean, key: string) => {
+        const playersPermission: PlayerPermissionSpecification =  { playerID: key, canPlace: value };
         updates.specifications.push(playersPermission);
-      }
-      
+      })
+
       try{
         await apiClient.updatePlayerPermissions({coveyTownID: currentTownID, coveyTownPassword: roomUpdatePassword,
           updates });
@@ -43,7 +44,7 @@ function PermissionsButton(): JSX.Element {
         closePermissions();
       } catch(err) {
         toast({
-          title: 'Unable to delete town',
+          title: 'Unable to update players locations',
           description: err.toString(),
           status: 'error'
         });
@@ -51,20 +52,19 @@ function PermissionsButton(): JSX.Element {
     }
   };
 
-
-  async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
-    const initialPlayerPermissions = new Map<string, boolean>();
-    initialPlayers.forEach(async (player) => {
-      const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-      initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
-    });
-    setPlayersCanPlace(initialPlayerPermissions);
-  }
-
   useEffect(() => {
+    async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
+      const initialPlayerPermissions = new Map<string, boolean>();
+      initialPlayers.forEach(async (player) => {
+        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
+      });
+      setPlayersCanPlace(initialPlayerPermissions);
+    }
+    
     setCurrentPlayers(players)
     initializePlayerCanPlace(players);
-  }, [players])
+  }, [apiClient, currentTownID, players])
 
     
 
@@ -93,7 +93,7 @@ return <>
           <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                       role='cell'>{player.id}</Td>
                       <Td role='cell'>
-                      <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} spacing="1rem">Can Place</Checkbox>
+                      <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox>
                       </Td>
           </Tr>
        ))}
