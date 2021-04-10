@@ -39,6 +39,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private paused = false;
 
+  private playerID?: string;
+
   private video: Video;
 
   private emitMovement: (loc: UserLocation) => void;
@@ -51,12 +53,13 @@ class CoveyGameScene extends Phaser.Scene {
 
   private placeables: Placeable[] = [];
 
-  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string) {
+  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string, playerID: string) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
     this.apiClient = apiClient;
     this.townId = townId;
+    this.playerID = playerID;
   }
 
   preload() {
@@ -372,18 +375,12 @@ class CoveyGameScene extends Phaser.Scene {
       boxButton.on('pointerout', () => {
         boxButton.setBackgroundColor('#004d00')
       })
-      
+
        // eslint-disable-next-line @typescript-eslint/no-use-before-define
       boxButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'box')
-          .setInteractive()
-          .setDisplaySize(50,50);
-        boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false); 
-        
-        this.physics.add.collider(sprite, boxSprite);
+
         // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
         // boxSprite.on('pointerup', () => {
         //   const isShown = true;
@@ -407,7 +404,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x  + 50 , yIndex: y + 50}});
 
       });
 
@@ -442,8 +439,8 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive()
           .setDisplaySize(50,50);
         boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false); 
-        
+        boxSprite.body.setAllowGravity(false);
+
         this.physics.add.collider(sprite, boxSprite);
         // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
         boxSprite.on('pointerup', () => {
@@ -607,7 +604,7 @@ class CoveyGameScene extends Phaser.Scene {
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
 
-    
+
 
 
     const sprite = this.physics.add
@@ -771,7 +768,7 @@ export default function WorldMap(): JSX.Element {
   const {
     emitMovement, players,
     // newly added
-    placeables, currentTownID, apiClient
+    placeables, currentTownID, apiClient, myPlayerID
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [modal, setModal] = useState(false);
@@ -797,7 +794,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, myPlayerID);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -810,7 +807,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement,apiClient, currentTownID]);
+  }, [video, emitMovement,apiClient, currentTownID, myPlayerID]);
 
   const deepPlayers = JSON.stringify(players);
 
@@ -837,6 +834,6 @@ export default function WorldMap(): JSX.Element {
       <div id="modal-container"/>
       <TicTacToe isShown={isShown} hide={toggle} modalContent={content} headerText={content} />
     </div>
-    
+
   );
 }
