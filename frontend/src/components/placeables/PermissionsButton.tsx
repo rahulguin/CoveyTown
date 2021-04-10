@@ -70,7 +70,7 @@ export default function PermissionsButton(): JSX.Element {
 
 
 return <>
-<MenuItem data-testid='openMenuButton' onClick={openPermissions}>
+<MenuItem data-testid='openPermissionsMenuButton' onClick={openPermissions}>
 <Typography variant="body1">Player Permissions</Typography>
 </MenuItem>
 <Modal isOpen={isOpen} onClose={closePermissions}>  
@@ -78,7 +78,7 @@ return <>
 <ModalContent>
   <ModalHeader>change players permissions</ModalHeader>
   <ModalCloseButton/>
-  <form onSubmit={(ev)=>{ev.preventDefault(); processUpdates('edit')}}>
+  <form onSubmit={(ev)=>{ev.preventDefault(); processUpdates('submit')}}>
     <ModalBody pb={6}>
     <FormControl isRequired>
         <FormLabel htmlFor="updatePassword">Town Update Password</FormLabel>

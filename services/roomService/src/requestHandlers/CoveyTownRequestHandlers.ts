@@ -29,8 +29,6 @@ export interface TownJoinRequest {
 export interface TownJoinResponse {
   /** Unique ID that represents this player * */
   coveyUserID: string;
-  /** A Unique secret key that a player can use when making requests to the server to prove it is them */
-  coveyPlayerSecretKey: string;
   /** Secret token that this player should use to authenticate
    * in future requests to this service * */
   coveySessionToken: string;
@@ -96,7 +94,7 @@ export interface TownUpdateRequest {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playersKey: string;
+  playerToken: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -112,7 +110,7 @@ export interface PlaceableAddResponse {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playersKey: string;
+  playersToken: string;
   location: PlaceableLocation;
 }
 
@@ -189,7 +187,6 @@ export async function townJoinHandler(
     isOK: true,
     response: {
       coveyUserID: newPlayer.id,
-      coveyPlayerSecretKey: newPlayer.secretKey,
       coveySessionToken: newSession.sessionToken,
       providerVideoToken: newSession.videoToken,
       currentPlayers: coveyTownController.players,
@@ -268,7 +265,7 @@ export async function addPlaceableHandler(
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
-    requestData.playersKey,
+    requestData.playerToken,
     requestData.placeableID,
     requestData.location,
   );
@@ -290,7 +287,7 @@ export async function deletePlaceableHandler(
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
-    requestData.playersKey,
+    requestData.playersToken,
     requestData.location,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
