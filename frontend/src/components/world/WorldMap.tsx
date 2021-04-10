@@ -204,31 +204,43 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location) {
+    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true);
+
+        myPlaceable.sprite = sprite;
+      }
+    }
+    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
-          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'tictactoe')
           .setScale(0.2)
           .setSize(32, 32)
-          .setOffset(0, 24);
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true);
         myPlaceable.sprite = sprite;
       }
+
+      sprite.on('pointerup', () => {
+        const isShown = true;
+        const toggle = () => {
+          ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+        };
+        ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
+      });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
@@ -404,7 +416,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x  + 50 , yIndex: y + 50}});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
 
       });
 
@@ -434,22 +446,6 @@ class CoveyGameScene extends Phaser.Scene {
       ticTacButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-
-        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'tictactoe')
-          .setInteractive()
-          .setDisplaySize(50,50);
-        boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false);
-
-        this.physics.add.collider(sprite, boxSprite);
-        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
-        boxSprite.on('pointerup', () => {
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-        });
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
         // const {x}  = this.game.input.mousePointer;
@@ -465,7 +461,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tictactoe',location: { xIndex: x -50 , yIndex: y +450 }});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
 
       });
 
@@ -499,18 +495,6 @@ class CoveyGameScene extends Phaser.Scene {
         buttonText.destroy();
         boxButton.destroy();
       }
-
-    });
-
-    sprite.on('pointerout', () => {
-
-      sprite.clearTint();
-
-    });
-
-    sprite.on('pointerup', () => {
-
-      sprite.clearTint();
 
     });
 

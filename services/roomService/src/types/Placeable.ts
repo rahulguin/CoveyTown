@@ -49,9 +49,10 @@ export default class Placeable {
   }
 
   static isAllowedPlaceable(placeableID: string): boolean {
-    
-     
-     this.ALLOWED_PLACEABLES.add('chess');
+
+
+     this.ALLOWED_PLACEABLES.add('tree');
+     this.ALLOWED_PLACEABLES.add('tictactoe');
      return this.ALLOWED_PLACEABLES.has(placeableID);
   }
 
