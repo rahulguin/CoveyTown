@@ -39,7 +39,7 @@ class CoveyGameScene extends Phaser.Scene {
 
   private paused = false;
 
-  private playerID?: string;
+  private playersToken: string;
 
   private video: Video;
 
@@ -53,13 +53,13 @@ class CoveyGameScene extends Phaser.Scene {
 
   private placeables: Placeable[] = [];
 
-  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string, playerID: string) {
+  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string, playerSessionToken: string) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
     this.apiClient = apiClient;
     this.townId = townId;
-    this.playerID = playerID;
+    this.playersToken = playerSessionToken;
   }
 
   preload() {
@@ -197,10 +197,17 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
+    const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
+    const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
+    const xCord = indexLocation.x;
+    const yCord = indexLocation.y;
+    if (this.id !== myPlaceable.placeableID && this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
-        sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(xCord, yCord, 'box')
           .setScale(0.2)
           .setSize(32, 32)
           .setOffset(0, 24)
@@ -210,13 +217,10 @@ class CoveyGameScene extends Phaser.Scene {
 
       }
     }
-    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
+    else if (this.id !== myPlaceable.placeableID && this.physics && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
       if (!sprite) {
-        const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
-        const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
-        const xCord = indexLocation.x;
-        const yCord = indexLocation.y;
+
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
@@ -341,13 +345,12 @@ class CoveyGameScene extends Phaser.Scene {
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 
-    let boxSprite;
-
     sprite.on('pointerdown', () => {
+      if (!this.lastLocation) {
+        return
+      }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const buttonText = this.add.text(this.lastLocation.x-140, this.lastLocation.y, "Which interactive object \nwould you like to create here?", {
+      const buttonText = this.add.text(this.lastLocation.x, this.lastLocation.y, "Which interactive object \nwould you like to create here?", {
         color: '#FFFFFF',
         // backgroundColor: '#F0000',
         backgroundColor: '#003300',
@@ -366,9 +369,7 @@ class CoveyGameScene extends Phaser.Scene {
         }
       });
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const boxButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 43, 'Tree',
+      const boxButton = this.add.text(this.lastLocation.x, this.lastLocation.y, 'Tree',
         {
           color: '#FFFFFF',
           backgroundColor: '#004d00',
@@ -411,12 +412,12 @@ class CoveyGameScene extends Phaser.Scene {
         console.log('y value: ', y);
         
 
-        if ((x !== undefined) && (y !== undefined) && this.playerID) {
+        if ((x !== undefined) && (y !== undefined)) {
           const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
           const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
           const xIndex = indexLocation.x;
           const yIndex = indexLocation.y;
-          await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex , yIndex}});
+          await this.apiClient.addPlaceable({coveyTownID: this.townId, playersToken: this.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex , yIndex}});
         }
         
 
@@ -754,7 +755,7 @@ export default function WorldMap(): JSX.Element {
   const {
     emitMovement, players,
     // newly added
-    placeables, currentTownID, apiClient, myPlayerID
+    placeables, currentTownID, apiClient, sessionToken
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
   const [modal, setModal] = useState(false);
@@ -780,7 +781,7 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, myPlayerID);
+      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, sessionToken);
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -793,7 +794,7 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement,apiClient, currentTownID, myPlayerID]);
+  }, [video, emitMovement,apiClient, currentTownID, sessionToken]);
 
   const deepPlayers = JSON.stringify(players);
 
