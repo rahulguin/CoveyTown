@@ -212,9 +212,9 @@ class CoveyGameScene extends Phaser.Scene {
           .setSize(32, 32)
           .setOffset(0, 24)
           .setDisplaySize(50,50)
-          .setImmovable(true);
+          .setImmovable(true)
+          .setInteractive();
 
-        myPlaceable.sprite = sprite;
       }
     }
     else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
@@ -228,11 +228,14 @@ class CoveyGameScene extends Phaser.Scene {
           .setSize(32, 32)
           .setOffset(0, 24)
           .setDisplaySize(50,50)
-          .setImmovable(true);
+          .setImmovable(true)
+          .setInteractive();
         myPlaceable.sprite = sprite;
       }
 
-      sprite.on('pointerup', () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      myPlaceable.sprite.on('pointerdown', () => {
         const isShown = true;
         const toggle = () => {
           ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -462,7 +465,7 @@ class CoveyGameScene extends Phaser.Scene {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
-
+        // tictac.location
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -555,16 +558,16 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
     /* Box object taken from tileMapJSON. Adding immovable property to the box object */
-    const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
-    let boxImage;
-    boxes.forEach(box => {
-      if(box.x && box.y){
-        boxImage = this.physics.add.image(box.x, box.y, 'box');
-        boxImage.setDisplaySize(50,50)
-        boxImage.setImmovable(true);
-        boxImage.body.setAllowGravity(false);
-      }
-    });
+    // const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
+    // let boxImage;
+    // boxes.forEach(box => {
+    //  if(box.x && box.y){
+    //    boxImage = this.physics.add.image(box.x, box.y, 'box');
+    //    boxImage.setDisplaySize(50,50)
+    //    boxImage.setImmovable(true);
+    //    boxImage.body.setAllowGravity(false);
+    //  }
+    // });
 
 
 
@@ -613,9 +616,9 @@ class CoveyGameScene extends Phaser.Scene {
     };
 
     /* Player and box object should collide. Blocks path of the player */
-    if(boxImage){
-      this.physics.add.collider(sprite, boxImage);
-    }
+    // if(boxImage){
+    //   this.physics.add.collider(sprite, boxImage);
+    // }
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
@@ -816,7 +819,6 @@ export default function WorldMap(): JSX.Element {
     <div>
       <div id="map-container"/>
       <div id="modal-container"/>
-      <TicTacToe isShown={isShown} hide={toggle} modalContent={content} headerText={content} />
     </div>
 
   );
