@@ -7,6 +7,7 @@ import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
+import { FlappyBird } from '../Placeables/FlappyBird';
 // import { Constraint } from 'matter';
 
 
@@ -67,6 +68,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.png');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
+    this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
@@ -214,6 +216,7 @@ class CoveyGameScene extends Phaser.Scene {
           .setDisplaySize(50,50)
           .setImmovable(true)
           .setInteractive();
+        myPlaceable.sprite = sprite;
 
       }
     }
@@ -240,7 +243,34 @@ class CoveyGameScene extends Phaser.Scene {
         const toggle = () => {
           ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
         };
-        ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
+        ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+      });
+    }
+
+    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'flappy') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'flappy')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(40,40)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      myPlaceable.sprite.on('pointerdown', () => {
+        const isShown = true;
+        const toggle = () => {
+          ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+        };
+        ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
       });
     }
   }
@@ -393,17 +423,6 @@ class CoveyGameScene extends Phaser.Scene {
 
        // eslint-disable-next-line @typescript-eslint/no-use-before-define
       boxButton.on('pointerdown', async () => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
-        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
-        // boxSprite.on('pointerup', () => {
-        //   const isShown = true;
-        //   const toggle = () => {
-        //     ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        //   };
-        //   ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-        // });
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
         // const {x}  = this.game.input.mousePointer;
@@ -470,8 +489,53 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+      const flappyButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Flappy Bird',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      flappyButton.setInteractive();
 
-      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Cancel',{
+      flappyButton.on('pointerover', () => {
+        flappyButton.setBackgroundColor('#008000')
+      })
+      flappyButton.on('pointerout', () => {
+        flappyButton.setBackgroundColor('#004d00')
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      flappyButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'flappy',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        // Flappy.location
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+
+      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Cancel',{
         color: '#FFFFFF',
         backgroundColor: '#004d00',
         align: 'center',
@@ -496,11 +560,12 @@ class CoveyGameScene extends Phaser.Scene {
         ticTacButton.destroy();
         cancelButton.destroy();
         buttonText.destroy();
+        flappyButton.destroy();
         boxButton.destroy();
+
       }
-
+      // this.pause();
     });
-
   }
 
   create() {
@@ -556,19 +621,6 @@ class CoveyGameScene extends Phaser.Scene {
         })
       }
     });
-
-    /* Box object taken from tileMapJSON. Adding immovable property to the box object */
-    // const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
-    // let boxImage;
-    // boxes.forEach(box => {
-    //  if(box.x && box.y){
-    //    boxImage = this.physics.add.image(box.x, box.y, 'box');
-    //    boxImage.setDisplaySize(50,50)
-    //    boxImage.setImmovable(true);
-    //    boxImage.body.setAllowGravity(false);
-    //  }
-    // });
-
 
 
 
@@ -762,7 +814,6 @@ export default function WorldMap(): JSX.Element {
 
   const [isShown, setIsShown] = useState<boolean>(true);
   const toggle = () => setIsShown(!isShown);
-  const content = 'Hey, Im a model.';
 
 
   useEffect(() => {

@@ -53,6 +53,7 @@ export default class Placeable {
 
      this.ALLOWED_PLACEABLES.add('tree');
      this.ALLOWED_PLACEABLES.add('tictactoe');
+    this.ALLOWED_PLACEABLES.add('flappy');
      return this.ALLOWED_PLACEABLES.has(placeableID);
   }
 
