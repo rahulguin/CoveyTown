@@ -411,12 +411,12 @@ class CoveyGameScene extends Phaser.Scene {
         console.log('y value: ', y);
         
 
-        if ((x !== undefined) && (y !== undefined)) {
+        if ((x !== undefined) && (y !== undefined) && this.playerID) {
           const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
           const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
           const xIndex = indexLocation.x;
           const yIndex = indexLocation.y;
-          await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: xIndex , yIndex: yIndex}});
+          await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex , yIndex}});
         }
         
 
