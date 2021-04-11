@@ -194,13 +194,6 @@ class CoveyGameScene extends Phaser.Scene {
 
     let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
     if (!myPlaceable) {
-      let { location } = placeable;
-      if (!location) {
-        location = {
-          xIndex: 0,
-          yIndex: 0,
-        };
-      }
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
@@ -220,10 +213,14 @@ class CoveyGameScene extends Phaser.Scene {
     else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
       if (!sprite) {
+        const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
+        const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
+        const xCord = indexLocation.x;
+        const yCord = indexLocation.y;
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
-          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'tictactoe')
+          .sprite(xCord, yCord, 'tictactoe')
           .setScale(0.2)
           .setSize(32, 32)
           .setOffset(0, 24)
@@ -408,18 +405,20 @@ class CoveyGameScene extends Phaser.Scene {
         destroyText();
         // const {x}  = this.game.input.mousePointer;
         const x  = this.lastLocation?.x
-        // eslint-disable-next-line
         console.log('x value: ', x);
         // const {y}  = this.game.input.mousePointer;
         const y  = this.lastLocation?.y
-        // eslint-disable-next-line
         console.log('y value: ', y);
+        
 
-        // location values are hardcoded in the  method call for now.
-        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
+        if ((x !== undefined) && (y !== undefined)) {
+          const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
+          const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
+          const xIndex = indexLocation.x;
+          const yIndex = indexLocation.y;
+          await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: xIndex , yIndex: yIndex}});
+        }
+        
 
       });
 
