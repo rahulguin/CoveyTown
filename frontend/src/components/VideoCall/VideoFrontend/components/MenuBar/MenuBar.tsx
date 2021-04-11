@@ -93,6 +93,7 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
             <Grid style={{ flex: 1 }}>
               <Grid container justify="flex-end">
                 <TownSettings />
+                <Menu />
                 <PermissionsButton />
                 <Menu />
                 <EndCallButton />
