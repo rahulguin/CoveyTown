@@ -5,7 +5,6 @@ import Player from "../../classes/Player";
 import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../../classes/TownsServiceClient";
 import useCoveyAppState from "../../hooks/useCoveyAppState";
 import useMaybeVideo from "../../hooks/useMaybeVideo";
-import '../../App.css';
 
 export default function PermissionsButton(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -56,10 +55,10 @@ export default function PermissionsButton(): JSX.Element {
   useEffect(() => {
     async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
       const initialPlayerPermissions = new Map<string, boolean>();
-      initialPlayers.forEach(async (player) => {
-        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
-      });
+      // initialPlayers.forEach(async (player) => {
+      //   const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+      //   initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
+      // });
       setPlayersCanPlace(initialPlayerPermissions);
     }
     
@@ -72,7 +71,8 @@ export default function PermissionsButton(): JSX.Element {
 
 return (
 <>
-  <Button className="playerPermissionButton" onClick={openPermissions}>
+  <Button colorScheme="whiteAlpha" variant="ghost"  
+          _hover={{ background: "#EDF2F7", }} onClick={openPermissions}>
     <Typography variant="body1">Player Permissions</Typography>
   </Button>
 
@@ -96,7 +96,7 @@ return (
             <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                         role='cell'>{player.id}</Td>
                         <Td role='cell'>
-                        <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox>
+                        {/* <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox> */}
                         </Td>
             </Tr>
         ))}
