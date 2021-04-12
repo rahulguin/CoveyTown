@@ -73,11 +73,7 @@ export default function PermissionsButton(): JSX.Element {
 
 return (
 <>
-<<<<<<< HEAD
   <MenuItem data-testid='openPermissionsMenuButton' onClick={openPermissions}>
-=======
-  <Button className="playerPermissionButton" onClick={openPermissions}>
->>>>>>> parent of fbce808 (add proper styling for permissions button)
     <Typography variant="body1">Player Permissions</Typography>
   </MenuItem>
 
