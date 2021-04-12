@@ -61,8 +61,8 @@ export default function PermissionsButton(): JSX.Element {
       });
       setPlayersCanPlace(initialPlayerPermissions);
     }
-    if (!currentPlayers || !currentPlayersCanPlace) {
-      setCurrentPlayers(players)
+    if (currentTownID && (!currentPlayers || !currentPlayersCanPlace)) {
+      setCurrentPlayers(players);
       initializePlayerCanPlace(players);
     }
   }, [apiClient, currentPlayers, currentPlayersCanPlace, currentTownID, players])
@@ -105,8 +105,8 @@ return (
       </ModalBody>
 
       <ModalFooter>
-        <Button data-testid='updatebutton' colorScheme="blue" mr={3} value="update" name='action2' onClick={()=>processUpdates('sumbit')}>
-          Update
+        <Button data-testid='updatebutton' colorScheme="blue" mr={3} value="submit" name='action2' onClick={()=>processUpdates('submit')}>
+          Submit
         </Button>
         <Button onClick={closePermissions}>Cancel</Button>
       </ModalFooter>
