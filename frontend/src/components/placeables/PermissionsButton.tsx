@@ -1,5 +1,5 @@
-import { Button, Checkbox, FormControl, FormLabel, Input, Menu, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, TableCaption, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
-import { Typography } from "@material-ui/core";
+import { Button, Checkbox, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, TableCaption, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { MenuItem, Typography } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import Player from "../../classes/Player";
 import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../../classes/TownsServiceClient";
@@ -44,7 +44,7 @@ export default function PermissionsButton(): JSX.Element {
         closePermissions();
       } catch(err) {
         toast({
-          title: 'Unable to update players locations',
+          title: 'Unable to update players permissions',
           description: err.toString(),
           status: 'error'
         });
@@ -55,26 +55,26 @@ export default function PermissionsButton(): JSX.Element {
   useEffect(() => {
     async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
       const initialPlayerPermissions = new Map<string, boolean>();
-      // initialPlayers.forEach(async (player) => {
-      //   const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-      //   initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
-      // });
+      initialPlayers.forEach(async (player) => {
+        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
+      });
       setPlayersCanPlace(initialPlayerPermissions);
     }
-    
-    setCurrentPlayers(players)
-    initializePlayerCanPlace(players);
-  }, [apiClient, currentTownID, players])
+    if (!currentPlayers || !currentPlayersCanPlace) {
+      setCurrentPlayers(players)
+      initializePlayerCanPlace(players);
+    }
+  }, [apiClient, currentPlayers, currentPlayersCanPlace, currentTownID, players])
 
     
 
 
 return (
 <>
-  <Button colorScheme="whiteAlpha" variant="ghost"  
-          _hover={{ background: "#EDF2F7", }} onClick={openPermissions}>
+  <MenuItem data-testid='openPermissionsMenuButton' onClick={openPermissions}>
     <Typography variant="body1">Player Permissions</Typography>
-  </Button>
+  </MenuItem>
 
   <Modal isOpen={isOpen} onClose={closePermissions}>  
   <ModalOverlay/>
@@ -96,7 +96,7 @@ return (
             <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                         role='cell'>{player.id}</Td>
                         <Td role='cell'>
-                        {/* <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox> */}
+                        <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox>
                         </Td>
             </Tr>
         ))}
