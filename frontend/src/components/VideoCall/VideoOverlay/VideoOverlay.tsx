@@ -14,6 +14,7 @@ import useLocalAudioToggle from '../VideoFrontend/hooks/useLocalAudioToggle/useL
 import useVideoContext from '../VideoFrontend/hooks/useVideoContext/useVideoContext';
 import useLocalVideoToggle from '../VideoFrontend/hooks/useLocalVideoToggle/useLocalVideoToggle';
 import './VideoGrid.scss';
+import { Grid } from '@material-ui/core';
 import MediaErrorSnackbar from '../VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
 import usePresenting from '../VideoFrontend/components/VideoProvider/usePresenting/usePresenting';
 import useMaybeVideo from '../../../hooks/useMaybeVideo';

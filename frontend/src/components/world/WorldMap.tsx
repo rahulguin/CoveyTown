@@ -606,7 +606,7 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
         // the map
 
       }
