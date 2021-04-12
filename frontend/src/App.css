@@ -36,3 +36,7 @@
         transform: rotate(360deg);
     }
 }
+
+.playerPermissionButton {
+    background-color: #000000;
+}
