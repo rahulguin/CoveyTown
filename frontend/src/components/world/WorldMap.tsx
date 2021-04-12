@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
@@ -848,6 +848,7 @@ export default function WorldMap(): JSX.Element {
   }, [video, emitMovement,apiClient, currentTownID, myPlayerID]);
 
   const deepPlayers = JSON.stringify(players);
+
 
   useEffect(() => {
     // eslint-disable-next-line no-console
