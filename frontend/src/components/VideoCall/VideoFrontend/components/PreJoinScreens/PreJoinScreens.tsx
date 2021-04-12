@@ -17,10 +17,11 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
   return (
     <IntroContainer>
       <div style={{
-        position: "absolute",
+        position: "fixed",
         backgroundColor: "white",
         width: "100%",
-        opacity: "100%"
+        opacity: "100%",
+        zIndex: 10,
       }}>
         <Flex boxShadow="dark-lg" p="4" bg="white" width="100%">
           <b><LocationCityIcon/>CoveyTown</b>

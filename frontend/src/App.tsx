@@ -252,7 +252,9 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     }
     return (
       <div>
-        <WorldMap />
+        <div style={{ marginBottom: '90px' }}>
+          <WorldMap />
+        </div>
         <VideoOverlay preferredMode="fullwidth" />
       </div>
     );
