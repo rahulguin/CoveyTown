@@ -106,6 +106,7 @@ export default class CoveyTownsStore {
     playerID: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
+    objectInformation?: Map<string, string>,
   ): string | undefined {
     if (!(placeableLocation && placeableLocation.xIndex && placeableLocation.yIndex)) {
 
@@ -127,7 +128,7 @@ export default class CoveyTownsStore {
         ) {
           return 'Invalid Location: the location to add the placeable must be defined';
         }
-        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation);
+        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation, objectInformation);
         return addResponce;
       }
       return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';

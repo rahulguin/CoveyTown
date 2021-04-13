@@ -8,6 +8,8 @@ export default class Placeable {
 
   private readonly _name: string;
 
+  private _objectInformation: Map<string, string> | undefined;
+
   static readonly EMPTY_PLACEABLE_ID: string = 'empty';
 
   static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
@@ -18,10 +20,11 @@ export default class Placeable {
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();
 
-  constructor(placeableID: string, location: PlaceableLocation, _name = 'dummy name') {
+  constructor(placeableID: string, location: PlaceableLocation, objectInformation?: Map<string, string>, _name = 'dummy name') {
     this._placeableID = placeableID;
     this._location = location;
     this._name = _name;
+    this._objectInformation = objectInformation
   }
 
   get location(): PlaceableLocation {
@@ -57,6 +60,6 @@ export default class Placeable {
   }
 
   static constructEmptyPlaceable(location: PlaceableLocation): Placeable {
-    return new Placeable(this.EMPTY_PLACEABLE_ID, location, this.EMPTY_PLACEABLE_NAME);
+    return new Placeable(this.EMPTY_PLACEABLE_ID, location, new Map(), this.EMPTY_PLACEABLE_NAME);
   }
 }
