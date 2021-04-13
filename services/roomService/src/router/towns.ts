@@ -179,11 +179,11 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.get('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
+  app.get('/towns/:townID/permissions/:playerID', BodyParser.json(), async (req, res) => {
     try {
       const result = await getPlayersPermissionHandler({
         coveyTownID: req.params.townID,
-        playerID: req.body.playerID,
+        playerID: req.params.playerID,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {

@@ -367,7 +367,7 @@ export async function getPlayersPermissionHandler(
     // return the value placeable if defined
     response: getResponce,
     // error message returned if undefined
-    message: getResponce === undefined ? 'Invalid town id given' : undefined,
+    message: getResponce === undefined ? 'Invalid town id or invalid player id given' : undefined,
   };
 }
 

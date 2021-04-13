@@ -6,28 +6,29 @@ import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../..
 import useCoveyAppState from "../../hooks/useCoveyAppState";
 import useMaybeVideo from "../../hooks/useMaybeVideo";
 import '../../App.css';
+import { useAppState } from "../VideoCall/VideoFrontend/state";
 
 export default function PermissionsButton(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const video = useMaybeVideo()
   const { players, apiClient, currentTownID } = useCoveyAppState();
   const [roomUpdatePassword, setRoomUpdatePassword] = useState<string>('');
-  const [currentPlayers, setCurrentPlayers] = useState<Player[]>();
+  const [currentPlayers, setCurrentPlayers] = useState<Player[]>([]);
   const [currentPlayersCanPlace, setPlayersCanPlace] = useState<Map<string, boolean>>()
   const toast = useToast();
 
   const openPermissions = useCallback(()=>{
-    async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
-      const initialPlayerPermissions = new Map<string, boolean>();
-      initialPlayers.forEach(async (player) => {
+    async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
+      const updatePlayerPermissions = new Map<string, boolean>();
+      playersOnOpen.forEach(async (player) => {
         const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
+        updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
       });
+      setPlayersCanPlace(updatePlayerPermissions);
     }
     onOpen();
     video?.pauseGame();
-    setCurrentPlayers(players);
-    initializePlayerCanPlace(players)
+    updatePlayersCanPlace(currentPlayers)
   }, [onOpen, video]);
 
   const closePermissions = useCallback(()=>{
@@ -38,11 +39,12 @@ export default function PermissionsButton(): JSX.Element {
   const processUpdates = async (action: string) =>{
     if(action === 'submit'){
       const updates: PlayerUpdateSpecifications = { specifications: []}
-
+      console.log(`currentSelections ${currentPlayersCanPlace}`);
       currentPlayersCanPlace?.forEach((value: boolean, key: string) => {
         const playersPermission: PlayerPermissionSpecification =  { playerID: key, canPlace: value };
         updates.specifications.push(playersPermission);
       })
+      console.log(`specifications ${updates.specifications[0].canPlace}`);
 
       try{
         await apiClient.updatePlayerPermissions({coveyTownID: currentTownID, coveyTownPassword: roomUpdatePassword,
@@ -59,10 +61,16 @@ export default function PermissionsButton(): JSX.Element {
           status: 'error'
         });
       }
+      const playerIDToTest = updates.specifications[0].playerID
+      if (playerIDToTest) {
+        console.log(`has permission`, await apiClient.getPlayersPermission({ playerID: playerIDToTest, coveyTownID: currentTownID }));
+      }
     }
   };
 
-
+  useEffect(() => {
+    setCurrentPlayers(players);
+  }, [players]);
 
 return (
 <>
@@ -83,14 +91,13 @@ return (
       </FormControl>
 
       <Table>
-        <TableCaption placement="bottom">Players</TableCaption>
         <Thead><Tr><Th>Player Name</Th><Th>player ID</Th><Th>can place</Th></Tr></Thead>
         <Tbody>
             {currentPlayers?.map((player) => (
             <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                         role='cell'>{player.id}</Td>
                         <Td role='cell'>
-                        <Checkbox isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem">Can Place</Checkbox>
+                        <Checkbox defaultisChecked={currentPlayersCanPlace?.get(player.id)} isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem" />
                         </Td>
             </Tr>
         ))}
