@@ -290,7 +290,7 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should check the password before adding placeable, and pass back error string - player id does not exist', async () => {
-        const playerSession = await town.addPlayer(player);
+        await town.addPlayer(player);
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),

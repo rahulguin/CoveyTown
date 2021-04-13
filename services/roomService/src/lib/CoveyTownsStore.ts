@@ -48,9 +48,7 @@ export default class CoveyTownsStore {
   }
 
   getControllerForTown(coveyTownID: string): CoveyTownController | undefined {
-    return this._towns.find(town => {
-      return town.coveyTownID === coveyTownID;
-    });
+    return this._towns.find(town => town.coveyTownID === coveyTownID);
   }
 
   getTowns(): CoveyTownList {
@@ -184,7 +182,6 @@ export default class CoveyTownsStore {
   }
 
   getPlayersPermission(townID: string, playerID: string): boolean | undefined {
-    console.log(`store player ${playerID}`);
     const existingTown = this.getControllerForTown(townID);
     if (existingTown) {
       const getResponce = existingTown.getPlayersPermission(playerID);

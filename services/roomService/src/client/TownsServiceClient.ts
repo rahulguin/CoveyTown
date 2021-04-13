@@ -270,7 +270,7 @@ export default class TownsServiceClient {
 
   async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
     const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
-      `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`
+      `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
