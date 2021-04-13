@@ -103,20 +103,26 @@ export default class CoveyTownsStore {
   addPlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
-    playerID: string,
+    playerSessionToken: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
-    if (!(placeableLocation && placeableLocation.xIndex && placeableLocation.yIndex)) {
-
-        return 'Invalid Location: the location  to add the placeable must be defined';
+    if (
+      !(
+        isDefined(placeableLocation) &&
+        isDefined(placeableLocation.xIndex) &&
+        isDefined(placeableLocation.yIndex)
+      )
+    ) {
+      return 'Invalid Location: the location to add the placeable must be defined';
     }
     const existingTown = this.getControllerForTown(coveyTownID);
 
     // checks that the room exists
     if (existingTown) {
       // checks that the player has permission to add or they have provided a valid password
-      const requestingPlayer = existingTown.players.find(player => player.id === playerID);
+      const requestionPlayerSession = existingTown.getSessionByToken(playerSessionToken);
+      const requestingPlayer = requestionPlayerSession?.player;
       if (correctPasswordOrPermission(coveyTownPassword, existingTown, requestingPlayer)) {
         if (
           !(
@@ -131,7 +137,6 @@ export default class CoveyTownsStore {
         return addResponce;
       }
       return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
-
     }
     return 'Invalid room information: Double check that the room exists';
   }
@@ -139,14 +144,15 @@ export default class CoveyTownsStore {
   deletePlaceable(
     coveyTownID: string,
     coveyTownPassword: string,
-    playerID: string,
+    playerSessionToken: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
     // checks the the town id provided exists with a stored town
     if (existingTown) {
       // checks that the player has permission to delete or they have provided a valid passsword
-      const requestingPlayer = existingTown.players.find(player => player.id === playerID);
+      const requestionPlayerSession = existingTown.getSessionByToken(playerSessionToken);
+      const requestingPlayer = requestionPlayerSession?.player;
       if (correctPasswordOrPermission(coveyTownPassword, existingTown, requestingPlayer)) {
         // currently provides a dummy player that can then later be swapped out for permissions funciton
         const deleteResponce = existingTown.deletePlaceable(placeableLocation);

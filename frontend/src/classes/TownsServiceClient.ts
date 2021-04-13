@@ -33,7 +33,6 @@ export interface TownJoinResponse {
   /** Is this a private town? * */
   isPubliclyListed: boolean;
 
-  // newly added
   currentPlaceables: ServerPlaceable[];
 }
 
@@ -80,18 +79,15 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
-
-
-// newly added
-
 /**
- * payload sent by the client to add an object to a town
+ * payload sent by the client to add a placeable to a town
  */
-export interface PlaceableAddRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  placeableID: string,
-  location: PlaceableLocation
+ export interface PlaceableAddRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  placeableID: string;
+  location: PlaceableLocation;
 }
 
 /**
@@ -109,7 +105,7 @@ export interface PlaceableGetRequest {
 export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
-  objectID: string,
+  placeableID: string,
   location: PlaceableLocation
 }
 
@@ -122,43 +118,46 @@ export interface PlaceableLocation {
 }
 
 /**
- * Payload sent by the client to delete an object from a town
+ * Payload sent by the client to delete a placeable from a town
  */
-export interface PlaceableDeleteRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  location: PlaceableLocation
+ export interface PlaceableDeleteRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  location: PlaceableLocation;
 }
 
 
 /**
  * Payload sent by the client to retrive objects from a town
  */
-export interface ObjectListRequest {
+export interface PlaceableListRequest {
   coveyTownID: string,
-}
-
-export interface ObjectInfo {
-  coveyTownID: string,
-  objectID: string,
-  objectName: string,
-  location: PlaceableLocation
 }
 
 /**
  * Responce from the server for a list of objects
  */
-export interface ObjectListResponce {
-  objects: ObjectInfo[]
+export interface PlaceableListResponce {
+  placeables: PlaceableInfo[]
 }
 
+/**
+ * Payload sent by the client to update players permission to add/delete placeables
+ */
+ export interface PlayerUpdatePermissionsRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  updates: PlayerUpdateSpecifications;
+}
 
-
-
-
-
-
-
+/**
+ * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
+ */
+ export interface PlayerGetPermissionRequest {
+  coveyTownID: string;
+  playerID: string;
+}
 
 
 /**
@@ -175,6 +174,14 @@ export type CoveyTownInfo = {
   coveyTownID: string;
   currentOccupancy: number;
   maximumOccupancy: number;
+};
+export type PlayerUpdateSpecifications = {
+  specifications: PlayerPermissionSpecification[];
+};
+
+export type PlayerPermissionSpecification = {
+  playerID: string;
+  canPlace: boolean;
 };
 
 export default class TownsServiceClient {
@@ -196,7 +203,7 @@ export default class TownsServiceClient {
       if (ignoreResponse) {
         return {} as T;
       }
-      assert(response.data.response);
+      assert(response.data.response !== undefined);
       return response.data.response;
     }
     throw new Error(`Error processing request: ${response.data.message}`);
@@ -227,12 +234,9 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  // newly added
 
-  // API methods to handle object requests
-  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
-    // eslint-disable-next-line 
-    console.log('pswd in service client: ', requestData.coveyTownPassword);
+  // API methods to handle placeable requests
+  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> { 
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
@@ -247,4 +251,20 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  async updatePlayerPermissions(requestData: PlayerUpdatePermissionsRequest): Promise<string[]> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<string[]>>(
+      `/towns/${requestData.coveyTownID}/permissions`,
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  // API emthodss to handle permission requests
+  async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
+      `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+
+  }
 }

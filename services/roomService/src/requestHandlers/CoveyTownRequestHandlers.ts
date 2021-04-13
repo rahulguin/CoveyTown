@@ -94,7 +94,7 @@ export interface TownUpdateRequest {
 export interface PlaceableAddRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playerID: string;
+  playerToken: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -110,7 +110,7 @@ export interface PlaceableAddResponse {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playerID: string;
+  playersToken: string;
   location: PlaceableLocation;
 }
 
@@ -261,13 +261,11 @@ export async function townUpdateHandler(
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
-  console.log('in req handler :coveyTownPassword is ', requestData.coveyTownPassword);
-
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
-    requestData.playerID,
+    requestData.playerToken,
     requestData.placeableID,
     requestData.location,
   );
@@ -289,7 +287,7 @@ export async function deletePlaceableHandler(
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
     requestData.coveyTownPassword,
-    requestData.playerID,
+    requestData.playersToken,
     requestData.location,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
@@ -369,7 +367,7 @@ export async function getPlayersPermissionHandler(
     // return the value placeable if defined
     response: getResponce,
     // error message returned if undefined
-    message: getResponce === undefined ? 'Invalid town id given' : undefined,
+    message: getResponce === undefined ? 'Invalid town id or invalid player id given' : undefined,
   };
 }
 

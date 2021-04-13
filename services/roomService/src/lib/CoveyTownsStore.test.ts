@@ -258,7 +258,6 @@ describe('CoveyTownsStore', () => {
       store = CoveyTownsStore.getInstance();
       player = new Player('test player');
       player.canPlace = true;
-      town.addPlayer(player);
       [placeableID] = randomPlaceablesFromAllowedPlaceables();
       const xIndex = randomInt(100);
       const yIndex = randomInt(100);
@@ -266,10 +265,11 @@ describe('CoveyTownsStore', () => {
     });
     describe('addPlaceable', () => {
       it('Should fail if townID does not exist, and pass back error string', async () => {
+        const playerSession = await town.addPlayer(player);
         const responce = store.addPlaceable(
           nanoid(),
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -277,11 +277,12 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should check the password and permission before adding placeable, and pass back error string - player doesnt have permission', async () => {
+        const playerSession = await town.addPlayer(player);
         player.canPlace = false;
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -289,6 +290,7 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should check the password before adding placeable, and pass back error string - player id does not exist', async () => {
+        await town.addPlayer(player);
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
@@ -299,32 +301,35 @@ describe('CoveyTownsStore', () => {
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
-      it('Should return undefined on a succesful addition - correct password', () => {
+      it('Should return undefined on a succesful addition - correct password', async () => {
+        const playerSession = await town.addPlayer(player);
         player.canPlace = false;
         const responce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
         expect(responce).toBe(undefined);
       });
-      it('Should return undefined on a succesful addition - has permission to place', () => {
+      it('Should return undefined on a succesful addition - has permission to place', async () => {
+        const playerSession = await town.addPlayer(player);
         const responce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
         expect(responce).toBe(undefined);
       });
       it('Should fail if there is already a placeable at the given location, and pass back error string', async () => {
+        const playerSession = await town.addPlayer(player);
         const firstResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -340,10 +345,11 @@ describe('CoveyTownsStore', () => {
         expect(secondResponce?.length).toBeGreaterThan(0);
       });
       it('Should fail if given a plaeable Id that does not exist', async () => {
+        const playerSession = await town.addPlayer(player);
         const secondResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           nanoid(),
           location,
         );
@@ -353,10 +359,11 @@ describe('CoveyTownsStore', () => {
     });
     describe('deletePlaceable', () => {
       it('Should fail if townID does not exist', async () => {
+        const playerSession = await town.addPlayer(player);
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -372,11 +379,12 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should check the password and permission before deleting placeable - player doesnt have permission', async () => {
+        const playerSession = await town.addPlayer(player);
         player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -387,10 +395,11 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should check the password and permission before deleting placeable - player id doesnt exist', async () => {
+        const playerSession = await town.addPlayer(player);
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -401,21 +410,23 @@ describe('CoveyTownsStore', () => {
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should fail if there is not a placeable at the given location, and pass back error string', async () => {
+        const playerSession = await town.addPlayer(player);
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           location,
         );
         expect(responce).not.toBe(undefined);
         expect(responce?.length).toBeGreaterThan(0);
       });
       it('Should return undefined on a succesful deletion - correct password', async () => {
+        const playerSession = await town.addPlayer(player);
         player.canPlace = false;
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -424,16 +435,17 @@ describe('CoveyTownsStore', () => {
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           location,
         );
         expect(responce).toBe(undefined);
       });
       it('Should return undefined on a succesful deletion - player has permission', async () => {
+        const playerSession = await town.addPlayer(player);
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           nanoid(),
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -442,16 +454,17 @@ describe('CoveyTownsStore', () => {
         const responce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           location,
         );
         expect(responce).toBe(undefined);
       });
       it('Should fail after repeated calls of deletion', async () => {
+        const playerSession = await town.addPlayer(player);
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           placeableID,
           location,
         );
@@ -460,7 +473,7 @@ describe('CoveyTownsStore', () => {
         const firstResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           location,
         );
         expect(firstResponce).toBe(undefined);
@@ -468,7 +481,7 @@ describe('CoveyTownsStore', () => {
         const secondResponce = store.deletePlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
-          player.id,
+          playerSession.sessionToken,
           location,
         );
         expect(secondResponce).not.toBe(undefined);

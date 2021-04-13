@@ -14,6 +14,7 @@ import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import TownSettings from '../../../../Login/TownSettings';
 import MenuContainer from '@material-ui/core/Menu';
+import PermissionsButton from '../../../../placeables/PermissionsButton';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -93,7 +94,8 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
             <Grid style={{ flex: 1 }}>
               <Grid container justify="flex-end">
                 <TownSettings />
-
+                <Menu />
+                <PermissionsButton />
                 <Menu />
                 <EndCallButton />
               </Grid>
