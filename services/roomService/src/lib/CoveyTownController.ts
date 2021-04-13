@@ -98,6 +98,7 @@ export default class CoveyTownController {
    * @returns returns if the two locations are equal
    */
   static compareLocation(location1: PlaceableLocation, location2: PlaceableLocation): unknown {
+
     return location1.xIndex === location2.xIndex && location1.yIndex === location2.yIndex;
   }
 
@@ -107,8 +108,10 @@ export default class CoveyTownController {
    * @returns the placeable at the location or undefined if there is not a placeable there
    */
   findPlaceableByLocation(location: PlaceableLocation): Placeable | undefined {
-    return this._placeables.find((placeable: Placeable) =>
-      CoveyTownController.compareLocation(placeable.location, location),
+
+    
+    return this._placeables.find((placeable: Placeable) => 
+      CoveyTownController.compareLocation(placeable.location, location)
     );
   }
 

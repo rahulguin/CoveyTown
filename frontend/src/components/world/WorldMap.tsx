@@ -1,17 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
+import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import Placeable from '../../classes/Placeable';
+import TownsServiceClient from '../../classes/TownsServiceClient';
+import { FlappyBird } from '../Placeables/FlappyBird';
 
 
-// https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
+
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
 
-  private id?: string;
+
+  private myPlayerID: string;
+
+  private townId;
+
+  private apiClient: TownsServiceClient;
 
   private players: Player[] = [];
 
@@ -30,21 +40,46 @@ class CoveyGameScene extends Phaser.Scene {
 
   private paused = false;
 
+  private playerID?: string;
+
   private video: Video;
 
   private emitMovement: (loc: UserLocation) => void;
 
-  constructor(video: Video, emitMovement: (loc: UserLocation) => void) {
+
+  // newly added
+
+  private placeable?: {
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+  };
+
+  private placeables: Placeable[] = [];
+
+  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string, playerID: string) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
+    this.apiClient = apiClient;
+    this.townId = townId;
+    this.myPlayerID = playerID;
   }
 
   preload() {
     // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
+    this.load.image('box', '/assets/placeable/treeObject.png');
+    this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
+    this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
+    this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
+  }
+
+
+  initialise(apiClient: TownsServiceClient, townId: string) {
+
+    this.apiClient = apiClient;
+    this.townId = townId;
   }
 
   updatePlayersLocations(players: Player[]) {
@@ -75,8 +110,6 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-
-
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find((p) => p.id === player.id);
     if (!myPlayer) {
@@ -92,7 +125,9 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location);
       this.players.push(myPlayer);
     }
-    if (this.id !== myPlayer.id && this.physics && player.location) {
+
+
+    if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
         sprite = this.physics.add
@@ -122,6 +157,118 @@ class CoveyGameScene extends Phaser.Scene {
       }
     }
   }
+
+
+  updatePlaceables(placeables: Placeable[]) {
+
+    if (!this.ready) {
+      this.placeables = placeables;
+      return;
+    }
+    placeables.forEach((p) => {
+      this.updatePlaceable(p);
+    });
+    // Remove deleted placeables from board
+    const deletedPlaceables = this.placeables.filter(
+      (object) => !placeables.find((p) => Placeable.compareLocation(p.location, object.location)),
+    );
+    deletedPlaceables.forEach((deletedPlaceable) => {
+      if (deletedPlaceable.sprite) {
+        deletedPlaceable.sprite.destroy();
+        deletedPlaceable.label?.destroy();
+      }
+    });
+    // Remove deleted placeables from list
+    if (deletedPlaceables.length) {
+      this.placeables = this.placeables.filter(
+        (object) => !deletedPlaceables.find(
+          (p) => Placeable.compareLocation(p.location, object.location),
+        ),
+      );
+    }
+  }
+
+
+
+  updatePlaceable(placeable: Placeable) {
+
+    let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
+    if (!myPlaceable) {
+      let { location } = placeable;
+      if (!location) {
+        location = {
+          xIndex: 0,
+          yIndex: 0,
+        };
+      }
+      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
+      this.placeables.push(myPlaceable);
+    }
+
+    if (this.myPlayerID !== myPlaceable.placeableID && this.physics && placeable.location) {
+      let { sprite } = myPlaceable;
+      if (!sprite && myPlaceable.placeableID === 'tree') {
+        sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+
+      }
+
+      else if (!sprite && myPlaceable.placeableID === 'tictactoe') {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'tictactoe')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
+      }
+
+      else if (!sprite && myPlaceable.placeableID === 'flappy') {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'flappy')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(40,40)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
+      }
+
+    }
+
+  }
+
+
 
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
@@ -183,6 +330,11 @@ class CoveyGameScene extends Phaser.Scene {
           break;
       }
 
+      if ((this.cursors.find(keySet => keySet.space?.isDown))) {
+        this.player.sprite.setVelocityY(-350);
+        this.player.sprite.play('jump', true);
+      }
+
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       this.player.sprite.body.velocity.normalize()
         .scale(speed);
@@ -212,6 +364,205 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+// This method is where addPlaceable method is called using the apiClient.On clicking the
+// yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
+
+  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+
+    let boxSprite;
+
+    sprite.on('pointerdown', () => {
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const buttonText = this.add.text(this.lastLocation.x-140, this.lastLocation.y, "Which interactive object \nwould you like to create here?", {
+        color: '#FFFFFF',
+        // backgroundColor: '#F0000',
+        backgroundColor: '#003300',
+        padding: {
+          x: 10,
+          y: 7
+        },
+        align: 'center',
+        // strokeThickness: 3,
+        // stroke: '#FFFFFF',
+        shadow: {
+          offsetX: 5,
+          offsetY: 5,
+          color: 'red',
+          blur: 5
+        }
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const boxButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 43, 'Tree',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      boxButton.setInteractive();
+      boxButton.on('pointerover', () => {
+        boxButton.setBackgroundColor('#008000')
+      })
+      boxButton.on('pointerout', () => {
+        boxButton.setBackgroundColor('#004d00')
+      })
+
+       // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      boxButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
+
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const ticTacButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 70, 'Tic Tac Toe',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      ticTacButton.setInteractive();
+
+      ticTacButton.on('pointerover', () => {
+        ticTacButton.setBackgroundColor('#008000')
+      })
+      ticTacButton.on('pointerout', () => {
+        ticTacButton.setBackgroundColor('#004d00')
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      ticTacButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        // tictac.location
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const flappyButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Flappy Bird',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      flappyButton.setInteractive();
+
+      flappyButton.on('pointerover', () => {
+        flappyButton.setBackgroundColor('#008000')
+      })
+      flappyButton.on('pointerout', () => {
+        flappyButton.setBackgroundColor('#004d00')
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      flappyButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'flappy',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        // Flappy.location
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+
+      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Cancel',{
+        color: '#FFFFFF',
+        backgroundColor: '#004d00',
+        align: 'center',
+        padding: {
+          x: 10,
+          y: 7
+        },
+        fixedWidth: 309,
+      });
+      cancelButton.setInteractive();
+
+      cancelButton.on('pointerover', () => {
+        cancelButton.setBackgroundColor('#008000')
+      })
+      cancelButton.on('pointerout', () => {
+        cancelButton.setBackgroundColor('#004d00')
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      cancelButton.on('pointerdown', () => {destroyText()});
+
+      function destroyText() {
+        ticTacButton.destroy();
+        cancelButton.destroy();
+        buttonText.destroy();
+        flappyButton.destroy();
+        boxButton.destroy();
+
+      }
+      // this.pause();
+    });
+  }
+
   create() {
     const map = this.make.tilemap({ key: 'map' });
 
@@ -226,7 +577,6 @@ class CoveyGameScene extends Phaser.Scene {
     const worldLayer = map.createLayer('World', tileset, 0, 0);
     worldLayer.setCollisionByProperty({ collides: true });
     const aboveLayer = map.createLayer('Above Player', tileset, 0, 0);
-
     /* By default, everything gets depth sorted on the screen in the order we created things.
      Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give
      it a depth. Higher depths will sit on top of lower depth objects.
@@ -251,8 +601,9 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
-                                  // the map
+        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        // the map
+
       }
     );
 
@@ -283,16 +634,23 @@ class CoveyGameScene extends Phaser.Scene {
       'right': Phaser.Input.Keyboard.KeyCodes.L
     }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
 
-
-
-
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
-    const sprite = this.physics.add
+
+
+
+
+    const mainSprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
-      .setOffset(0, 24);
+      .setOffset(0, 24)
+      .setInteractive();
+
+
+    this.placeableAddition(mainSprite);
+
+
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
       font: '18px monospace',
       color: '#000000',
@@ -300,35 +658,40 @@ class CoveyGameScene extends Phaser.Scene {
       backgroundColor: '#ffffff',
     });
     this.player = {
-      sprite,
+      sprite: mainSprite,
       label
     };
+
+    /* Player and box object should collide. Blocks path of the player */
+    // if(boxImage){
+    //   this.physics.add.collider(sprite, boxImage);
+    // }
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
     transport to the location on the map that is referenced by the 'target' property
     of the transporter.
      */
-    this.physics.add.overlap(sprite, transporters,
+    this.physics.add.overlap(mainSprite, transporters,
       (overlappingObject, transporter)=>{
-      if(cursorKeys.space.isDown && this.player){
-        // In the tiled editor, set the 'target' to be an *object* pointer
-        // Here, we'll see just the ID, then find the object by ID
-        const transportTargetID = transporter.getData('target') as number;
-        const target = map.findObject('Objects', obj => (obj as unknown as Phaser.Types.Tilemaps.TiledObject).id === transportTargetID);
-        if(target && target.x && target.y && this.lastLocation){
-          // Move the player to the target, update lastLocation and send it to other players
-          this.player.sprite.x = target.x;
-          this.player.sprite.y = target.y;
-          this.lastLocation.x = target.x;
-          this.lastLocation.y = target.y;
-          this.emitMovement(this.lastLocation);
+        if(cursorKeys.space.isDown && this.player){
+          // In the tiled editor, set the 'target' to be an *object* pointer
+          // Here, we'll see just the ID, then find the object by ID
+          const transportTargetID = transporter.getData('target') as number;
+          const target = map.findObject('Objects', obj => (obj as unknown as Phaser.Types.Tilemaps.TiledObject).id === transportTargetID);
+          if(target && target.x && target.y && this.lastLocation){
+            // Move the player to the target, update lastLocation and send it to other players
+            this.player.sprite.x = target.x;
+            this.player.sprite.y = target.y;
+            this.lastLocation.x = target.x;
+            this.lastLocation.y = target.y;
+            this.emitMovement(this.lastLocation);
+          }
+          else{
+            throw new Error(`Unable to find target object ${target}`);
+          }
         }
-        else{
-          throw new Error(`Unable to find target object ${target}`);
-        }
-      }
-    })
+      })
 
     this.emitMovement({
       rotation: 'front',
@@ -340,7 +703,7 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
     // Watch the player and worldLayer for collisions, for the duration of the scene:
-    this.physics.add.collider(sprite, worldLayer);
+    this.physics.add.collider(mainSprite, worldLayer);
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -416,7 +779,10 @@ class CoveyGameScene extends Phaser.Scene {
       // sprites....
       this.players.forEach((p) => this.updatePlayerLocation(p));
     }
+
   }
+
+
 
   pause() {
     this.paused = true;
@@ -426,17 +792,28 @@ class CoveyGameScene extends Phaser.Scene {
 
   resume() {
     this.paused = false;
-    this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    if(Video.instance()){
+      // If the game is also in process of being torn down, the keyboard could be undefined
+      this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    }
     this.previouslyCapturedKeys = [];
   }
 }
 
+
+
+
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
-    emitMovement, players, placeables
+
+    emitMovement, players,
+    // newly added
+    placeables, currentTownID, apiClient, myPlayerID
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
+
+
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
@@ -453,7 +830,9 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement);
+
+      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, myPlayerID);
+
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -466,12 +845,30 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, placeables]);
+  }, [video, emitMovement,apiClient, currentTownID, myPlayerID]);
 
   const deepPlayers = JSON.stringify(players);
-  useEffect(() => {
-    gameScene?.updatePlayersLocations(players);
-  }, [players, deepPlayers, gameScene]);
 
-  return <div id="map-container"/>;
+
+  useEffect(() => {
+
+    gameScene?.initialise(apiClient, currentTownID);
+    gameScene?.updatePlayersLocations(players);
+    if(placeables) {
+      gameScene?.updatePlaceables(placeables);
+    }
+
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
+
+  useEffect(() => {
+    gameScene?.updatePlaceables(placeables); // newly added this fun call
+  }, [placeables, gameScene]); // newly added placeableObjects
+
+  return (
+    <div>
+      <div id="map-container"/>
+      <div id="modal-container"/>
+    </div>
+
+  );
 }

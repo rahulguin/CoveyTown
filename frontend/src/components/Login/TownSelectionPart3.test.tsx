@@ -126,7 +126,7 @@ describe('Town Selection - depends on Part 1 passing', () => {
     renderData = render(wrappedTownSelection());
     await waitFor(() => expect(renderData.getByText(`town1${suffix}`))
       .toBeInTheDocument());
-    newTownIsPublicCheckbox = renderData.getByLabelText('Publicly Listed') as HTMLInputElement;
+    newTownIsPublicCheckbox = renderData.getByLabelText('Publicly Listed?') as HTMLInputElement;
     newTownNameField = renderData.getByPlaceholderText('New Town Name') as HTMLInputElement;
     userNameField = renderData.getByPlaceholderText('Your name') as HTMLInputElement;
     newTownButton = renderData.getByTestId('newTownButton');

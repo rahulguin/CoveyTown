@@ -99,6 +99,7 @@ export type CoveyTownInfo = {
  */
 export interface PlaceableAddRequest {
   coveyTownID: string;
+
   coveyTownPassword: string;
   playersToken: string;
   placeableID: string;

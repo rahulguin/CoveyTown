@@ -79,8 +79,6 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
-
-
 /**
  * payload sent by the client to add a placeable to a town
  */
@@ -160,7 +158,6 @@ export interface PlaceableListResponce {
   coveyTownID: string;
   playerID: string;
 }
-
 
 
 /**
