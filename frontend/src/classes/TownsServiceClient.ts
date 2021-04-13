@@ -28,12 +28,12 @@ export interface TownJoinResponse {
   providerVideoToken: string;
   /** List of players currently in this town * */
   currentPlayers: ServerPlayer[];
-  /** List of placeabels currently in this town */
-  currentPlaceables: ServerPlaceable[];
   /** Friendly name of this town * */
   friendlyName: string;
   /** Is this a private town? * */
   isPubliclyListed: boolean;
+
+  currentPlaceables: ServerPlaceable[];
 }
 
 /**
@@ -43,7 +43,6 @@ export interface TownCreateRequest {
   friendlyName: string;
   isPubliclyListed: boolean;
 }
-
 
 /**
  * Response from the server for a Town create request
@@ -80,20 +79,23 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
+
+
 /**
- * payload sent by the client to add an object to a town
+ * payload sent by the client to add a placeable to a town
  */
-export interface PlaceableAddRequest {
-  coveyTownID: string,
-  coveyTownpassword: string,
-  objectID: string,
-  location: PlaceableLocation
+ export interface PlaceableAddRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  placeableID: string;
+  location: PlaceableLocation;
 }
 
 /**
  * Payload sent by client to retrieve a Placeable at a location
  */
- export interface PlaceableGetRequest {
+export interface PlaceableGetRequest {
   coveyTownID: string
   placeableID: string,
   location: PlaceableLocation
@@ -105,7 +107,7 @@ export interface PlaceableAddRequest {
 export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
-  objectID: string,
+  placeableID: string,
   location: PlaceableLocation
 }
 
@@ -118,34 +120,28 @@ export interface PlaceableLocation {
 }
 
 /**
- * Payload sent by the client to delete an object from a town
+ * Payload sent by the client to delete a placeable from a town
  */
-export interface PlaceableDeleteRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  location: PlaceableLocation
+ export interface PlaceableDeleteRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  location: PlaceableLocation;
 }
 
 
 /**
  * Payload sent by the client to retrive objects from a town
  */
-export interface ObjectListRequest {
+export interface PlaceableListRequest {
   coveyTownID: string,
-}
-
-export interface ObjectInfo {
-  coveyTownID: string,
-  objectID: string,
-  objectName: string,
-  location: PlaceableLocation
 }
 
 /**
  * Responce from the server for a list of objects
  */
-export interface ObjectListResponce {
-  objects: ObjectInfo[]
+export interface PlaceableListResponce {
+  placeables: PlaceableInfo[]
 }
 
 /**
@@ -166,6 +162,7 @@ export interface ObjectListResponce {
 }
 
 
+
 /**
  * Envelope that wraps any response from the server
  */
@@ -175,15 +172,12 @@ export interface ResponseEnvelope<T> {
   response?: T;
 }
 
-
-
 export type CoveyTownInfo = {
   friendlyName: string;
   coveyTownID: string;
   currentOccupancy: number;
-  maximumOccupancy: number
+  maximumOccupancy: number;
 };
-
 export type PlayerUpdateSpecifications = {
   specifications: PlayerPermissionSpecification[];
 };
@@ -243,8 +237,9 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+
   // API methods to handle placeable requests
-  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+  async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> { 
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
@@ -267,14 +262,12 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  // API emthodss to handle permission requests
   async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
-    console.log(`tsc player ${requestData.playerID}`)
     const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
       `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
 
   }
-  
-
 }

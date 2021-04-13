@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, TableCaption, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
+import { Button, Checkbox, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Table, Tbody, Td, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react";
 import { MenuItem, Typography } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react";
 import Player from "../../classes/Player";
@@ -16,20 +16,21 @@ export default function PermissionsButton(): JSX.Element {
   const [currentPlayersCanPlace, setPlayersCanPlace] = useState<Map<string, boolean>>(new Map<string, boolean>());
   const toast = useToast();
 
-  async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
-    const updatePlayerPermissions = new Map<string, boolean>();
-    playersOnOpen.forEach(async (player) => {
-      const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-      updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
-    });
-    setPlayersCanPlace(updatePlayerPermissions);
-  }
+  
 
   const openPermissions = useCallback(async ()=>{
+    async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
+      const updatePlayerPermissions = new Map<string, boolean>();
+      playersOnOpen.forEach(async (player) => {
+        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+        updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
+      });
+      setPlayersCanPlace(updatePlayerPermissions);
+    }
     await updatePlayersCanPlace(currentPlayers)
     video?.pauseGame();
     onOpen();
-  }, [onOpen, video]);
+  }, [apiClient, currentPlayers, currentTownID, onOpen, video]);
 
   const closePermissions = useCallback(()=>{
     onClose();
@@ -39,12 +40,10 @@ export default function PermissionsButton(): JSX.Element {
   const processUpdates = async (action: string) =>{
     if(action === 'submit'){
       const updates: PlayerUpdateSpecifications = { specifications: []}
-      console.log(`currentSelections ${currentPlayersCanPlace}`);
       currentPlayersCanPlace?.forEach((value: boolean, key: string) => {
         const playersPermission: PlayerPermissionSpecification =  { playerID: key, canPlace: value };
         updates.specifications.push(playersPermission);
       })
-      console.log(`specifications ${updates.specifications[0].canPlace}`);
 
       try{
         await apiClient.updatePlayerPermissions({coveyTownID: currentTownID, coveyTownPassword: roomUpdatePassword,
@@ -54,17 +53,12 @@ export default function PermissionsButton(): JSX.Element {
           status: 'success'
         })
         closePermissions();
-        updatePlayersCanPlace(currentPlayers);
       } catch(err) {
         toast({
           title: 'Unable to update players permissions',
           description: err.toString(),
           status: 'error'
         });
-      }
-      const playerIDToTest = updates.specifications[0].playerID
-      if (playerIDToTest) {
-        console.log(`has permission`, await apiClient.getPlayersPermission({ playerID: playerIDToTest, coveyTownID: currentTownID }));
       }
     }
   };
@@ -74,8 +68,16 @@ export default function PermissionsButton(): JSX.Element {
   }, [players]);
 
   useEffect(() => {
+    async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
+      const updatePlayerPermissions = new Map<string, boolean>();
+      playersOnOpen.forEach(async (player) => {
+        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+        updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
+      });
+      setPlayersCanPlace(updatePlayerPermissions);
+    }
     updatePlayersCanPlace(currentPlayers);
-  }, [currentPlayers])
+  }, [apiClient, currentPlayers, currentTownID]);
 
 return (
 <>
