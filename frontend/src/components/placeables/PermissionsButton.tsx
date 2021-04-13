@@ -16,7 +16,7 @@ export default function PermissionsButton(): JSX.Element {
   const [currentPlayersCanPlace, setPlayersCanPlace] = useState<Map<string, boolean>>(new Map<string, boolean>());
   const toast = useToast();
 
-  
+
 
   const openPermissions = useCallback(async ()=>{
     async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
@@ -85,10 +85,10 @@ return (
     <Typography variant="body1">Player Permissions</Typography>
   </MenuItem>
 
-  <Modal isOpen={isOpen} onClose={closePermissions}>  
+  <Modal isOpen={isOpen} onClose={closePermissions}>
   <ModalOverlay/>
   <ModalContent>
-    <ModalHeader>change players permissions</ModalHeader>
+    <ModalHeader>Player Permissions</ModalHeader>
     <ModalCloseButton/>
     <form onSubmit={(ev)=>{ev.preventDefault(); processUpdates('submit')}}>
       <ModalBody pb={6}>

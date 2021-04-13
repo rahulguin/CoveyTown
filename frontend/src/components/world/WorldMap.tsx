@@ -198,10 +198,10 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
-    const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
-    const xCord = indexLocation.x;
-    const yCord = indexLocation.y;
+    // const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
+    // const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
+    const xCord = myPlaceable.location.xIndex;
+    const yCord = myPlaceable.location.yIndex;
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
@@ -240,7 +240,7 @@ class CoveyGameScene extends Phaser.Scene {
         });
       }
     }
-      
+
     else if (this.physics && myPlaceable.placeableID === 'flappy') {
       let { sprite } = myPlaceable;
       if (!sprite) {
@@ -382,14 +382,14 @@ class CoveyGameScene extends Phaser.Scene {
       const y  = gameScene.lastLocation?.y
 
       if ((x !== undefined) && (y !== undefined)) {
-        const tilemap: Phaser.Tilemaps.Tilemap = gameScene.cache.tilemap.get('map');
-        const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
-        const xIndex = indexLocation.x;
-        const yIndex = indexLocation.y;
-        await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex}});
+        // const tilemap: Phaser.Tilemaps.Tilemap = gameScene.cache.tilemap.get('map');
+        // const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
+        // const xIndex = x;
+        // const yIndex = indexLocation.y;
+        await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
       }
     }
-    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: () => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
+    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
 
       let xLocation: integer
       let yLocation: integer
@@ -401,7 +401,7 @@ class CoveyGameScene extends Phaser.Scene {
         xLocation = 0;
         yLocation = 0;
       }
-      
+
       const button = gameScene.add.text(xLocation, yLocation, placeableName,
       {
         fontSize: FONT_SIZE,
@@ -423,12 +423,12 @@ class CoveyGameScene extends Phaser.Scene {
       });
       if (placeableID) {
         button.on('pointerdown', async () => {
-          closeFunction()
+          closeFunction(gameScene)
           await addPlaceableByID(gameScene, placeableID);
         });
       } else {
         button.on('pointerdown', async () => {
-          closeFunction();
+          closeFunction(gameScene);
         });
       }
       return button;
@@ -460,7 +460,7 @@ class CoveyGameScene extends Phaser.Scene {
           blur: 5
         }
       });
-      
+
       const placeableButtonList: Phaser.GameObjects.Text[] = []
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree'));
@@ -473,12 +473,15 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'cancel', destroyText, 3))
 
-      function destroyText() {
+      function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
         placeableButtonList.forEach((button) => {
           button.destroy();
         })
+        gameScene.resume();
+
       }
+      this.pause();
     });
   }
 
@@ -737,8 +740,8 @@ export default function WorldMap(): JSX.Element {
     const config = {
       type: Phaser.AUTO,
       parent: 'map-container',
-      minWidth: 800,
-      minHeight: 600,
+      width: 1250,
+      height: 550,
       physics: {
         default: 'arcade',
         arcade: {
