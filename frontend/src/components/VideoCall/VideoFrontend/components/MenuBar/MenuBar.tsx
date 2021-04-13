@@ -17,7 +17,6 @@ import MenuContainer from '@material-ui/core/Menu';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
-    backgroundColor: theme.palette.background.default,
     bottom: 20,
     left: 0,
     right: 0,
@@ -25,11 +24,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     position: 'absolute',
     display: 'flex',
     padding: '0 1.43em',
+    background: 'white',
     zIndex: 10,
     [theme.breakpoints.down('sm')]: {
       height: `${theme.mobileFooterHeight}px`,
       padding: 0,
     },
+
   },
   screenShareBanner: {
     position: 'absolute',

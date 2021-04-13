@@ -4,7 +4,20 @@ import React, {
 import './App.css';
 import { BrowserRouter } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import { ChakraProvider } from '@chakra-ui/react';
+import {
+  Box,
+  ChakraProvider,
+  Button,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody,
+  Input,
+  DrawerFooter,
+  useDisclosure, Center
+} from '@chakra-ui/react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
 import WorldMap from './components/world/WorldMap';
@@ -23,12 +36,14 @@ import ErrorDialog from './components/VideoCall/VideoFrontend/components/ErrorDi
 import theme from './components/VideoCall/VideoFrontend/theme';
 import { Callback } from './components/VideoCall/VideoFrontend/types';
 import Player, { ServerPlayer, UserLocation } from './classes/Player';
+import Placeable, { ServerPlaceable } from './classes/Placeable';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
-import Placeable, { ServerPlaceable } from './classes/Placeable';
+import MenuBar from "./components/VideoCall/VideoFrontend/components/MenuBar/MenuBar";
+
 
 type CoveyAppUpdate =
-  | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, socket: Socket, players: Player[], placeables: Placeable[], emitMovement: (location: UserLocation) => void },  }
+  | { action: 'doConnect'; data: { userName: string, townFriendlyName: string, townID: string,townIsPubliclyListed:boolean, sessionToken: string, myPlayerID: string, socket: Socket, players: Player[], emitMovement: (location: UserLocation) => void, placeables: Placeable[] } }
   | { action: 'addPlayer'; player: Player }
   | { action: 'playerMoved'; player: Player }
   | { action: 'playerDisconnect'; player: Player }
@@ -42,7 +57,6 @@ function defaultAppState(): CoveyAppState {
   return {
     nearbyPlayers: { nearbyPlayers: [] },
     players: [],
-    placeables: [],
     myPlayerID: '',
     currentTownFriendlyName: '',
     currentTownID: '',
@@ -56,6 +70,8 @@ function defaultAppState(): CoveyAppState {
     emitMovement: () => {
     },
     apiClient: new TownsServiceClient(),
+    // newly added
+    placeables: [],
   };
 }
 function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyAppState {
@@ -72,7 +88,8 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     apiClient: state.apiClient,
-    placeables: state.placeables
+    // newly
+    placeables: state.placeables,
   };
 
   function calculateNearbyPlayers(players: Player[], currentLocation: UserLocation) {
@@ -108,6 +125,8 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.socket = update.data.socket;
       nextState.players = update.data.players;
       nextState.placeables = update.data.placeables;
+
+
       break;
     case 'addPlayer':
       nextState.players = nextState.players.concat([update.player]);
@@ -132,7 +151,6 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       if (samePlayers(nextState.nearbyPlayers, state.nearbyPlayers)) {
         nextState.nearbyPlayers = state.nearbyPlayers;
       }
-
       break;
     case 'playerDisconnect':
       nextState.players = nextState.players.filter((player) => player.id !== update.player.id);
@@ -146,12 +164,14 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'disconnect':
       state.socket?.disconnect();
       return defaultAppState();
+
     case 'placeableAdded':
       nextState.placeables = nextState.placeables.concat([update.addedPlaceable])
       break;
     case 'placeableDeleted':
       nextState.placeables = nextState.placeables.filter((placeable) => placeable.location !== update.deletedPlaceable.location)
       break;
+
     default:
       throw new Error('Unexpected state request');
   }
@@ -160,7 +180,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
 }
 
 async function GameController(initData: TownJoinResponse,
-  dispatchAppUpdate: (update: CoveyAppUpdate) => void) {
+                              dispatchAppUpdate: (update: CoveyAppUpdate) => void) {
   // Now, set up the game sockets
   const gamePlayerID = initData.coveyUserID;
   const sessionToken = initData.coveySessionToken;
@@ -189,17 +209,18 @@ async function GameController(initData: TownJoinResponse,
   socket.on('disconnect', () => {
     dispatchAppUpdate({ action: 'disconnect' });
   });
+
   socket.on('placeableAdded', (addedPlaceable: ServerPlaceable) => {
     dispatchAppUpdate({ action: 'placeableAdded', addedPlaceable: Placeable.fromServerPlaceable(addedPlaceable)})
   });
   socket.on('placeableDeleted', (deletedPlaceable: ServerPlaceable) => {
     dispatchAppUpdate({ action: 'placeableDeleted', deletedPlaceable: Placeable.fromServerPlaceable(deletedPlaceable)})
   });
+
   const emitMovement = (location: UserLocation) => {
     socket.emit('playerMovement', location);
     dispatchAppUpdate({ action: 'weMoved', location });
   };
-
 
   dispatchAppUpdate({
     action: 'doConnect',
@@ -213,7 +234,8 @@ async function GameController(initData: TownJoinResponse,
       emitMovement,
       socket,
       players: initData.currentPlayers.map((sp) => Player.fromServerPlayer(sp)),
-      placeables: initData.currentPlaceables.map((placeable: ServerPlaceable) => Placeable.fromServerPlaceable(placeable)),
+      placeables: initData.currentPlaceables.map((sp) => Placeable.fromServerPlaceable(sp)),
+
     },
   });
   return true;
@@ -242,13 +264,14 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     } if (!videoInstance) {
       return <div>Loading...</div>;
     }
+
+
     return (
       <div>
-        <WorldMap />
         <VideoOverlay preferredMode="fullwidth" />
       </div>
     );
-  }, [setupGameController, appState.sessionToken, videoInstance]);
+  }, [setupGameController, appState.sessionToken, videoInstance] );
   return (
 
     <CoveyAppContext.Provider value={appState}>

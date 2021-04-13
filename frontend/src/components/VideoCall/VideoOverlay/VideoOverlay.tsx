@@ -17,6 +17,8 @@ import './VideoGrid.scss';
 import MediaErrorSnackbar from '../VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
 import usePresenting from '../VideoFrontend/components/VideoProvider/usePresenting/usePresenting';
 import useMaybeVideo from '../../../hooks/useMaybeVideo';
+import {Center, Divider, ModalCloseButton, Spinner} from "@chakra-ui/react";
+import WorldMap from "../../world/WorldMap";
 
 const Container = styled('div')({
   display: 'grid',
@@ -120,14 +122,27 @@ export default function VideoGrid(props: Props) {
       <Container style={{ height: '100%' }} className="video-grid">
         {roomState === 'disconnected' ? (
         // <PreJoinScreens room={{id: coveyRoom, twilioID: coveyRoom}} setMediaError={setMediaError} />
-          <div>Error</div>
+          <Center h="1000px">
+            <Spinner color="red.500" size="xl" textAlign="center" />
+          </Center>
         ) : (
-          <Main style={{ paddingBottom: '90px' }}>
-            <ReconnectingNotification />
-            <MobileTopMenuBar />
-            <Room />
-            <MenuBar setMediaError={setMediaError} />
-          </Main>
+          <div>
+            <Main style={{marginBottom: '0px', background: '#1111'}}>
+              <MenuBar setMediaError={setMediaError} />
+            </Main>
+            <Main >
+              <Center color="white"
+                      backgroundImage="url('https://cdn.pixabay.com/photo/2020/01/04/18/40/trees-4741364_1280.png')" >
+                <WorldMap />
+              </Center>
+
+              <ReconnectingNotification />
+              <MobileTopMenuBar />
+              &nbsp;
+              <Divider boxShadow="dark-md" rounded="1rem"/>
+              <Room />
+            </Main>
+          </div>
         )}
         <MediaErrorSnackbar error={mediaError} dismissError={() => setMediaError(undefined)} />
       </Container>

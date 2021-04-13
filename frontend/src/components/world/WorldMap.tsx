@@ -1,19 +1,27 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import Placeable from '../../classes/Placeable';
+import TownsServiceClient from '../../classes/TownsServiceClient';
+import { FlappyBird } from '../Placeables/FlappyBird';
 
 
-// https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
+
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
 
+
   private myPlayerID: string;
+
+  private townId;
+
+  private apiClient: TownsServiceClient;
 
   private players: Player[] = [];
 
@@ -32,15 +40,28 @@ class CoveyGameScene extends Phaser.Scene {
 
   private paused = false;
 
+  private playerID?: string;
+
   private video: Video;
 
   private emitMovement: (loc: UserLocation) => void;
 
-  constructor(video: Video, emitMovement: (loc: UserLocation) => void, myPlayerID : string) {
+
+  // newly added
+
+  private placeable?: {
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
+  };
+
+  private placeables: Placeable[] = [];
+
+  constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string, playerID: string) {
     super('PlayGame');
     this.video = video;
     this.emitMovement = emitMovement;
-    this.myPlayerID = myPlayerID;
+    this.apiClient = apiClient;
+    this.townId = townId;
+    this.myPlayerID = playerID;
   }
 
   preload() {
@@ -48,8 +69,17 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.png');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
+    this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
+    this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
+  }
+
+
+  initialise(apiClient: TownsServiceClient, townId: string) {
+
+    this.apiClient = apiClient;
+    this.townId = townId;
   }
 
   updatePlayersLocations(players: Player[]) {
@@ -80,8 +110,6 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-
-
   updatePlayerLocation(player: Player) {
     let myPlayer = this.players.find((p) => p.id === player.id);
     if (!myPlayer) {
@@ -97,6 +125,8 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location);
       this.players.push(myPlayer);
     }
+
+
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
@@ -127,6 +157,118 @@ class CoveyGameScene extends Phaser.Scene {
       }
     }
   }
+
+
+  updatePlaceables(placeables: Placeable[]) {
+
+    if (!this.ready) {
+      this.placeables = placeables;
+      return;
+    }
+    placeables.forEach((p) => {
+      this.updatePlaceable(p);
+    });
+    // Remove deleted placeables from board
+    const deletedPlaceables = this.placeables.filter(
+      (object) => !placeables.find((p) => Placeable.compareLocation(p.location, object.location)),
+    );
+    deletedPlaceables.forEach((deletedPlaceable) => {
+      if (deletedPlaceable.sprite) {
+        deletedPlaceable.sprite.destroy();
+        deletedPlaceable.label?.destroy();
+      }
+    });
+    // Remove deleted placeables from list
+    if (deletedPlaceables.length) {
+      this.placeables = this.placeables.filter(
+        (object) => !deletedPlaceables.find(
+          (p) => Placeable.compareLocation(p.location, object.location),
+        ),
+      );
+    }
+  }
+
+
+
+  updatePlaceable(placeable: Placeable) {
+
+    let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
+    if (!myPlaceable) {
+      let { location } = placeable;
+      if (!location) {
+        location = {
+          xIndex: 0,
+          yIndex: 0,
+        };
+      }
+      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
+      this.placeables.push(myPlaceable);
+    }
+
+    if (this.myPlayerID !== myPlaceable.placeableID && this.physics && placeable.location) {
+      let { sprite } = myPlaceable;
+      if (!sprite && myPlaceable.placeableID === 'tree') {
+        sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+
+      }
+
+      else if (!sprite && myPlaceable.placeableID === 'tictactoe') {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'tictactoe')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
+      }
+
+      else if (!sprite && myPlaceable.placeableID === 'flappy') {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'flappy')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(40,40)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
+      }
+
+    }
+
+  }
+
+
 
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
@@ -222,103 +364,12 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-  create() {
-    const map = this.make.tilemap({ key: 'map' });
+// This method is where addPlaceable method is called using the apiClient.On clicking the
+// yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
-    /* Parameters are the name you gave the tileset in Tiled and then the key of the
-     tileset image in Phaser's cache (i.e. the name you used in preload)
-     */
-    const tileset = map.addTilesetImage('tuxmon-sample-32px-extruded', 'tiles');
-
-    // Parameters: layer name (or index) from Tiled, tileset, x, y
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const belowLayer = map.createLayer('Below Player', tileset, 0, 0);
-    const worldLayer = map.createLayer('World', tileset, 0, 0);
-    worldLayer.setCollisionByProperty({ collides: true });
-    const aboveLayer = map.createLayer('Above Player', tileset, 0, 0);
-
-    /* By default, everything gets depth sorted on the screen in the order we created things.
-     Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give
-     it a depth. Higher depths will sit on top of lower depth objects.
-     */
-    aboveLayer.setDepth(10);
-
-    // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
-    // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-    const spawnPoint = map.findObject('Objects',
-      (obj) => obj.name === 'Spawn Point') as unknown as
-      Phaser.GameObjects.Components.Transform;
-
-
-    // Find all of the transporters, add them to the physics engine
-    const transporters = map.createFromObjects('Objects',
-      { name: 'transporter' })
-    this.physics.world.enable(transporters);
-
-    // For each of the transporters (rectangle objects), we need to tweak their location on the scene
-    // for reasons that are not obvious to me, but this seems to work. We also set them to be invisible
-    // but for debugging, you can comment out that line.
-    transporters.forEach(transporter => {
-        const sprite = transporter as Phaser.GameObjects.Sprite;
-        sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
-                                  // the map
-
-      }
-    );
-
-    const labels = map.filterObjects('Objects',(obj)=>obj.name==='label');
-    labels.forEach(label => {
-      if(label.x && label.y){
-        this.add.text(label.x, label.y, label.text.text, {
-          color: '#FFFFFF',
-          backgroundColor: '#000000',
-        })
-      }
-    });
-
-    /* Box object taken from tileMapJSON. Adding immovable property to the box object */
-    const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
-    let boxImage;
-    boxes.forEach(box => {
-      if(box.x && box.y){
-        boxImage = this.physics.add.image(box.x, box.y, 'box');
-        boxImage.setDisplaySize(50,50)
-        boxImage.setImmovable(true);
-        boxImage.body.setAllowGravity(false);
-      }
-    });
-
-
-
-
-    const cursorKeys = this.input.keyboard.createCursorKeys();
-    this.cursors.push(cursorKeys);
-    this.cursors.push(this.input.keyboard.addKeys({
-      'up': Phaser.Input.Keyboard.KeyCodes.W,
-      'down': Phaser.Input.Keyboard.KeyCodes.S,
-      'left': Phaser.Input.Keyboard.KeyCodes.A,
-      'right': Phaser.Input.Keyboard.KeyCodes.D
-    }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
-    this.cursors.push(this.input.keyboard.addKeys({
-      'up': Phaser.Input.Keyboard.KeyCodes.H,
-      'down': Phaser.Input.Keyboard.KeyCodes.J,
-      'left': Phaser.Input.Keyboard.KeyCodes.K,
-      'right': Phaser.Input.Keyboard.KeyCodes.L
-    }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
-
-    // Create a sprite with physics enabled via the physics system. The image used for the sprite
-    // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
-    // player's body.
+  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 
     let boxSprite;
-
-
-    const sprite = this.physics.add
-      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
-      .setSize(30, 40)
-      .setOffset(0, 24)
-      .setInteractive();
 
     sprite.on('pointerdown', () => {
 
@@ -364,27 +415,26 @@ class CoveyGameScene extends Phaser.Scene {
       boxButton.on('pointerout', () => {
         boxButton.setBackgroundColor('#004d00')
       })
+
        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      boxButton.on('pointerdown', () => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'box')
-          .setInteractive()
-          .setDisplaySize(50,50);
-        boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false); 
-        
-        this.physics.add.collider(sprite, boxSprite);
-        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
-        // boxSprite.on('pointerup', () => {
-        //   const isShown = true;
-        //   const toggle = () => {
-        //     ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        //   };
-        //   ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-        // });
+      boxButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
+
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -410,33 +460,77 @@ class CoveyGameScene extends Phaser.Scene {
         ticTacButton.setBackgroundColor('#004d00')
       })
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      ticTacButton.on('pointerdown', () => {
+      ticTacButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-
-        boxSprite = this.physics.add.sprite(this.lastLocation.x,this.lastLocation.y,'tictactoe')
-          .setInteractive()
-          .setDisplaySize(50,50);
-        boxSprite.setImmovable(true);
-        boxSprite.body.setAllowGravity(false); 
-        
-        this.physics.add.collider(sprite, boxSprite);
-        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
-        boxSprite.on('pointerup', () => {
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-        });
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        // tictac.location
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const flappyButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Flappy Bird',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      flappyButton.setInteractive();
+
+      flappyButton.on('pointerover', () => {
+        flappyButton.setBackgroundColor('#008000')
+      })
+      flappyButton.on('pointerout', () => {
+        flappyButton.setBackgroundColor('#004d00')
+      })
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      flappyButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        // const {x}  = this.game.input.mousePointer;
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        // const {y}  = this.game.input.mousePointer;
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        // location values are hardcoded in the  method call for now.
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'flappy',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        // Flappy.location
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
 
-      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Cancel',{
+      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Cancel',{
         color: '#FFFFFF',
         backgroundColor: '#004d00',
         align: 'center',
@@ -461,12 +555,100 @@ class CoveyGameScene extends Phaser.Scene {
         ticTacButton.destroy();
         cancelButton.destroy();
         buttonText.destroy();
+        flappyButton.destroy();
         boxButton.destroy();
-      }
 
+      }
+      // this.pause();
+    });
+  }
+
+  create() {
+    const map = this.make.tilemap({ key: 'map' });
+
+    /* Parameters are the name you gave the tileset in Tiled and then the key of the
+     tileset image in Phaser's cache (i.e. the name you used in preload)
+     */
+    const tileset = map.addTilesetImage('tuxmon-sample-32px-extruded', 'tiles');
+
+    // Parameters: layer name (or index) from Tiled, tileset, x, y
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const belowLayer = map.createLayer('Below Player', tileset, 0, 0);
+    const worldLayer = map.createLayer('World', tileset, 0, 0);
+    worldLayer.setCollisionByProperty({ collides: true });
+    const aboveLayer = map.createLayer('Above Player', tileset, 0, 0);
+    /* By default, everything gets depth sorted on the screen in the order we created things.
+     Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give
+     it a depth. Higher depths will sit on top of lower depth objects.
+     */
+    aboveLayer.setDepth(10);
+
+    // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
+    // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
+    const spawnPoint = map.findObject('Objects',
+      (obj) => obj.name === 'Spawn Point') as unknown as
+      Phaser.GameObjects.Components.Transform;
+
+
+    // Find all of the transporters, add them to the physics engine
+    const transporters = map.createFromObjects('Objects',
+      { name: 'transporter' })
+    this.physics.world.enable(transporters);
+
+    // For each of the transporters (rectangle objects), we need to tweak their location on the scene
+    // for reasons that are not obvious to me, but this seems to work. We also set them to be invisible
+    // but for debugging, you can comment out that line.
+    transporters.forEach(transporter => {
+        const sprite = transporter as Phaser.GameObjects.Sprite;
+        sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
+        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        // the map
+
+      }
+    );
+
+    const labels = map.filterObjects('Objects',(obj)=>obj.name==='label');
+    labels.forEach(label => {
+      if(label.x && label.y){
+        this.add.text(label.x, label.y, label.text.text, {
+          color: '#FFFFFF',
+          backgroundColor: '#000000',
+        })
+      }
     });
 
 
+
+    const cursorKeys = this.input.keyboard.createCursorKeys();
+    this.cursors.push(cursorKeys);
+    this.cursors.push(this.input.keyboard.addKeys({
+      'up': Phaser.Input.Keyboard.KeyCodes.W,
+      'down': Phaser.Input.Keyboard.KeyCodes.S,
+      'left': Phaser.Input.Keyboard.KeyCodes.A,
+      'right': Phaser.Input.Keyboard.KeyCodes.D
+    }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
+    this.cursors.push(this.input.keyboard.addKeys({
+      'up': Phaser.Input.Keyboard.KeyCodes.H,
+      'down': Phaser.Input.Keyboard.KeyCodes.J,
+      'left': Phaser.Input.Keyboard.KeyCodes.K,
+      'right': Phaser.Input.Keyboard.KeyCodes.L
+    }, false) as Phaser.Types.Input.Keyboard.CursorKeys);
+
+    // Create a sprite with physics enabled via the physics system. The image used for the sprite
+    // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
+    // player's body.
+
+
+
+
+    const mainSprite = this.physics.add
+      .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
+      .setSize(30, 40)
+      .setOffset(0, 24)
+      .setInteractive();
+
+
+    this.placeableAddition(mainSprite);
 
 
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
@@ -476,40 +658,40 @@ class CoveyGameScene extends Phaser.Scene {
       backgroundColor: '#ffffff',
     });
     this.player = {
-      sprite,
+      sprite: mainSprite,
       label
     };
 
     /* Player and box object should collide. Blocks path of the player */
-    if(boxImage){
-      this.physics.add.collider(sprite, boxImage);
-    }
+    // if(boxImage){
+    //   this.physics.add.collider(sprite, boxImage);
+    // }
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
     transport to the location on the map that is referenced by the 'target' property
     of the transporter.
      */
-    this.physics.add.overlap(sprite, transporters,
+    this.physics.add.overlap(mainSprite, transporters,
       (overlappingObject, transporter)=>{
-      if(cursorKeys.space.isDown && this.player){
-        // In the tiled editor, set the 'target' to be an *object* pointer
-        // Here, we'll see just the ID, then find the object by ID
-        const transportTargetID = transporter.getData('target') as number;
-        const target = map.findObject('Objects', obj => (obj as unknown as Phaser.Types.Tilemaps.TiledObject).id === transportTargetID);
-        if(target && target.x && target.y && this.lastLocation){
-          // Move the player to the target, update lastLocation and send it to other players
-          this.player.sprite.x = target.x;
-          this.player.sprite.y = target.y;
-          this.lastLocation.x = target.x;
-          this.lastLocation.y = target.y;
-          this.emitMovement(this.lastLocation);
+        if(cursorKeys.space.isDown && this.player){
+          // In the tiled editor, set the 'target' to be an *object* pointer
+          // Here, we'll see just the ID, then find the object by ID
+          const transportTargetID = transporter.getData('target') as number;
+          const target = map.findObject('Objects', obj => (obj as unknown as Phaser.Types.Tilemaps.TiledObject).id === transportTargetID);
+          if(target && target.x && target.y && this.lastLocation){
+            // Move the player to the target, update lastLocation and send it to other players
+            this.player.sprite.x = target.x;
+            this.player.sprite.y = target.y;
+            this.lastLocation.x = target.x;
+            this.lastLocation.y = target.y;
+            this.emitMovement(this.lastLocation);
+          }
+          else{
+            throw new Error(`Unable to find target object ${target}`);
+          }
         }
-        else{
-          throw new Error(`Unable to find target object ${target}`);
-        }
-      }
-    })
+      })
 
     this.emitMovement({
       rotation: 'front',
@@ -521,7 +703,7 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
     // Watch the player and worldLayer for collisions, for the duration of the scene:
-    this.physics.add.collider(sprite, worldLayer);
+    this.physics.add.collider(mainSprite, worldLayer);
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -618,17 +800,18 @@ class CoveyGameScene extends Phaser.Scene {
   }
 }
 
+
+
+
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
-    emitMovement, players, placeables, myPlayerID
+
+    emitMovement, players,
+    // newly added
+    placeables, currentTownID, apiClient, myPlayerID
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
-  const [modal, setModal] = useState(false);
-
-  const [isShown, setIsShown] = useState<boolean>(true);
-  const toggle = () => setIsShown(!isShown);
-  const content = 'Hey, Im a model.';
 
 
   useEffect(() => {
@@ -647,7 +830,9 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
-      const newGameScene = new CoveyGameScene(video, emitMovement, myPlayerID);
+
+      const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, myPlayerID);
+
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
@@ -660,19 +845,30 @@ export default function WorldMap(): JSX.Element {
     return () => {
       game.destroy(true);
     };
-  }, [video, emitMovement, placeables, myPlayerID]);
+  }, [video, emitMovement,apiClient, currentTownID, myPlayerID]);
 
   const deepPlayers = JSON.stringify(players);
+
+
   useEffect(() => {
+
+    gameScene?.initialise(apiClient, currentTownID);
     gameScene?.updatePlayersLocations(players);
-  }, [players, deepPlayers, gameScene]);
+    if(placeables) {
+      gameScene?.updatePlaceables(placeables);
+    }
+
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
+
+  useEffect(() => {
+    gameScene?.updatePlaceables(placeables); // newly added this fun call
+  }, [placeables, gameScene]); // newly added placeableObjects
 
   return (
     <div>
       <div id="map-container"/>
       <div id="modal-container"/>
-      <TicTacToe isShown={isShown} hide={toggle} modalContent={content} headerText={content} />
     </div>
-    
+
   );
 }
