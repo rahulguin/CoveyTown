@@ -127,7 +127,7 @@ describe('Town Selection - depends on Part 1 passing', () => {
     renderData = render(wrappedTownSelection());
     await waitFor(() => expect(renderData.getByText(`town1${suffix}`))
       .toBeInTheDocument());
-    townIDToJoinField = renderData.getByPlaceholderText('ID of town to join, or select from list') as HTMLInputElement;
+    townIDToJoinField = renderData.getByPlaceholderText('ID of town to join, or select from the list') as HTMLInputElement;
     userNameField = renderData.getByPlaceholderText('Your name') as HTMLInputElement;
     joinTownByIDButton = renderData.getByTestId('joinTownByIDButton');
   });

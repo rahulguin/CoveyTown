@@ -28,12 +28,13 @@ export interface TownJoinResponse {
   providerVideoToken: string;
   /** List of players currently in this town * */
   currentPlayers: ServerPlayer[];
-  /** List of placeabels currently in this town */
-  currentPlaceables: ServerPlaceable[];
   /** Friendly name of this town * */
   friendlyName: string;
   /** Is this a private town? * */
   isPubliclyListed: boolean;
+
+  // newly added
+  currentPlaceables: ServerPlaceable[];
 }
 
 /**
@@ -43,7 +44,6 @@ export interface TownCreateRequest {
   friendlyName: string;
   isPubliclyListed: boolean;
 }
-
 
 /**
  * Response from the server for a Town create request
@@ -80,20 +80,24 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
+
+
+// newly added
+
 /**
  * payload sent by the client to add an object to a town
  */
 export interface PlaceableAddRequest {
   coveyTownID: string,
-  coveyTownpassword: string,
-  objectID: string,
+  coveyTownPassword: string,
+  placeableID: string,
   location: PlaceableLocation
 }
 
 /**
  * Payload sent by client to retrieve a Placeable at a location
  */
- export interface PlaceableGetRequest {
+export interface PlaceableGetRequest {
   coveyTownID: string
   placeableID: string,
   location: PlaceableLocation
@@ -166,6 +170,14 @@ export interface ObjectListResponce {
 }
 
 
+
+
+
+
+
+
+
+
 /**
  * Envelope that wraps any response from the server
  */
@@ -175,13 +187,11 @@ export interface ResponseEnvelope<T> {
   response?: T;
 }
 
-
-
 export type CoveyTownInfo = {
   friendlyName: string;
   coveyTownID: string;
   currentOccupancy: number;
-  maximumOccupancy: number
+  maximumOccupancy: number;
 };
 
 export type PlayerUpdateSpecifications = {
@@ -243,8 +253,11 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+
   // API methods to handle placeable requests
   async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
+    // eslint-disable-next-line 
+    console.log('pswd in service client: ', requestData.coveyTownPassword);
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
@@ -275,6 +288,5 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
 
   }
-  
 
 }

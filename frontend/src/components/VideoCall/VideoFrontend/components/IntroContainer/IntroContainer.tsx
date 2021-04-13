@@ -15,19 +15,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   innerContainer: {
     display: 'block',
     height: 'auto',
-    width: 'calc(100% - 40px)',
-    margin: '10px auto',
-    maxWidth: '700px',
+    width: 'calc(100% - 0px)',
+    margin: '0px auto',
+    maxWidth: '7000px',
 
-    borderRadius: '8px',
-    border: '1px solid #ccc',
+    borderRadius: '0px',
+    border: '0px solid #ccc',
     overflow: 'hidden',
     position: 'relative',
   },
   content: {
     background: 'white',
     width: '100%',
-    padding: '2em',
+    padding: '0em',
     flex: 1,
   },
   subContentContainer: {

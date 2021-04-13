@@ -49,7 +49,12 @@ export default class Placeable {
   }
 
   static isAllowedPlaceable(placeableID: string): boolean {
-    return this.ALLOWED_PLACEABLES.has(placeableID);
+
+
+     this.ALLOWED_PLACEABLES.add('tree');
+     this.ALLOWED_PLACEABLES.add('tictactoe');
+    this.ALLOWED_PLACEABLES.add('flappy');
+     return this.ALLOWED_PLACEABLES.has(placeableID);
   }
 
   static constructEmptyPlaceable(location: PlaceableLocation): Placeable {

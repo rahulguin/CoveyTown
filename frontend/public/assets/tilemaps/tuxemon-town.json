@@ -220,7 +220,29 @@
                  "width":89.546875,
                  "x":1045.48494238827,
                  "y":871.339298184358
-                }],
+                },
+                {
+                     "height":18.84375,
+                     "id":295,
+                     "name":"box",
+                     "rotation":0,
+                     "properties":[
+                            {
+                             "name":"target",
+                             "type":"object",
+                             "value":275
+                     }],
+                     "text":
+                     {
+                            "text":"Box object here",
+                            "wrap":true
+                     },
+                     "type":"",
+                     "visible":true,
+                     "width":89.546875,
+                     "x":445.48494238827,
+                     "y":1220.339298184358
+                    }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
