@@ -1,13 +1,10 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button, Box
 } from "@chakra-ui/react";
 
 
@@ -17,12 +14,7 @@ export interface ModalProps {
   modalContent: string;
   headerText: string;
 }
-export const FlappyBird: FunctionComponent<ModalProps> = ({
-                                                           isShown,
-                                                           hide,
-                                                           modalContent,
-                                                           headerText,
-                                                         }) => {
+export const FlappyBird: FunctionComponent<ModalProps> = ({hide}) => {
   const [showing, setShowing] = useState<boolean>(true);
   const hiding = () => {
     setShowing(false);

@@ -1,16 +1,12 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { FunctionComponent, useState } from 'react';
 // import Button from 'react-bootstrap/Button';
 // import Modal from 'react-bootstrap/Modal'\;
 import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button, Box
 } from "@chakra-ui/react";
 
 
@@ -20,12 +16,7 @@ export interface ModalProps {
   modalContent: string;
   headerText: string;
 }
-export const TicTacToe: FunctionComponent<ModalProps> = ({
-  isShown,
-  hide,
-  modalContent,
-  headerText,
-}) => {
+export const TicTacToe: FunctionComponent<ModalProps> = ({hide}) => {
     const [showing, setShowing] = useState<boolean>(true);
     const hiding = () => {
         setShowing(false);

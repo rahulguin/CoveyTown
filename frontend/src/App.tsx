@@ -4,23 +4,9 @@ import React, {
 import './App.css';
 import { BrowserRouter } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import {
-  Box,
-  ChakraProvider,
-  Button,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeader,
-  DrawerBody,
-  Input,
-  DrawerFooter,
-  useDisclosure, Center
-} from '@chakra-ui/react';
+import { ChakraProvider,} from '@chakra-ui/react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
-import WorldMap from './components/world/WorldMap';
 import VideoOverlay from './components/VideoCall/VideoOverlay/VideoOverlay';
 import { CoveyAppState, NearbyPlayers } from './CoveyTypes';
 import VideoContext from './contexts/VideoContext';
@@ -39,7 +25,6 @@ import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import Placeable, { ServerPlaceable } from './classes/Placeable';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import Video from './classes/Video/Video';
-import MenuBar from "./components/VideoCall/VideoFrontend/components/MenuBar/MenuBar";
 
 
 type CoveyAppUpdate =

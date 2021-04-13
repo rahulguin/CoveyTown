@@ -874,7 +874,7 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlaceables(placeables);
     }
 
-  }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); // newly added placeableObjects
 
   useEffect(() => {
     gameScene?.updatePlaceables(placeables); // newly added this fun call
