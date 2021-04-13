@@ -8,14 +8,14 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
-// import { Constraint } from 'matter';
 
 
-// https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
+
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
+
 
   private id?: string;
 
@@ -124,8 +124,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location);
       this.players.push(myPlayer);
     }
-    // eslint-disable-next-line
-    console.log('this.id and myPlayer.id values: ', this.id, myPlayer.id);
+
     if (this.id !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
@@ -159,9 +158,6 @@ class CoveyGameScene extends Phaser.Scene {
 
 
   updatePlaceables(placeables: Placeable[]) {
-
-    // eslint-disable-next-line
-    console.log('placeable number ', placeables.length);
 
     if (!this.ready) {
       this.placeables = placeables;
@@ -206,9 +202,10 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
+
+    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location) {
       let { sprite } = myPlaceable;
-      if (!sprite) {
+      if (!sprite && myPlaceable.placeableID === 'tree') {
         sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
           .setScale(0.2)
           .setSize(32, 32)
@@ -219,10 +216,8 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
 
       }
-    }
-    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
+
+      else if (!sprite && myPlaceable.placeableID === 'tictactoe') {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
@@ -234,22 +229,19 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      myPlaceable.sprite.on('pointerdown', () => {
-        const isShown = true;
-        const toggle = () => {
-          ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        };
-        ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
-      });
-    }
-
-    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'flappy') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
+      else if (!sprite && myPlaceable.placeableID === 'flappy') {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - JB todo
@@ -261,19 +253,20 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        });
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      myPlaceable.sprite.on('pointerdown', () => {
-        const isShown = true;
-        const toggle = () => {
-          ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        };
-        ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
-      });
     }
+
   }
+
+
 
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
@@ -646,14 +639,14 @@ class CoveyGameScene extends Phaser.Scene {
 
 
 
-    const sprite = this.physics.add
+    const mainSprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
       .setInteractive();
 
 
-    this.placeableAddition(sprite);
+    this.placeableAddition(mainSprite);
 
 
     const label = this.add.text(spawnPoint.x, spawnPoint.y - 20, '(You)', {
@@ -663,7 +656,7 @@ class CoveyGameScene extends Phaser.Scene {
       backgroundColor: '#ffffff',
     });
     this.player = {
-      sprite,
+      sprite: mainSprite,
       label
     };
 
@@ -677,7 +670,7 @@ class CoveyGameScene extends Phaser.Scene {
     transport to the location on the map that is referenced by the 'target' property
     of the transporter.
      */
-    this.physics.add.overlap(sprite, transporters,
+    this.physics.add.overlap(mainSprite, transporters,
       (overlappingObject, transporter)=>{
         if(cursorKeys.space.isDown && this.player){
           // In the tiled editor, set the 'target' to be an *object* pointer
@@ -708,7 +701,7 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
     // Watch the player and worldLayer for collisions, for the duration of the scene:
-    this.physics.add.collider(sprite, worldLayer);
+    this.physics.add.collider(mainSprite, worldLayer);
 
     // Create the player's walking animations from the texture atlas. These are stored in the global
     // animation manager so any sprite can access them.
@@ -802,6 +795,9 @@ class CoveyGameScene extends Phaser.Scene {
   }
 }
 
+
+
+
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
@@ -810,10 +806,6 @@ export default function WorldMap(): JSX.Element {
     placeables, currentTownID, apiClient, myPlayerID
   } = useCoveyAppState();
   const [gameScene, setGameScene] = useState<CoveyGameScene>();
-  const [modal, setModal] = useState(false);
-
-  const [isShown, setIsShown] = useState<boolean>(true);
-  const toggle = () => setIsShown(!isShown);
 
 
   useEffect(() => {
@@ -851,8 +843,7 @@ export default function WorldMap(): JSX.Element {
 
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('players: ', players);
+
     gameScene?.initialise(apiClient, currentTownID);
     gameScene?.updatePlayersLocations(players);
     if(placeables) {
@@ -862,8 +853,6 @@ export default function WorldMap(): JSX.Element {
   }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('placeables: ', placeables);
     gameScene?.updatePlaceables(placeables); // newly added this fun call
   }, [placeables, gameScene]); // newly added placeableObjects
 
