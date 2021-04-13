@@ -465,6 +465,8 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree'));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
@@ -476,107 +478,7 @@ class CoveyGameScene extends Phaser.Scene {
         placeableButtonList.forEach((button) => {
           button.destroy();
         })
-        // ticTacButton.destroy();
-        // cancelButton.destroy();
-        // buttonText.destroy();
-        // flappyButton.destroy();
-        // boxButton.destroy();
       }
-
-      // const boxButton = this.add.text(this.lastLocation.x, this.lastLocation.y, 'Tree',
-      //   {
-      //     color: '#FFFFFF',
-      //     backgroundColor: '#004d00',
-      //     align: 'center',
-      //     padding: {
-      //       x: 10,
-      //       y: 7
-      //     },
-      //     fixedWidth: 309,
-      //   }
-      // );
-      // boxButton.setInteractive();
-      // boxButton.on('pointerover', () => {
-      //   boxButton.setBackgroundColor('#008000');
-      // });
-      // boxButton.on('pointerout', () => {
-      //   boxButton.setBackgroundColor('#004d00');
-      // });
-
-      // boxButton.on('pointerdown', async () => {
-      //   destroyText();
-      //   await addPlaceableByID(this, 'tree');
-      // });
-
-      // const ticTacButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 70, 'Tic Tac Toe',
-      //   {
-      //     color: '#FFFFFF',
-      //     backgroundColor: '#004d00',
-      //     align: 'center',
-      //     padding: {
-      //       x: 10,
-      //       y: 7
-      //     },
-      //     fixedWidth: 309,
-      //   }
-      // );
-      // ticTacButton.setInteractive();
-
-      // ticTacButton.on('pointerover', () => {
-      //   ticTacButton.setBackgroundColor('#008000')
-      // })
-      // ticTacButton.on('pointerout', () => {
-      //   ticTacButton.setBackgroundColor('#004d00')
-      // })
-      // ticTacButton.on('pointerdown', async () => {
-      //   destroyText();
-      //   await addPlaceableByID(this, 'tictactoe');
-      // });
-
-      // const flappyButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Flappy Bird',
-      //   {
-      //     color: '#FFFFFF',
-      //     backgroundColor: '#004d00',
-      //     align: 'center',
-      //     padding: {
-      //       x: 10,
-      //       y: 7
-      //     },
-      //     fixedWidth: 309,
-      //   }
-      // );
-      // flappyButton.setInteractive();
-
-      // flappyButton.on('pointerover', () => {
-      //   flappyButton.setBackgroundColor('#008000');
-      // });
-      // flappyButton.on('pointerout', () => {
-      //   flappyButton.setBackgroundColor('#004d00');
-      // });
-      // flappyButton.on('pointerdown', async () => {
-      //   destroyText();
-      //   await addPlaceableByID(this, 'flappy');
-      // });
-
-      // const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Cancel',{
-      //   color: '#FFFFFF',
-      //   backgroundColor: '#004d00',
-      //   align: 'center',
-      //   padding: {
-      //     x: 10,
-      //     y: 7
-      //   },
-      //   fixedWidth: 309,
-      // });
-      // cancelButton.setInteractive();
-
-      // cancelButton.on('pointerover', () => {
-      //   cancelButton.setBackgroundColor('#008000')
-      // })
-      // cancelButton.on('pointerout', () => {
-      //   cancelButton.setBackgroundColor('#004d00')
-      // })
-      // cancelButton.on('pointerdown', () => {destroyText()});
     });
   }
 
