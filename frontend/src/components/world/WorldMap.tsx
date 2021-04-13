@@ -17,7 +17,7 @@ class CoveyGameScene extends Phaser.Scene {
   };
 
 
-  private id?: string;
+  private myPlayerID: string;
 
   private townId;
 
@@ -46,6 +46,7 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitMovement: (loc: UserLocation) => void;
 
+
   // newly added
 
   private placeable?: {
@@ -60,7 +61,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.emitMovement = emitMovement;
     this.apiClient = apiClient;
     this.townId = townId;
-    this.playerID = playerID;
+    this.myPlayerID = playerID;
   }
 
   preload() {
@@ -125,7 +126,8 @@ class CoveyGameScene extends Phaser.Scene {
       this.players.push(myPlayer);
     }
 
-    if (this.id !== myPlayer.id && this.physics && player.location) {
+
+    if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
         sprite = this.physics.add
@@ -203,7 +205,7 @@ class CoveyGameScene extends Phaser.Scene {
       this.placeables.push(myPlaceable);
     }
 
-    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location) {
+    if (this.myPlayerID !== myPlaceable.placeableID && this.physics && placeable.location) {
       let { sprite } = myPlaceable;
       if (!sprite && myPlaceable.placeableID === 'tree') {
         sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
@@ -431,7 +433,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
 
       });
 
@@ -476,7 +478,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
         // tictac.location
       });
 
@@ -521,7 +523,7 @@ class CoveyGameScene extends Phaser.Scene {
         // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'flappy',location: { xIndex: x  + 50 , yIndex: y + 50 }});
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'WEbyXt-t5NmR9lIe8mHJ3sl4',placeableID: 'flappy',location: { xIndex: x  + 50 , yIndex: y + 50 }});
         // Flappy.location
       });
 
@@ -790,7 +792,10 @@ class CoveyGameScene extends Phaser.Scene {
 
   resume() {
     this.paused = false;
-    this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    if(Video.instance()){
+      // If the game is also in process of being torn down, the keyboard could be undefined
+      this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    }
     this.previouslyCapturedKeys = [];
   }
 }
@@ -801,6 +806,7 @@ class CoveyGameScene extends Phaser.Scene {
 export default function WorldMap(): JSX.Element {
   const video = Video.instance();
   const {
+
     emitMovement, players,
     // newly added
     placeables, currentTownID, apiClient, myPlayerID
@@ -824,7 +830,9 @@ export default function WorldMap(): JSX.Element {
 
     const game = new Phaser.Game(config);
     if (video) {
+
       const newGameScene = new CoveyGameScene(video, emitMovement, apiClient, currentTownID, myPlayerID);
+
       setGameScene(newGameScene);
       game.scene.add('coveyBoard', newGameScene, true);
       video.pauseGame = () => {
