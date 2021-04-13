@@ -17,8 +17,17 @@ export default function PermissionsButton(): JSX.Element {
   const toast = useToast();
 
   const openPermissions = useCallback(()=>{
+    async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
+      const initialPlayerPermissions = new Map<string, boolean>();
+      initialPlayers.forEach(async (player) => {
+        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
+      });
+    }
     onOpen();
     video?.pauseGame();
+    setCurrentPlayers(players);
+    initializePlayerCanPlace(players)
   }, [onOpen, video]);
 
   const closePermissions = useCallback(()=>{
@@ -53,22 +62,6 @@ export default function PermissionsButton(): JSX.Element {
     }
   };
 
-  useEffect(() => {
-    async function initializePlayerCanPlace(initialPlayers: Player[]): Promise<void> {
-      const initialPlayerPermissions = new Map<string, boolean>();
-      initialPlayers.forEach(async (player) => {
-        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-        initialPlayerPermissions.set(player.id, thisPlayerCanPlace);
-      });
-      setPlayersCanPlace(initialPlayerPermissions);
-    }
-    if (currentTownID && (!currentPlayers || !currentPlayersCanPlace)) {
-      setCurrentPlayers(players);
-      initializePlayerCanPlace(players);
-    }
-  }, [apiClient, currentPlayers, currentPlayersCanPlace, currentTownID, players])
-
-    
 
 
 return (

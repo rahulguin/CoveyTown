@@ -160,7 +160,7 @@ export interface ObjectListResponce {
 /**
  * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
  */
-export interface PlayerGetPermissionRequest {
+ export interface PlayerGetPermissionRequest {
   coveyTownID: string;
   playerID: string;
 }
@@ -212,7 +212,7 @@ export default class TownsServiceClient {
       if (ignoreResponse) {
         return {} as T;
       }
-      assert(response.data.response);
+      assert(response.data.response !== undefined);
       return response.data.response;
     }
     throw new Error(`Error processing request: ${response.data.message}`);
@@ -243,7 +243,7 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  // API methods to handle object requests
+  // API methods to handle placeable requests
   async addPlaceable(requestData: PlaceableAddRequest): Promise<PlaceableInfo> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
@@ -268,16 +268,13 @@ export default class TownsServiceClient {
   }
 
   async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
+    console.log(`tsc player ${requestData.playerID}`)
     const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
-      `/towns/${requestData.coveyTownID}/permissions`,
-      { data: requestData },
+      `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+
   }
   
-    // async avaliableObject(): Promise<ObjectListResponce> {
-    //   const responseWrapper = await this._axios.get<ResponseEnvelope<ObjectListResponce>>(`/objects`);
-    //   return TownsServiceClient.unwrapOrThrowError(responseWrapper);
-    // }
 
 }
