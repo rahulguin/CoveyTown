@@ -205,7 +205,8 @@ class CoveyGameScene extends Phaser.Scene {
           yIndex: 0,
         };
       }
-      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
+      console.log(placeable);
+      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location, placeable.objectInformation);
       this.placeables.push(myPlaceable);
     }
     if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
@@ -278,6 +279,7 @@ class CoveyGameScene extends Phaser.Scene {
 
     else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'banner') {
       let { sprite } = myPlaceable;
+      console.log(myPlaceable);
       if (!sprite) {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment

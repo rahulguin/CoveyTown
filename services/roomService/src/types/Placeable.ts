@@ -39,6 +39,10 @@ export default class Placeable {
     return this._placeableID;
   }
 
+  get objectInformation(): Map<string, string> | undefined {
+    return this._objectInformation;
+  }
+
   get EMPTY_PLACEABLE_ID(): string {
     return this.EMPTY_PLACEABLE_ID;
   }

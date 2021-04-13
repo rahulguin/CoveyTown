@@ -219,7 +219,6 @@ export default class CoveyTownController {
     // will need to be updated to create the specific object wanted
     const addedPlaceable = new Placeable(placeableID, location, objectInformation);
     this._placeables = this._placeables.concat([addedPlaceable]);
-    console.log('in controller object info: ', addedPlaceable);
 
     // then for all listeners to this room notify them that an placeable was added
     this._listeners.forEach(listener => {
@@ -263,6 +262,7 @@ export default class CoveyTownController {
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location,
+        objectInformation: new Map(),
       };
     }
 
@@ -271,6 +271,7 @@ export default class CoveyTownController {
       placeableID: placeableAtLocation.placeableID,
       placeableName: placeableAtLocation.name,
       location: placeableAtLocation.location,
+      objectInformation: placeableAtLocation.objectInformation,
     };
   }
 

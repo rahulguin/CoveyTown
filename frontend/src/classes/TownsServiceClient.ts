@@ -101,7 +101,8 @@ export interface PlaceableAddRequest {
 export interface PlaceableGetRequest {
   coveyTownID: string
   placeableID: string,
-  location: PlaceableLocation
+  location: PlaceableLocation,
+  objectInformation: Map<string, string>,
 }
 
 /**
@@ -111,7 +112,8 @@ export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
   objectID: string,
-  location: PlaceableLocation
+  location: PlaceableLocation,
+  objectInformation: Map<string, string>,
 }
 
 /**
@@ -143,7 +145,8 @@ export interface ObjectInfo {
   coveyTownID: string,
   objectID: string,
   objectName: string,
-  location: PlaceableLocation
+  location: PlaceableLocation,
+  objectInformation: Map<string, string>,
 }
 
 /**
