@@ -6,7 +6,6 @@ import { PlayerPermissionSpecification, PlayerUpdateSpecifications } from "../..
 import useCoveyAppState from "../../hooks/useCoveyAppState";
 import useMaybeVideo from "../../hooks/useMaybeVideo";
 import '../../App.css';
-import { useAppState } from "../VideoCall/VideoFrontend/state";
 
 export default function PermissionsButton(): JSX.Element {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -14,21 +13,22 @@ export default function PermissionsButton(): JSX.Element {
   const { players, apiClient, currentTownID } = useCoveyAppState();
   const [roomUpdatePassword, setRoomUpdatePassword] = useState<string>('');
   const [currentPlayers, setCurrentPlayers] = useState<Player[]>([]);
-  const [currentPlayersCanPlace, setPlayersCanPlace] = useState<Map<string, boolean>>()
+  const [currentPlayersCanPlace, setPlayersCanPlace] = useState<Map<string, boolean>>(new Map<string, boolean>());
   const toast = useToast();
 
-  const openPermissions = useCallback(()=>{
-    async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
-      const updatePlayerPermissions = new Map<string, boolean>();
-      playersOnOpen.forEach(async (player) => {
-        const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-        updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
-      });
-      setPlayersCanPlace(updatePlayerPermissions);
-    }
-    onOpen();
+  async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
+    const updatePlayerPermissions = new Map<string, boolean>();
+    playersOnOpen.forEach(async (player) => {
+      const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
+      updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
+    });
+    setPlayersCanPlace(updatePlayerPermissions);
+  }
+
+  const openPermissions = useCallback(async ()=>{
+    await updatePlayersCanPlace(currentPlayers)
     video?.pauseGame();
-    updatePlayersCanPlace(currentPlayers)
+    onOpen();
   }, [onOpen, video]);
 
   const closePermissions = useCallback(()=>{
@@ -54,6 +54,7 @@ export default function PermissionsButton(): JSX.Element {
           status: 'success'
         })
         closePermissions();
+        updatePlayersCanPlace(currentPlayers);
       } catch(err) {
         toast({
           title: 'Unable to update players permissions',
@@ -69,8 +70,12 @@ export default function PermissionsButton(): JSX.Element {
   };
 
   useEffect(() => {
-    setCurrentPlayers(players);
+    setCurrentPlayers(players)
   }, [players]);
+
+  useEffect(() => {
+    updatePlayersCanPlace(currentPlayers);
+  }, [currentPlayers])
 
 return (
 <>
@@ -97,7 +102,7 @@ return (
             <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                         role='cell'>{player.id}</Td>
                         <Td role='cell'>
-                        <Checkbox defaultisChecked={currentPlayersCanPlace?.get(player.id)} isChecked={currentPlayersCanPlace?.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace?.set(player.id, e.target.checked))} spacing="1rem" />
+                        <Checkbox isChecked={currentPlayersCanPlace.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace.set(player.id, e.target.checked))} spacing="1rem" />
                         </Td>
             </Tr>
         ))}
