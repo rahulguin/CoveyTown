@@ -107,9 +107,14 @@ export default class CoveyTownsStore {
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
-    if (!(placeableLocation && placeableLocation.xIndex && placeableLocation.yIndex)) {
-
-        return 'Invalid Location: the location  to add the placeable must be defined';
+    if (
+      !(
+        isDefined(placeableLocation) &&
+        isDefined(placeableLocation.xIndex) &&
+        isDefined(placeableLocation.yIndex)
+      )
+    ) {
+      return 'Invalid Location: the location to add the placeable must be defined';
     }
     const existingTown = this.getControllerForTown(coveyTownID);
 
@@ -132,7 +137,6 @@ export default class CoveyTownsStore {
         return addResponce;
       }
       return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
-
     }
     return 'Invalid room information: Double check that the room exists';
   }
