@@ -534,8 +534,70 @@ class CoveyGameScene extends Phaser.Scene {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+      const bannerButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Banner',
+        {
+          color: '#FFFFFF',
+          backgroundColor: '#004d00',
+          align: 'center',
+          padding: {
+            x: 10,
+            y: 7
+          },
+          fixedWidth: 309,
+        }
+      );
+      bannerButton.setInteractive();
+      bannerButton.on('pointerover', () => {
+        bannerButton.setBackgroundColor('#008000')
+      })
+      bannerButton.on('pointerout', () => {
+        bannerButton.setBackgroundColor('#004d00')
+      })
 
-      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 120, 'Cancel',{
+       // eslint-disable-next-line @typescript-eslint/no-use-before-define
+       bannerButton.on('pointerdown', async () => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        destroyText();
+        const x  = this.lastLocation?.x
+        // eslint-disable-next-line
+        console.log('x value: ', x);
+        const y  = this.lastLocation?.y
+        // eslint-disable-next-line
+        console.log('y value: ', y);
+
+        
+        // this.add.dom(x, y, 'div', 'background-color: lime; width: 220px; height: 100px; font: 48px Arial', 'Phaser');
+        const form = `<input type="text" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; "> `;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const inputBannerText = this.add.dom(x, y).createFromHTML(form);
+        inputBannerText.setInteractive();
+        const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const submitBannerText = this.add.dom(x, y+25).createFromHTML(submit);
+        submitBannerText.setInteractive();
+        const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const cancelBannerText = this.add.dom(x, y+25).createFromHTML(cancel);
+        cancelBannerText.setInteractive();
+        cancelBannerText.addListener('click');
+        cancelBannerText.on('click', {
+          destroyText()
+        });
+
+        // location values are hardcoded in the  method call for now.
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}});
+
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+
+      const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 145, 'Cancel',{
         color: '#FFFFFF',
         backgroundColor: '#004d00',
         align: 'center',
@@ -562,7 +624,7 @@ class CoveyGameScene extends Phaser.Scene {
         buttonText.destroy();
         flappyButton.destroy();
         boxButton.destroy();
-
+        bannerButton.destroy();
       }
       // this.pause();
     });
@@ -828,6 +890,9 @@ export default function WorldMap(): JSX.Element {
           gravity: { y: 0 }, // Top down game, so no gravity
         },
       },
+      dom: {
+        createContainer: true
+      } 
     };
 
     const game = new Phaser.Game(config);

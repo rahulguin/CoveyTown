@@ -262,7 +262,6 @@ export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
   console.log('in req handler :coveyTownPassword is ', requestData.coveyTownPassword);
-
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(
     requestData.coveyTownID,
