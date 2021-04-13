@@ -8,6 +8,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
+import { Banner } from '../Placeables/Banner';
 // import { Constraint } from 'matter';
 
 
@@ -69,6 +70,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('box', '/assets/placeable/treeObject.png');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
+    this.load.image('banner', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
@@ -271,6 +273,38 @@ class CoveyGameScene extends Phaser.Scene {
           ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
         };
         ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+      });
+    }
+
+    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'banner') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'banner')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(40,40)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      myPlaceable.sprite.on('pointerdown', () => {
+        // const isShown = true;
+        // const toggle = () => {
+        //   ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+        // };
+        // ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        const submit = `<Banner isShown={true} hide={toggle} modalContent='game' headerText='TicTacToe'/> `;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const submitBannerText = this.add.dom(myPlaceable.location.xIndex, myPlaceable.location.yIndex).createFromHTML(submit);
+        submitBannerText.setInteractive();
       });
     }
   }
@@ -567,30 +601,51 @@ class CoveyGameScene extends Phaser.Scene {
 
         
         // this.add.dom(x, y, 'div', 'background-color: lime; width: 220px; height: 100px; font: 48px Arial', 'Phaser');
-        const form = `<input type="text" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; "> `;
+        const form = `<input type="text" value="asdf" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; "> `;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const inputBannerText = this.add.dom(x, y).createFromHTML(form);
         inputBannerText.setInteractive();
+        inputBannerText.addListener('input');
         const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const submitBannerText = this.add.dom(x, y+25).createFromHTML(submit);
         submitBannerText.setInteractive();
+        const submitBannerCallback = async function(scene: CoveyGameScene) {
+          console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
+          const objectInfo = {
+            bannerText: 'Text from Back-end'
+          }
+          // location values are hardcoded in the  method call for now.
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation: objectInfo});
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          destroyText();
+          inputBannerText.destroy();
+          submitBannerText.destroy();
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          cancelBannerText.destroy();
+        }
+        submitBannerText.addListener('click');
+        submitBannerText.on('click', () => submitBannerCallback(this));
+
         const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const cancelBannerText = this.add.dom(x, y+25).createFromHTML(cancel);
+        const cancelBannerText = this.add.dom(x, y+50).createFromHTML(cancel);
         cancelBannerText.setInteractive();
         cancelBannerText.addListener('click');
-        cancelBannerText.on('click', {
-          destroyText()
-        });
-
-        // location values are hardcoded in the  method call for now.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}});
+        
+        const cancelBannerCallback = function() {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          destroyText();
+          inputBannerText.destroy();
+          submitBannerText.destroy();
+          cancelBannerText.destroy();
+        };
+        cancelBannerText.on('click', cancelBannerCallback);        
 
       });
 

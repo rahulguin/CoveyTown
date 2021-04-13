@@ -113,6 +113,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       console.log('in towns townid: ', req.params.townID);
       console.log('in towns pswd: ', req.body.coveyTownPassword);
       console.log('in towns placeable id: ', req.body.placeableID);
+      console.log('in towns object info: ', req.body.objectInformation);
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
