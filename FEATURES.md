@@ -11,21 +11,30 @@ interactable placeables provide users with some additional function such as allo
 
 To add placeables to your town
 
-1. cick on your user in the town
-2. select which of the placeables you would like to add
-3. the placeable will automatically get added next to you
+1. make sure that you have permission to perform this actions (if you do not see [giving a removing player permissions](#giving-and-removing-player-positions))
+2. cick on your user in the town
+3. select which of the placeables you would like to add
+4. the placeable will automatically get added next to you
 
 ### Deleting placeabels
+
+To Delete a placeable from your town
+
+1. make sure the placeable you want to delete is in view on your screen
+2. make sure that you have permission to perform this actions (if you do not see [giving a removing player permissions](#giving-and-removing-player-positions))
+3. right click on the placeable you would like to delete
+4. then hit delete
 
 ### Current placeables
 
 |  Placeable  |                                  Icon                                  | number of players | Blocks path | Placeable ID |
 | :---------: | :--------------------------------------------------------------------: | :---------------: | :---------: | :----------: |
-|    Tree     |   <img src="frontend/public/assets/placeables/tree.png" width="32">    | non interactable  |    true     |     tree     |
-|   Flowers   |  <img src="frontend/public/assets/placeables/flowers.png" width="32">  | non interactable  |    false    |   flowers    |
-|   speaker   |  <img src="frontend/public/assets/placeables/speaker.png" width="32">  | non interactable  |    true     |   speaker    |
-| Chess board |   <img src="frontend/public/assets/placeables/chess.png" width="32">   |         1         |    true     |    chess     |
-| tic-tac-toe | <img src="frontend/public/assets/placeables/tictactoe.png" width="32"> |         1         |    true     |  tictactoe   |
+|    Tree     | <img src="frontend/public/assets/placeable/treeSprite.png" width="32"> | non interactable  |    true     |     tree     |
+|   Flowers   |  <img src="frontend/public/assets/placeable/flowers.png" width="32">   | non interactable  |    false    |   flowers    |
+|   banner    |   <img src="frontend/public/assets/placeable/banner.png" width="32">   |     infinite      |    true     |    banner    |
+| Chess board |   <img src="frontend/public/assets/placeable/chess.png" width="32">    |         1         |    true     |    chess     |
+| tic-tac-toe | <img src="frontend/public/assets/placeable/tictactoe.png" width="32">  |         1         |    true     |  tictactoe   |
+| Flappy Bird | <img src="frontend/public/assets/placeable/FlappyBird.png" width="32"> |         1         |    true     |    flappy    |
 
 ### How to interact with placables
 
