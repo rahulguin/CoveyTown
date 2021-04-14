@@ -426,7 +426,7 @@ class CoveyGameScene extends Phaser.Scene {
           },
           fixedHeight: 50,
           fixedWidth: 50,
-          align: 'center'
+          align: 'center',
         });
         gameScene.pause();
         buttonText.setInteractive();
@@ -496,6 +496,7 @@ class CoveyGameScene extends Phaser.Scene {
         },
         fixedWidth: BUTTON_WIDTH,
       });
+      button.setDepth(10);
       button.setInteractive();
       const escapeKey = gameScene.input.keyboard.addKey('ESC');
       escapeKey.on('down', async () => {
@@ -544,6 +545,7 @@ class CoveyGameScene extends Phaser.Scene {
           blur: 5
         }
       });
+      buttonText.setDepth(10);
 
       const placeableButtonList: Phaser.GameObjects.Text[] = []
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
