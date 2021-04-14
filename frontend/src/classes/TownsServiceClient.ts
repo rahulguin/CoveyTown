@@ -113,7 +113,9 @@ export interface PlaceableInfo {
   coveyTownpassword: string,
   objectID: string,
   location: PlaceableLocation,
-  objectInformation: Map<string, string>,
+  objectInformation: {
+    bannerText: string
+  },
 }
 
 /**
@@ -238,6 +240,7 @@ export default class TownsServiceClient {
     // eslint-disable-next-line 
     console.log('pswd in service client: ', requestData.coveyTownPassword);
     const responseWrapper = await this._axios.post<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, requestData);
+    console.log('in client ', responseWrapper);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

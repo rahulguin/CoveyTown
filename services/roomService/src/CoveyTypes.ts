@@ -21,7 +21,9 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
-  objectInformation: Map<string, string> | undefined
+  objectInformation: {
+    bannerText?: string
+  }
 }
 
 export type PlayerUpdateSpecifications = {

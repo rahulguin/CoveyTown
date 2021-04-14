@@ -262,7 +262,7 @@ export default class CoveyTownController {
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location,
-        objectInformation: new Map(),
+        objectInformation: {},
       };
     }
 
@@ -271,7 +271,9 @@ export default class CoveyTownController {
       placeableID: placeableAtLocation.placeableID,
       placeableName: placeableAtLocation.name,
       location: placeableAtLocation.location,
-      objectInformation: placeableAtLocation.objectInformation,
+      objectInformation: {
+        bannerText: placeableAtLocation.objectInformation?.get('bannerText')
+      },
     };
   }
 

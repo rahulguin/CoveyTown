@@ -103,6 +103,7 @@ export interface PlaceableAddRequest {
 export interface PlaceableAddResponse {
   placeableID: string;
   location: PlaceableLocation;
+  objectInformation?: Map<string, string>;
 }
 
 /**
@@ -127,6 +128,9 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
+  objectInformation: {
+    bannerText?: string
+  };
 }
 
 /**

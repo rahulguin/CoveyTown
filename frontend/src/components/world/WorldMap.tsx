@@ -626,11 +626,9 @@ class CoveyGameScene extends Phaser.Scene {
           const objectInformation = {
             bannerText: inputText
           }
-          console.log(objectInformation);
-          // location values are hardcoded in the  method call for now.
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'GNF-PucfLd_c9LOFU9ior03F',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'R9ZXBB-r6WJzi9IyDGDkkx9r',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           destroyText();
           inputBannerText.destroy();

@@ -129,6 +129,8 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         location: req.body.location,
         objectInformation
       });
+      console.log(result)
+      
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
       logError(err);
