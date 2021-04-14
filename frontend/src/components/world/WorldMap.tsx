@@ -266,7 +266,7 @@ class CoveyGameScene extends Phaser.Scene {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
-          .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'flappy')
+          .sprite(xCord, yCord, 'flappy')
           .setScale(0.2)
           .setSize(32, 32)
           .setDisplaySize(32,32)
