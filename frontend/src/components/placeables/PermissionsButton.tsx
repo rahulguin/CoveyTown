@@ -28,7 +28,7 @@ export default function PermissionsButton(): JSX.Element {
     await updatePlayersCanPlace(currentPlayers)
     video?.pauseGame();
     onOpen();
-  }, [apiClient, currentPlayers, currentTownID, onOpen, video]);
+  }, [apiClient, currentPlayers, currentTownID, onOpen, video, currentPlayersCanPlace]);
 
   const closePermissions = useCallback(()=>{
     onClose();
