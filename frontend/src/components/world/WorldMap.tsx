@@ -55,6 +55,9 @@ class CoveyGameScene extends Phaser.Scene {
 
   private placeables: Placeable[] = [];
 
+  /** the tilemap for this world that is initialized within the create function */
+  private tilemap!: Phaser.Tilemaps.Tilemap;
+
   constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string,  myPlayerID: string, playerSessionToken: string) {
     super('PlayGame');
     this.video = video;
@@ -204,10 +207,9 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    // const tilemap: Phaser.Tilemaps.Tilemap = this.cache.tilemap.get('map');
-    // const indexLocation: Phaser.Math.Vector2 = tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
-    const xCord = myPlaceable.location.xIndex;
-    const yCord = myPlaceable.location.yIndex;
+    const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
+    const xCord = indexLocation.x
+    const yCord = indexLocation.y
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
@@ -381,14 +383,10 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-
-
-
-
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
-  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
 
 
     const BUTTON_WIDTH = 309;
@@ -397,24 +395,23 @@ class CoveyGameScene extends Phaser.Scene {
     const FONT_SIZE_IN_PIXLES = 13;
     const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
     const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
-    const TEXT_HEIGHT = 50;
+    const TEXT_HEIGHT = 55;
     const PLAYER_WIDTH = 31;
     const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
-      // const {x}  = this.game.input.mousePointer;
-      const x  = gameScene.lastLocation?.x
-      // const {y}  = this.game.input.mousePointer;
-      const y  = gameScene.lastLocation?.y
-
-
-      if ((x !== undefined) && (y !== undefined)) {
+      const xCord = gameScene.lastLocation?.x;
+      const yCord = gameScene.lastLocation?.y;
+      if (!(xCord && yCord)) {
+        return
+      }
+      const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
+      const xIndex  = indexLocation.x
+      const yIndex  = indexLocation.y
 
         try{
-          await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
+          await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
         } catch (e) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const buttonText = gameScene.add.text(gameScene.lastLocation.x + X_OFFSET, gameScene.lastLocation.y, "Action Denied. Please request \npermission from the owner. \n(Click me to close)", {
+          const buttonText = gameScene.add.text(xCord + X_OFFSET, yCord, "Action Denied. Please request\npermission from the owner.\n(Click me to close)", {
             color: '#FFFFFF',
             fontSize: FONT_SIZE,
             backgroundColor: 'darkred',
@@ -422,7 +419,7 @@ class CoveyGameScene extends Phaser.Scene {
               x: X_PADDING,
               y: Y_PADDING
             },
-            fixedHeight: TEXT_HEIGHT + 5,
+            fixedHeight: TEXT_HEIGHT,
             fixedWidth: 300,
             align: 'center'
           });
@@ -433,8 +430,6 @@ class CoveyGameScene extends Phaser.Scene {
             gameScene.resume();
           });
         }
-
-      }
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
 
@@ -444,7 +439,6 @@ class CoveyGameScene extends Phaser.Scene {
         xLocation = gameScene.lastLocation.x + X_OFFSET
         yLocation = gameScene.lastLocation.y + TEXT_HEIGHT + BUTTON_HEIGHT * numberInList
       } else {
-        // need to figure out what to do here
         xLocation = 0;
         yLocation = 0;
       }
@@ -536,6 +530,7 @@ class CoveyGameScene extends Phaser.Scene {
 
   create() {
     const map = this.make.tilemap({ key: 'map' });
+    this.tilemap = map;
 
     /* Parameters are the name you gave the tileset in Tiled and then the key of the
      tileset image in Phaser's cache (i.e. the name you used in preload)
