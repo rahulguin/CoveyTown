@@ -66,14 +66,20 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   preload() {
-    // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
-    this.load.image('box', '/assets/placeable/treeObject.png');
+    this.load.image('box', '/assets/placeable/treeObject.gif');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
+
+
+    this.load.image('tree1', '/assets/placeable/treeSprite/frame1.gif');
+    this.load.image('tree2', '/assets/placeable/treeSprite/frame2.gif');
+    this.load.image('tree3', '/assets/placeable/treeSprite/frame3.gif');
+    this.load.image('tree4', '/assets/placeable/treeSprite/frame4.gif');
+    this.load.image('tree5', '/assets/placeable/treeSprite/frame5.gif');
   }
 
 
@@ -205,16 +211,29 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
+
+        this.anims.create({
+          key: 'tree',
+          frames: [
+            { key: 'tree1' },
+            { key: 'tree2' },
+            { key: 'tree3' },
+            { key: 'tree4' },
+            { key: 'tree5', duration: 50 }
+          ],
+          frameRate: 8,
+          repeat: -1
+        });
+
         sprite = this.physics.add
-          .sprite(xCord, yCord, 'box')
-          .setScale(0.2)
+          .sprite(xCord, yCord, 'tree1')
+          .setScale(0.4)
           .setSize(32, 32)
           .setOffset(0, 24)
-          .setDisplaySize(50,50)
+          .setDisplaySize(60,60)
           .setImmovable(true)
-          .setInteractive();
+          .play('tree');
         myPlaceable.sprite = sprite;
-
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -395,7 +414,7 @@ class CoveyGameScene extends Phaser.Scene {
         } catch (e) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          const buttonText = gameScene.add.text(gameScene.lastLocation.x + X_OFFSET, gameScene.lastLocation.y, "Action Denied. Please request \npermission from the owner.", {
+          const buttonText = gameScene.add.text(gameScene.lastLocation.x + X_OFFSET, gameScene.lastLocation.y, "Action Denied. Please request \npermission from the owner. \n(Click me to close)", {
             color: '#FFFFFF',
             fontSize: FONT_SIZE,
             backgroundColor: 'darkred',
@@ -403,7 +422,7 @@ class CoveyGameScene extends Phaser.Scene {
               x: X_PADDING,
               y: Y_PADDING
             },
-            fixedHeight: TEXT_HEIGHT,
+            fixedHeight: TEXT_HEIGHT + 5,
             fixedWidth: 300,
             align: 'center'
           });
@@ -553,7 +572,7 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
         // the map
 
       }
@@ -771,7 +790,7 @@ export default function WorldMap(): JSX.Element {
       type: Phaser.AUTO,
       parent: 'map-container',
       width: 1250,
-      height: 550,
+      height: 600,
       physics: {
         default: 'arcade',
         arcade: {
