@@ -362,10 +362,16 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+
+
+
+
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+
+
     const BUTTON_WIDTH = 309;
     const X_PADDING = 10;
     const Y_PADDING = 7;
@@ -381,12 +387,34 @@ class CoveyGameScene extends Phaser.Scene {
       // const {y}  = this.game.input.mousePointer;
       const y  = gameScene.lastLocation?.y
 
+
       if ((x !== undefined) && (y !== undefined)) {
-        // const tilemap: Phaser.Tilemaps.Tilemap = gameScene.cache.tilemap.get('map');
-        // const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
-        // const xIndex = x;
-        // const yIndex = indexLocation.y;
-        await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
+
+        try{
+          await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
+        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const buttonText = gameScene.add.text(gameScene.lastLocation.x + X_OFFSET, gameScene.lastLocation.y, "Action Denied. Please request \npermission from the owner.", {
+            color: '#FFFFFF',
+            fontSize: FONT_SIZE,
+            backgroundColor: 'darkred',
+            padding: {
+              x: X_PADDING,
+              y: Y_PADDING
+            },
+            fixedHeight: TEXT_HEIGHT,
+            fixedWidth: 300,
+            align: 'center'
+          });
+          gameScene.pause();
+          buttonText.setInteractive();
+          buttonText.on('pointerdown', () => {
+            buttonText.destroy();
+            gameScene.resume();
+          });
+        }
+
       }
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
@@ -415,6 +443,10 @@ class CoveyGameScene extends Phaser.Scene {
         fixedWidth: BUTTON_WIDTH,
       });
       button.setInteractive();
+      const escapeKey = gameScene.input.keyboard.addKey('ESC');
+      escapeKey.on('down', async () => {
+        closeFunction(gameScene);
+      });
       button.on('pointerover', () => {
         button.setBackgroundColor('#008000');
       });
@@ -451,8 +483,6 @@ class CoveyGameScene extends Phaser.Scene {
         fixedWidth: BUTTON_WIDTH,
         align: 'center',
 
-        // strokeThickness: 3,
-        // stroke: '#FFFFFF',
         shadow: {
           offsetX: 5,
           offsetY: 5,
@@ -471,7 +501,7 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'cancel', destroyText, 3))
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 3))
 
       function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
