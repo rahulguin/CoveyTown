@@ -31,3 +31,5 @@ export type CoveyAppState = {
   apiClient: TownsServiceClient,
   placeables: Placeable[]
 };
+
+

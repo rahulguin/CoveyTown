@@ -1,6 +1,6 @@
 import React from 'react';
 import Scroll from 'react-scroll';
-import { Divider, VStack, Center, Flex, Box, Spacer, Button, Heading, Text } from '@chakra-ui/react';
+import { Divider, VStack, Center, Flex, Box, Spacer, Button, Heading, Text , Image} from '@chakra-ui/react';
 import DeviceSelectionScreen from './DeviceSelectionScreen/DeviceSelectionScreen';
 import IntroContainer from '../IntroContainer/IntroContainer';
 import { TownJoinResponse } from '../../../../../classes/TownsServiceClient';
@@ -17,13 +17,18 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
   return (
     <IntroContainer>
       <div style={{
-        position: "absolute",
+        position: "fixed",
         backgroundColor: "white",
         width: "100%",
-        opacity: "100%"
+        opacity: "100%",
+        zIndex: 10
       }}>
         <Flex boxShadow="dark-lg" p="4" bg="white" width="100%">
-          <b><LocationCityIcon/>CoveyTown</b>
+          <Image src="logo.png" boxSize="40px" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                ></Image>
+          <Button colorScheme="teal" mr="5" variant="ghost" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <b>Covey Town</b>
+          </Button>
           <Spacer />
           <Box>
             <ScrollLink

@@ -17,6 +17,9 @@ import './VideoGrid.scss';
 import MediaErrorSnackbar from '../VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
 import usePresenting from '../VideoFrontend/components/VideoProvider/usePresenting/usePresenting';
 import useMaybeVideo from '../../../hooks/useMaybeVideo';
+import {Center, Divider, ModalCloseButton, Spinner, Flex, Box, Spacer, Button,} from "@chakra-ui/react";
+import Scroll from 'react-scroll';
+import WorldMap from "../../world/WorldMap";
 
 const Container = styled('div')({
   display: 'grid',
@@ -24,6 +27,15 @@ const Container = styled('div')({
 });
 
 const Main = styled('main')(({ theme: _theme }: { theme: Theme }) => ({
+  overflow: 'hidden',
+  position: 'relative',
+  paddingBottom: `${_theme.footerHeight}px`, // Leave some space for the footer
+  [_theme.breakpoints.down('sm')]: {
+    paddingBottom: `${_theme.mobileFooterHeight + _theme.mobileTopBarHeight}px`, // Leave some space for the mobile header and footer
+  },
+}));
+
+const Main2 = styled('div')(({ theme: _theme }: { theme: Theme }) => ({
   overflow: 'hidden',
   position: 'relative',
   paddingBottom: `${_theme.footerHeight}px`, // Leave some space for the footer
@@ -113,6 +125,7 @@ export default function VideoGrid(props: Props) {
       props.onPresentingChanged(isPresenting);
     }
   }, [presenting, props]);
+  const ScrollLink = Scroll.Link;
 
   return (
     <>
@@ -120,14 +133,43 @@ export default function VideoGrid(props: Props) {
       <Container style={{ height: '100%' }} className="video-grid">
         {roomState === 'disconnected' ? (
         // <PreJoinScreens room={{id: coveyRoom, twilioID: coveyRoom}} setMediaError={setMediaError} />
-          <div>Error</div>
+          <Center h="1000px">
+            <Spinner color="red.500" size="xl" textAlign="center" />
+          </Center>
         ) : (
-          <Main style={{ paddingBottom: '90px' }}>
-            <ReconnectingNotification />
-            <MobileTopMenuBar />
-            <Room />
-            <MenuBar setMediaError={setMediaError} />
-          </Main>
+          <div>
+
+              <div style={{
+                      position: "fixed",
+                      backgroundColor: "white",
+                      width: "100%",
+                      opacity: "100%",
+                      zIndex: 10
+                    }}>
+                      <Flex boxShadow="dark-lg" m="5" p="4" bg="white" width="100%">
+                        <Box>
+                          <MenuBar setMediaError={setMediaError} />
+                        </Box>
+
+                      </Flex>
+                    </div>
+
+            {/* <Main style={{marginBottom: '0px', background: '#1111'}}> */}
+              {/* <MenuBar setMediaError={setMediaError} /> */}
+            {/* </Main> */}
+            
+              <Center color="white"
+                      backgroundImage="url('https://cdn.pixabay.com/photo/2020/01/04/18/40/trees-4741364_1280.png')" >
+                <WorldMap />
+              </Center>
+            <Main >
+              <ReconnectingNotification />
+              <MobileTopMenuBar />
+              &nbsp;
+              <Divider boxShadow="dark-md" rounded="1rem"/>
+              <Room />
+            </Main>
+          </div>
         )}
         <MediaErrorSnackbar error={mediaError} dismissError={() => setMediaError(undefined)} />
       </Container>
