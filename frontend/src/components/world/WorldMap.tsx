@@ -66,14 +66,20 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   preload() {
-    // this.load.image("logo", logoImg);
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
-    this.load.image('box', '/assets/placeable/treeObject.png');
+    this.load.image('box', '/assets/placeable/treeObject.gif');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
+
+
+    this.load.image('tree1', '/assets/placeable/treeSprite/frame1.gif');
+    this.load.image('tree2', '/assets/placeable/treeSprite/frame2.gif');
+    this.load.image('tree3', '/assets/placeable/treeSprite/frame3.gif');
+    this.load.image('tree4', '/assets/placeable/treeSprite/frame4.gif');
+    this.load.image('tree5', '/assets/placeable/treeSprite/frame5.gif');
   }
 
 
@@ -205,16 +211,29 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
+
+        this.anims.create({
+          key: 'tree',
+          frames: [
+            { key: 'tree1' },
+            { key: 'tree2' },
+            { key: 'tree3' },
+            { key: 'tree4' },
+            { key: 'tree5', duration: 50 }
+          ],
+          frameRate: 8,
+          repeat: -1
+        });
+
         sprite = this.physics.add
-          .sprite(xCord, yCord, 'box')
-          .setScale(0.2)
+          .sprite(xCord, yCord, 'tree1')
+          .setScale(0.4)
           .setSize(32, 32)
           .setOffset(0, 24)
-          .setDisplaySize(50,50)
+          .setDisplaySize(60,60)
           .setImmovable(true)
-          .setInteractive();
+          .play('tree');
         myPlaceable.sprite = sprite;
-
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -362,10 +381,16 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+
+
+
+
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+
+
     const BUTTON_WIDTH = 309;
     const X_PADDING = 10;
     const Y_PADDING = 7;
@@ -381,12 +406,34 @@ class CoveyGameScene extends Phaser.Scene {
       // const {y}  = this.game.input.mousePointer;
       const y  = gameScene.lastLocation?.y
 
+
       if ((x !== undefined) && (y !== undefined)) {
-        // const tilemap: Phaser.Tilemaps.Tilemap = gameScene.cache.tilemap.get('map');
-        // const indexLocation: Phaser.Math.Vector2 = tilemap.worldToTileXY(x, y);
-        // const xIndex = x;
-        // const yIndex = indexLocation.y;
-        await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
+
+        try{
+          await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex : x , yIndex : y}});
+        } catch (e) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const buttonText = gameScene.add.text(gameScene.lastLocation.x + X_OFFSET, gameScene.lastLocation.y, "Action Denied. Please request \npermission from the owner. \n(Click me to close)", {
+            color: '#FFFFFF',
+            fontSize: FONT_SIZE,
+            backgroundColor: 'darkred',
+            padding: {
+              x: X_PADDING,
+              y: Y_PADDING
+            },
+            fixedHeight: TEXT_HEIGHT + 5,
+            fixedWidth: 300,
+            align: 'center'
+          });
+          gameScene.pause();
+          buttonText.setInteractive();
+          buttonText.on('pointerdown', () => {
+            buttonText.destroy();
+            gameScene.resume();
+          });
+        }
+
       }
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
@@ -415,6 +462,10 @@ class CoveyGameScene extends Phaser.Scene {
         fixedWidth: BUTTON_WIDTH,
       });
       button.setInteractive();
+      const escapeKey = gameScene.input.keyboard.addKey('ESC');
+      escapeKey.on('down', async () => {
+        closeFunction(gameScene);
+      });
       button.on('pointerover', () => {
         button.setBackgroundColor('#008000');
       });
@@ -451,8 +502,6 @@ class CoveyGameScene extends Phaser.Scene {
         fixedWidth: BUTTON_WIDTH,
         align: 'center',
 
-        // strokeThickness: 3,
-        // stroke: '#FFFFFF',
         shadow: {
           offsetX: 5,
           offsetY: 5,
@@ -471,7 +520,7 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'cancel', destroyText, 3))
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 3))
 
       function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
@@ -523,7 +572,7 @@ class CoveyGameScene extends Phaser.Scene {
     transporters.forEach(transporter => {
         const sprite = transporter as Phaser.GameObjects.Sprite;
         sprite.y += 2 * sprite.height; // Phaser and Tiled seem to disagree on which corner is y
-        // sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
+        sprite.setVisible(false); // Comment this out to see the transporter rectangles drawn on
         // the map
 
       }
@@ -741,7 +790,7 @@ export default function WorldMap(): JSX.Element {
       type: Phaser.AUTO,
       parent: 'map-container',
       width: 1250,
-      height: 550,
+      height: 600,
       physics: {
         default: 'arcade',
         arcade: {

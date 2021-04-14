@@ -146,7 +146,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
       </Center>
       <Element id="username" name="username">
         <Flex
-          backgroundImage="url('http://clipart-library.com/img/1151995.png')"
+          backgroundImage="url('/assets/backgrounds/abstract.png')"
           backgroundPosition="center"
           backgroundRepeat="no-repeat"
           align="center"
@@ -197,7 +197,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
 
       <Element id="create" name="create">
         <Flex
-          backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+          backgroundImage="url('/assets/backgrounds/sky.jpg')"
           backgroundPosition="center"
           backgroundRepeat="no-repeat"
           align="center"
@@ -257,7 +257,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
 
       <Element id="join" name="join">
         <Flex
-          backgroundImage="url('http://clipart-library.com/img/741208.jpg')"
+          backgroundImage="url('/assets/backgrounds/abstract.png')"
           backgroundPosition="center"
           backgroundRepeat="no-repeat"
           align="center"
