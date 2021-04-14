@@ -202,13 +202,13 @@ export default class CoveyTownController {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
-      return 'cannot add: given id for placeable that does not exist';
+      return 'cannot add:\ngiven id for placeable that does not exist';
     }
     // check that placeable can get added
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement !== undefined) {
       // this means there was a conflict with placement
-      return 'cannot add: placeable already at specified location';
+      return 'cannot add:\nplaceable already exists at specified location';
     }
 
     // add placeable at that location
@@ -235,7 +235,7 @@ export default class CoveyTownController {
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement === undefined) {
       // this means there was nothing to be deleted from here
-      return 'cannot delete: no placeable to delete at specifed location';
+      return 'cannot delete:\nno placeable to delete at specifed location';
     }
 
     // removes the placeable from the list of placebles

@@ -107,15 +107,6 @@ export default class CoveyTownsStore {
     placeableID: string,
     placeableLocation: PlaceableLocation,
   ): string | undefined {
-    if (
-      !(
-        isDefined(placeableLocation) &&
-        isDefined(placeableLocation.xIndex) &&
-        isDefined(placeableLocation.yIndex)
-      )
-    ) {
-      return 'Invalid Location: the location to add the placeable must be defined';
-    }
     const existingTown = this.getControllerForTown(coveyTownID);
 
     // checks that the room exists
@@ -131,14 +122,14 @@ export default class CoveyTownsStore {
             isDefined(placeableLocation.yIndex)
           )
         ) {
-          return 'Invalid Location: the location to add the placeable must be defined';
+          return 'Invalid Location:\nthe location to add the placeable must be defined';
         }
         const addResponce = existingTown.addPlaceable(placeableID, placeableLocation);
         return addResponce;
       }
-      return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
+      return 'Do not have permission:\nask someone in the room to give you permission';
     }
-    return 'Invalid room information: Double check that the room exists';
+    return 'Invalid room information:\nDouble check that the room exists';
   }
 
   deletePlaceable(
@@ -158,9 +149,9 @@ export default class CoveyTownsStore {
         const deleteResponce = existingTown.deletePlaceable(placeableLocation);
         return deleteResponce;
       }
-      return 'Do not have permission: make sure inputted password is correct or ask someone in the room to give you permission';
+      return 'Do not have permission:\nask someone in the room to give you permission';
     }
-    return 'Invalid room information: Double check that the room exists';
+    return 'Invalid room information:\n Double check that the room exists';
   }
 
   getPlaceable(
@@ -186,9 +177,9 @@ export default class CoveyTownsStore {
         const updateResponce = existingTown.updatePlayerPermissions(updates);
         return updateResponce;
       }
-      return 'Incorrect password: please double check that you have the password correct';
+      return 'Incorrect password:\nplease double check that you have the password correct';
     }
-    return 'Invalid room information: Double check that the room exists';
+    return 'Invalid room information:\nDouble check that the room exists';
   }
 
   getPlayersPermission(townID: string, playerID: string): boolean | undefined {

@@ -410,8 +410,13 @@ class CoveyGameScene extends Phaser.Scene {
 
         try{
           await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
-        } catch (e) {
-          const buttonText = gameScene.add.text(xCord + X_OFFSET, yCord, "Action Denied. Please request\npermission from the owner.\n(Click me to close)", {
+        } catch (err) {
+          const errorMessage: string = err.message;
+          const errorLines = errorMessage.split("\n")
+          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
+          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+          const buttonText = gameScene.add.text(xCord + xErrorOffset, yCord, `${err.message}\n(Click me to close)`, {
             color: '#FFFFFF',
             fontSize: FONT_SIZE,
             backgroundColor: 'darkred',
@@ -419,8 +424,8 @@ class CoveyGameScene extends Phaser.Scene {
               x: X_PADDING,
               y: Y_PADDING
             },
-            fixedHeight: TEXT_HEIGHT,
-            fixedWidth: 300,
+            fixedHeight: errorLines.length * BUTTON_HEIGHT,
+            fixedWidth: maxStringLength * W_WIDTH,
             align: 'center'
           });
           gameScene.pause();

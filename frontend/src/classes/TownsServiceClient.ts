@@ -206,7 +206,7 @@ export default class TownsServiceClient {
       assert(response.data.response !== undefined);
       return response.data.response;
     }
-    throw new Error(`Error processing request: ${response.data.message}`);
+    throw new Error(response.data.message);
   }
 
   async createTown(requestData: TownCreateRequest): Promise<TownCreateResponse> {
