@@ -1,4 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
+import YouTube from 'react-youtube';
+import getYoutubeID from "get-youtube-id";
 import {
   Modal,
   ModalOverlay,
@@ -17,7 +19,10 @@ export interface ModalProps {
   modalContent: string;
   headerText: string;
 }
-export const Banner: FunctionComponent<ModalProps> = ({
+
+
+
+export const Youtube: FunctionComponent<ModalProps> = ({
                                                         isShown,
                                                         hide,
                                                         modalContent,
@@ -28,6 +33,22 @@ export const Banner: FunctionComponent<ModalProps> = ({
     setShowing(false);
     hide();
   };
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const [ID, setID] = useState<string>(getYoutubeID(modalContent));
+
+  const opts = {
+    height: '390',
+    width: '640',
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+    },
+  };
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   const modal = (
     <Modal isOpen={showing} onClose={hiding} blockScrollOnMount>
       <ModalOverlay />
@@ -37,11 +58,11 @@ export const Banner: FunctionComponent<ModalProps> = ({
                           mb={{ base: 12, md: 0 }}
                           style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
         <ModalBody isCentered>
-          {modalContent}
+          <YouTube videoId={ID} opts={{height:"390", width:'640', playerVars:{autoplay: 1}}}/>;
         </ModalBody>
       </ModalContent>
     </Modal>
   );
   return modal;
 
-};
+}
