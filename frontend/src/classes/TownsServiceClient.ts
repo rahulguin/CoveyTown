@@ -85,13 +85,14 @@ export interface TownUpdateRequest {
 // newly added
 
 /**
- * payload sent by the client to add an object to a town
+ * payload sent by the client to add a placeable to a town
  */
-export interface PlaceableAddRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  placeableID: string,
-  location: PlaceableLocation
+ export interface PlaceableAddRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  placeableID: string;
+  location: PlaceableLocation;
 }
 
 /**
@@ -122,13 +123,21 @@ export interface PlaceableLocation {
 }
 
 /**
- * Payload sent by the client to delete an object from a town
+ * Payload sent by the client to delete a placeable from a town
  */
-export interface PlaceableDeleteRequest {
-  coveyTownID: string,
-  coveyTownPassword: string,
-  playerID: string
-  location: PlaceableLocation
+// <<<<<<< HEAD
+// export interface PlaceableDeleteRequest {
+//   coveyTownID: string,
+//   coveyTownPassword: string,
+//   playerID: string
+//   location: PlaceableLocation
+// =======
+ export interface PlaceableDeleteRequest {
+  coveyTownID: string;
+  coveyTownPassword: string;
+  playersToken: string;
+  location: PlaceableLocation;
+// >>>>>>> da647c96afff4f93853e3c19e0e754b3c0c30241
 }
 
 
