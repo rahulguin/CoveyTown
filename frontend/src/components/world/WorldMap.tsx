@@ -46,6 +46,9 @@ class CoveyGameScene extends Phaser.Scene {
 
   private emitMovement: (loc: UserLocation) => void;
 
+   /** the tilemap for this world that is initialized within the create function */
+   private tilemap!: Phaser.Tilemaps.Tilemap;
+
 
   // newly added
 
@@ -54,9 +57,6 @@ class CoveyGameScene extends Phaser.Scene {
   };
 
   private placeables: Placeable[] = [];
-
-  /** the tilemap for this world that is initialized within the create function */
-  private tilemap!: Phaser.Tilemaps.Tilemap;
 
   constructor(video: Video, emitMovement: (loc: UserLocation) => void, apiClient: TownsServiceClient, townId: string,  myPlayerID: string, playerSessionToken: string) {
     super('PlayGame');
@@ -236,6 +236,7 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
+
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -283,6 +284,7 @@ class CoveyGameScene extends Phaser.Scene {
         });
       }
     }
+
 
   }
 
@@ -380,13 +382,25 @@ class CoveyGameScene extends Phaser.Scene {
         this.lastLocation.moving = isMoving;
         this.emitMovement(this.lastLocation);
       }
+
+
+      /* this.placeables.forEach(placeable => {
+        if(placeable.sprite && this.player?.sprite) {
+          this.physics.collide(placeable.sprite, this.player?.sprite);
+        }
+      }) */
+
     }
   }
+
+
+
+
 
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
-  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): void {
+  placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 
 
     const BUTTON_WIDTH = 309;
@@ -395,7 +409,7 @@ class CoveyGameScene extends Phaser.Scene {
     const FONT_SIZE_IN_PIXLES = 13;
     const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
     const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
-    const TEXT_HEIGHT = 55;
+    const TEXT_HEIGHT = 50;
     const PLAYER_WIDTH = 31;
     const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
@@ -435,6 +449,7 @@ class CoveyGameScene extends Phaser.Scene {
             gameScene.resume();
           });
         }
+
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
 
@@ -444,6 +459,7 @@ class CoveyGameScene extends Phaser.Scene {
         xLocation = gameScene.lastLocation.x + X_OFFSET
         yLocation = gameScene.lastLocation.y + TEXT_HEIGHT + BUTTON_HEIGHT * numberInList
       } else {
+        // need to figure out what to do here
         xLocation = 0;
         yLocation = 0;
       }
@@ -632,6 +648,8 @@ class CoveyGameScene extends Phaser.Scene {
       sprite: mainSprite,
       label
     };
+
+
 
     /* Player and box object should collide. Blocks path of the player */
     // if(boxImage){
