@@ -23,7 +23,7 @@ export const FlappyBird: FunctionComponent<ModalProps> = ({hide}) => {
   const modal = (
     <Modal isOpen={showing} onClose={hiding} blockScrollOnMount>
       <ModalOverlay />
-      <ModalContent maxW="50%" marginLeft="20%" marginTop="50px">
+      <ModalContent maxW="50%" marginLeft="20%" marginTop="70px" zIndex="150">
         <ModalCloseButton boxShadow="dark-md" rounded="1rem"
                           w={{ base: "30%", sm: "15%", md: "30%" }}
                           mb={{ base: 12, md: 0 }}
