@@ -603,26 +603,34 @@ class CoveyGameScene extends Phaser.Scene {
 
         
         // this.add.dom(x, y, 'div', 'background-color: lime; width: 220px; height: 100px; font: 48px Arial', 'Phaser');
-        const form = `<input type="text" value="asdf" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; "> `;
+        const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; ">  `;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const inputBannerText = this.add.dom(x, y).createFromHTML(form);
         inputBannerText.setInteractive();
-        inputBannerText.addListener('input');
+        inputBannerText.addListener('keyup');
+        let inputText = '';
+        inputBannerText.on('keyup',  (event: any) => {
+          if (event.target.value) {
+            inputText = event.target.value;
+          }
+        });
+
         const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const submitBannerText = this.add.dom(x, y+25).createFromHTML(submit);
         submitBannerText.setInteractive();
         const submitBannerCallback = async function(scene: CoveyGameScene) {
-          console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
+          // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
           const objectInformation = {
-            bannerText: 'Text from Back-end'
+            bannerText: inputText
           }
+          console.log(objectInformation);
           // location values are hardcoded in the  method call for now.
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'GNF-PucfLd_c9LOFU9ior03F',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           destroyText();
           inputBannerText.destroy();
@@ -644,7 +652,7 @@ class CoveyGameScene extends Phaser.Scene {
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           destroyText();
           inputBannerText.destroy();
-          submitBannerText.destroy();
+          // submitBannerText.destroy();
           cancelBannerText.destroy();
         };
         cancelBannerText.on('click', cancelBannerCallback);        
