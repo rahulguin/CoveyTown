@@ -125,19 +125,11 @@ export interface PlaceableLocation {
 /**
  * Payload sent by the client to delete a placeable from a town
  */
-// <<<<<<< HEAD
-// export interface PlaceableDeleteRequest {
-//   coveyTownID: string,
-//   coveyTownPassword: string,
-//   playerID: string
-//   location: PlaceableLocation
-// =======
  export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
   playersToken: string;
   location: PlaceableLocation;
-// >>>>>>> da647c96afff4f93853e3c19e0e754b3c0c30241
 }
 
 
