@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
 import { PlaceableLocation } from '../CoveyTypes';
 
 export default class Placeable {
@@ -13,7 +12,7 @@ export default class Placeable {
   static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
 
   static initializeSet(): Set<string> {
-    return new Set<string>().add('speaker').add('box');
+    return new Set<string>().add('speaker').add('tree').add('tictactoe').add('flappy');
   }
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();
@@ -49,11 +48,7 @@ export default class Placeable {
   }
 
   static isAllowedPlaceable(placeableID: string): boolean {
-
-
-     this.ALLOWED_PLACEABLES.add('tree');
-     this.ALLOWED_PLACEABLES.add('tictactoe');
-     return this.ALLOWED_PLACEABLES.has(placeableID);
+    return this.ALLOWED_PLACEABLES.has(placeableID);
   }
 
   static constructEmptyPlaceable(location: PlaceableLocation): Placeable {

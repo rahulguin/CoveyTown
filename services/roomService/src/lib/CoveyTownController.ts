@@ -98,12 +98,7 @@ export default class CoveyTownController {
    * @returns returns if the two locations are equal
    */
   static compareLocation(location1: PlaceableLocation, location2: PlaceableLocation): unknown {
-
-    if(location2.xIndex <= (location1.xIndex + 50) && location2.xIndex >= (location1.xIndex - 50)  && location2.yIndex <= (location1.yIndex + 50) && location2.yIndex >= (location1.yIndex - 50)) {
-      return true;
-    }
-    return false;
-    // return location1.xIndex === location2.xIndex && location1.yIndex === location2.yIndex;
+    return location1.xIndex === location2.xIndex && location1.yIndex === location2.yIndex;
   }
 
   /**
@@ -112,9 +107,8 @@ export default class CoveyTownController {
    * @returns the placeable at the location or undefined if there is not a placeable there
    */
   findPlaceableByLocation(location: PlaceableLocation): Placeable | undefined {
-    
-    return this._placeables.find((placeable: Placeable) => 
-      CoveyTownController.compareLocation(placeable.location, location)
+    return this._placeables.find((placeable: Placeable) =>
+      CoveyTownController.compareLocation(placeable.location, location),
     );
   }
 
@@ -208,13 +202,13 @@ export default class CoveyTownController {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
-      return 'cannot add: given id for placeable that does not exist';
+      return 'cannot add:\ngiven id for placeable that does not exist';
     }
     // check that placeable can get added
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement !== undefined) {
       // this means there was a conflict with placement
-      return 'cannot add: placeable already at specified location';
+      return 'cannot add:\nplaceable already exists at specified location';
     }
 
     // add placeable at that location
@@ -237,16 +231,21 @@ export default class CoveyTownController {
    */
   deletePlaceable(location: PlaceableLocation): string | undefined {
     // check that placeable can be deleted from here
+
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement === undefined) {
       // this means there was nothing to be deleted from here
-      return 'cannot delete: no placeable to delete at specifed location';
+      return 'cannot delete:\nno placeable to delete at specifed location';
     }
 
     // removes the placeable from the list of placebles
     this._placeables = this._placeables.filter(
       (placeable: Placeable) => !CoveyTownController.compareLocation(placeable.location, location),
     );
+
+    // eslint-disable-next-line
+    console.log('placeable afte deletion in towncont',this.placeables);
+
     const placeableNow = Placeable.constructEmptyPlaceable(location);
     // for all listeners notifies them that the object was deleted, with what is now at the location
     this._listeners.forEach(listener => listener.onPlaceableDeleted(placeableNow));

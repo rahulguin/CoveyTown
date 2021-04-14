@@ -156,13 +156,6 @@ export interface ObjectListResponce {
 
 
 
-
-
-
-
-
-
-
 /**
  * Envelope that wraps any response from the server
  */
@@ -238,6 +231,8 @@ export default class TownsServiceClient {
   }
 
   async deletePlaceable(requestData: PlaceableDeleteRequest): Promise<PlaceableInfo> {
+    // eslint-disable-next-line
+    console.log('entered in service client with details', requestData);
     const responseWrapper = await this._axios.delete<ResponseEnvelope<PlaceableInfo>>(`/placeables/${requestData.coveyTownID}`, { data: requestData });
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }

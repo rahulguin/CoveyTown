@@ -26,7 +26,7 @@ export default class Player {
     };
     this._userName = userName;
     this._id = nanoid();
-    this.canPlace = true;
+    this.canPlace = false;
   }
 
   get userName(): string {

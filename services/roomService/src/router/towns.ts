@@ -60,7 +60,6 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.get('/towns', BodyParser.json(), async (_req, res) => {
     try {
-      
       const result = await townListHandler();
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
@@ -113,7 +112,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
-        playerID: req.body.playerID,
+        playerToken: req.body.playersToken,
         placeableID: req.body.placeableID,
         location: req.body.location,
       });
@@ -131,10 +130,13 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.delete('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
+
+     // eslint-disable-next-line
+     console.log('entered in towns with details');
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,
-        playerID: req.body.playerID,
+        playersToken: req.body.playersToken,
         location: req.body.location,
       });
       res.status(StatusCodes.OK).json(result);
@@ -180,11 +182,11 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
-  app.get('/towns/:townID/permissions', BodyParser.json(), async (req, res) => {
+  app.get('/towns/:townID/permissions/:playerID', BodyParser.json(), async (req, res) => {
     try {
       const result = await getPlayersPermissionHandler({
         coveyTownID: req.params.townID,
-        playerID: req.body.playerID,
+        playerID: req.params.playerID,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
