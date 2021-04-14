@@ -20,12 +20,10 @@ export default function PermissionsButton(): JSX.Element {
 
   const openPermissions = useCallback(async ()=>{
     async function updatePlayersCanPlace(playersOnOpen: Player[]): Promise<void> {
-      const updatePlayerPermissions = new Map<string, boolean>();
       playersOnOpen.forEach(async (player) => {
         const thisPlayerCanPlace = await apiClient.getPlayersPermission({ coveyTownID: currentTownID, playerID: player.id });
-        updatePlayerPermissions.set(player.id, thisPlayerCanPlace);
+        currentPlayersCanPlace.set(player.id, thisPlayerCanPlace);
       });
-      setPlayersCanPlace(updatePlayerPermissions);
     }
     await updatePlayersCanPlace(currentPlayers)
     video?.pauseGame();
@@ -104,7 +102,7 @@ return (
             <Tr key={player.id}><Td role='cell'>{player.userName}</Td><Td
                         role='cell'>{player.id}</Td>
                         <Td role='cell'>
-                        <Checkbox isChecked={currentPlayersCanPlace.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace.set(player.id, e.target.checked))} spacing="1rem" />
+                        <Checkbox defaultChecked={currentPlayersCanPlace.get(player.id)} onChange={(e) => setPlayersCanPlace(currentPlayersCanPlace.set(player.id, e.target.checked))} spacing="1rem" />
                         </Td>
             </Tr>
         ))}
