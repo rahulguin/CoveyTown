@@ -628,7 +628,7 @@ class CoveyGameScene extends Phaser.Scene {
           }
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: 'R9ZXBB-r6WJzi9IyDGDkkx9r',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playerID: scene.playerID, coveyTownPassword: ' v1L_wd8llsrk5u4f9jzYrrNM',placeableID: 'banner',location: { xIndex: x  + 50 , yIndex: y + 50}, objectInformation});
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           destroyText();
           inputBannerText.destroy();

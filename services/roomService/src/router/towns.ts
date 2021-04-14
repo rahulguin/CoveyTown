@@ -113,13 +113,7 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       console.log('in towns townid: ', req.params.townID);
       console.log('in towns pswd: ', req.body.coveyTownPassword);
       console.log('in towns placeable id: ', req.body.placeableID);
-      
-      const objectInformation = new Map<string, string>();
-      if(req.body.objectInformation){
-        if(req.body.objectInformation.bannerText){
-          objectInformation.set('bannerText', req.body.objectInformation.bannerText);
-        }
-      }
+     
       
       const result = await addPlaceableHandler({
         coveyTownID: req.params.townID,
@@ -127,9 +121,8 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         playerID: req.body.playerID,
         placeableID: req.body.placeableID,
         location: req.body.location,
-        objectInformation
+        objectInformation: req.body.objectInformation
       });
-      console.log(result)
       
       res.status(StatusCodes.OK).json(result);
     } catch (err) {

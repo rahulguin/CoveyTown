@@ -106,7 +106,9 @@ export default class CoveyTownsStore {
     playerID: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
-    objectInformation?: Map<string, string>,
+    objectInformation?: {
+      bannerText?: string
+    },
   ): string | undefined {
     if (!(placeableLocation && placeableLocation.xIndex && placeableLocation.yIndex)) {
 

@@ -97,13 +97,17 @@ export interface PlaceableAddRequest {
   playerID: string;
   placeableID: string;
   location: PlaceableLocation,
-  objectInformation: Map<string, string>;
+  objectInformation?: {
+    bannerText?: string
+  };
 }
 
 export interface PlaceableAddResponse {
   placeableID: string;
   location: PlaceableLocation;
-  objectInformation?: Map<string, string>;
+  objectInformation: {
+    bannerText: string
+  };
 }
 
 /**
@@ -128,7 +132,7 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
-  objectInformation: {
+  objectInformation?: {
     bannerText?: string
   };
 }

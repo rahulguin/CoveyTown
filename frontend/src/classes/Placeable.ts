@@ -6,13 +6,16 @@ export default class Placeable {
 
   private readonly _name: string;
 
-  private _objectInformation: Map<string, string> | undefined;
+  private _objectInformation?: {
+    bannerText?: string
+  };
+  
 
   public sprite?: Phaser.GameObjects.Sprite;
 
   public label?: Phaser.GameObjects.Text;
 
-  constructor (placeableID: string, placeableName: string, location: PlaceableLocation, objectInformation?: Map<string, string>) {
+  constructor (placeableID: string, placeableName: string, location: PlaceableLocation, objectInformation?: { bannerText?: string }) {
     this._placeableID = placeableID
     this._location = location
     this._name = placeableName
@@ -39,7 +42,7 @@ export default class Placeable {
     return this._name
   }
 
-  get objectInformation(): Map<string, string> | undefined {
+  get objectInformation(): { bannerText?: string } | undefined {
     return this._objectInformation;
   }
 
@@ -67,5 +70,5 @@ export default class Placeable {
 
 export type PlaceableLocation = { xIndex: number, yIndex: number }
 
-export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, _location: PlaceableLocation, _objectInformation?: Map<string, string> }
+export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, _location: PlaceableLocation, _objectInformation?: { bannerText?: string } }
 

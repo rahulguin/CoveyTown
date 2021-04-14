@@ -201,7 +201,7 @@ export default class CoveyTownController {
    * @param placeableID the id assocaited of the placeable that is wanting to be added
    * @param location the location the player is wanting to add the placeable
    */
-  addPlaceable(placeableID: string, location: PlaceableLocation, objectInformation?: Map<string, string>): string | undefined {
+  addPlaceable(placeableID: string, location: PlaceableLocation, objectInformation?: { bannerText?: string }): string | undefined {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
@@ -271,9 +271,7 @@ export default class CoveyTownController {
       placeableID: placeableAtLocation.placeableID,
       placeableName: placeableAtLocation.name,
       location: placeableAtLocation.location,
-      objectInformation: {
-        bannerText: placeableAtLocation.objectInformation?.get('bannerText')
-      },
+      objectInformation: placeableAtLocation.objectInformation,
     };
   }
 
