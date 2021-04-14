@@ -18,7 +18,7 @@ function useStyles(width: 'sidebar' | 'fullwidth') {
       overflowY: 'auto',
       background: 'rgb(79, 83, 85)',
       gridArea: '1 / 2 / 1 / 3',
-      zIndex: 5,
+      zIndex: -5,
       [theme.breakpoints.down('sm')]: {
         gridArea: '2 / 1 / 3 / 3',
         overflowY: 'initial',

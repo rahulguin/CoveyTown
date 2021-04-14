@@ -232,7 +232,7 @@ class CoveyGameScene extends Phaser.Scene {
           .setScale(0.4)
           .setSize(32, 32)
           .setOffset(0, 60 - 32)
-          .setDisplaySize(60,60)
+          .setDisplaySize(32,32)
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
