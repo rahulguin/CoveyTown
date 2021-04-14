@@ -32,8 +32,8 @@ export const TicTacToe: FunctionComponent<ModalProps> = ({hide}) => {
                                 style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
             <ModalBody isCentered>
               <iframe src="https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark"
-                      title="hi"
-                      style={{width:'100%',height:'500px'}} />
+                      title="tictactoe"
+                      style={{width:'800px' ,height:'520px'}} frameBorder="0" scrolling="no" />
               { /* <iframe src="https://funhtml5games.com?embed=flappy" title="gf" style={{width:'800px' ,height:'520px'}}
                       frameBorder="0" scrolling="no" /> */ }
             </ModalBody>
