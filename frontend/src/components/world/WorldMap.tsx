@@ -231,7 +231,7 @@ class CoveyGameScene extends Phaser.Scene {
           .sprite(xCord, yCord, 'tree1')
           .setScale(0.4)
           .setSize(32, 32)
-          .setOffset(0, 24)
+          .setOffset(0, 60 - 32)
           .setDisplaySize(60,60)
           .setImmovable(true)
           .play('tree');
@@ -247,8 +247,7 @@ class CoveyGameScene extends Phaser.Scene {
           .sprite(xCord, yCord, 'tictactoe')
           .setScale(0.2)
           .setSize(32, 32)
-          .setOffset(0, 24)
-          .setDisplaySize(50,50)
+          .setDisplaySize(32,32)
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
@@ -270,8 +269,7 @@ class CoveyGameScene extends Phaser.Scene {
           .sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'flappy')
           .setScale(0.2)
           .setSize(32, 32)
-          .setOffset(0, 24)
-          .setDisplaySize(40,40)
+          .setDisplaySize(32,32)
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
@@ -410,16 +408,38 @@ class CoveyGameScene extends Phaser.Scene {
     const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
     const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
     const TEXT_HEIGHT = 50;
-    const PLAYER_WIDTH = 31;
+    const PLAYER_WIDTH = 32;
+    const X_PLACEMENT_OFFSET = PLAYER_WIDTH + 12;
+    const Y_PLACEMENT_OFFSET = 42;
     const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
-      const xCord = gameScene.lastLocation?.x;
-      const yCord = gameScene.lastLocation?.y;
+      let xCord = gameScene.lastLocation?.x;
+      let yCord = gameScene.lastLocation?.y;
       if (!(xCord && yCord)) {
+        const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
+          color: '#FFFFFF',
+          fontSize: FONT_SIZE,
+          backgroundColor: 'darkred',
+          padding: {
+            x: X_PADDING,
+            y: Y_PADDING
+          },
+          fixedHeight: 50,
+          fixedWidth: 50,
+          align: 'center'
+        });
+        gameScene.pause();
+        buttonText.setInteractive();
+        buttonText.on('pointerdown', () => {
+          buttonText.destroy();
+          gameScene.resume();
+        });
         return
       }
+      xCord += (X_PLACEMENT_OFFSET / 2);
+      yCord += (Y_PLACEMENT_OFFSET / 2);
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
-      const xIndex  = indexLocation.x
+      const xIndex  = indexLocation.x 
       const yIndex  = indexLocation.y
 
         try{
