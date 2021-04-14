@@ -37,7 +37,7 @@ export const Banner: FunctionComponent<ModalProps> = ({
                           mb={{ base: 12, md: 0 }}
                           style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
         <ModalBody isCentered>
-          Hello
+          {modalContent}
         </ModalBody>
       </ModalContent>
     </Modal>

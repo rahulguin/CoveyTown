@@ -205,7 +205,7 @@ class CoveyGameScene extends Phaser.Scene {
           yIndex: 0,
         };
       }
-      console.log(placeable);
+      
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location, placeable.objectInformation);
       this.placeables.push(myPlaceable);
     }
@@ -279,7 +279,7 @@ class CoveyGameScene extends Phaser.Scene {
 
     else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'banner') {
       let { sprite } = myPlaceable;
-      console.log(myPlaceable);
+      
       if (!sprite) {
         sprite = this.physics.add
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -297,16 +297,15 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       myPlaceable.sprite.on('pointerdown', () => {
-        // const isShown = true;
-        // const toggle = () => {
-        //   ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        // };
-        // ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
-        const submit = `<Banner isShown={true} hide={toggle} modalContent='game' headerText='TicTacToe'/> `;
+        const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+        const isShown = true;
+        const toggle = () => {
+          ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+        };
+        ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const submitBannerText = this.add.dom(myPlaceable.location.xIndex, myPlaceable.location.yIndex).createFromHTML(submit);
-        submitBannerText.setInteractive();
       });
     }
   }
