@@ -261,7 +261,6 @@ export async function townUpdateHandler(
 export async function addPlaceableHandler(
   requestData: PlaceableAddRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
-  console.log('in req handler :coveyTownPassword is ', requestData.coveyTownPassword);
 
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.addPlaceable(
@@ -285,6 +284,7 @@ export async function addPlaceableHandler(
 export async function deletePlaceableHandler(
   requestData: PlaceableDeleteRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
+
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,

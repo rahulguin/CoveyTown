@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import Phaser from 'phaser';
 import Player, { UserLocation } from '../../classes/Player';
@@ -15,6 +15,7 @@ class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
+
 
   private id?: string;
 
@@ -69,7 +70,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
-    this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
+    // this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
   }
 
 
@@ -122,9 +123,8 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location);
       this.players.push(myPlayer);
     }
-    // eslint-disable-next-line
-    console.log('this.id and myPlayer.id values: ', this.id, myPlayer.id);
-    if (this.id !== myPlayer.id && this.physics && player.location) {
+
+    if (this.playerID !== myPlayer.id && this.physics && player.location) {
       let { sprite } = myPlayer;
       if (!sprite) {
         sprite = this.physics.add
@@ -189,6 +189,77 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
 
+  placeableDeletion(myPlaceable: Placeable | undefined) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    myPlaceable.sprite.on('pointerdown', () => {
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const deleteOption = this.add.text(this.lastLocation.x + 20, this.lastLocation.y, 'Do you want to delete\n this object?',
+      {
+      color: '#FFFFFF',
+      backgroundColor: '#004d00',
+      align: 'center',
+      padding: {
+        x: 10,
+        y: 2
+      },
+      fixedWidth: 309,
+      });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+     // @ts-ignore
+      const deleteOptionYes = this.add.text(this.lastLocation.x + 20, this.lastLocation.y + 20, 'Yes',
+      {
+      color: '#FFFFFF',
+      backgroundColor: '#004d00',
+      align: 'center',
+      padding: {
+        x: 10,
+        y: 7
+      },
+      fixedWidth: 309,
+      });
+      deleteOptionYes.setInteractive();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const deleteOptionNo = this.add.text(this.lastLocation.x + 20, this.lastLocation.y + 45, 'No',
+      {
+       color: '#FFFFFF',
+       backgroundColor: '#004d00',
+       align: 'center',
+       padding: {
+         x: 10,
+         y: 7
+       },
+      fixedWidth: 309,
+      });
+      
+    
+    deleteOptionNo.setInteractive();
+    deleteOptionYes.on('pointerdown', () => {
+    deleteOption.destroy();
+    deleteOptionNo.destroy();
+    deleteOptionYes.destroy();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: 'kVKOukZQjSZq58llngyTfhAK',playerID: this.playerID,location: {xIndex: this.lastLocation.x, yIndex: this.lastLocation.y}});          
+    this.updatePlaceables(this.placeables);
+    });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  deleteOptionNo.on('pointerdown', () => destroyOptions());
+
+  function destroyOptions() {
+    deleteOption.destroy();
+    deleteOptionNo.destroy();
+    deleteOptionYes.destroy();
+  }
+  });
+}
+
+
 
   updatePlaceable(placeable: Placeable) {
 
@@ -204,7 +275,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-    if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
+    if (this.playerID !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add.sprite(myPlaceable.location.xIndex, myPlaceable.location.yIndex, 'box')
@@ -214,10 +285,13 @@ class CoveyGameScene extends Phaser.Scene {
           .setDisplaySize(50,50)
           .setImmovable(true)
           .setInteractive();
+        myPlaceable.sprite = sprite;
 
       }
+      this.placeableDeletion(myPlaceable);
+
     }
-    else if (this.id !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
+    else if (this.playerID !== myPlaceable.placeableID && this.physics && placeable.location && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
@@ -231,18 +305,21 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
-      }
+      }      
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       myPlaceable.sprite.on('pointerdown', () => {
+
         const isShown = true;
         const toggle = () => {
           ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
         };
         ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-      });
-    }
+        this.placeableDeletion(myPlaceable);
+
+      });     
+    }  
   }
 
   getNewMovementDirection() {
@@ -339,12 +416,8 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
-// This method is where addPlaceable method is called using the apiClient.On clicking the
-// yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-
-    let boxSprite;
 
     sprite.on('pointerdown', () => {
 
@@ -395,37 +468,17 @@ class CoveyGameScene extends Phaser.Scene {
       boxButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-
-        // boxSprite.on('pointerup', () => {window.open('https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark','name','height=480,width=760');});
-        // boxSprite.on('pointerup', () => {
-        //   const isShown = true;
-        //   const toggle = () => {
-        //     ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-        //   };
-        //   ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='Hi' headerText='Hi'/>, document.getElementById('modal-container'))
-        // });
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
-        // const {x}  = this.game.input.mousePointer;
-        const x  = this.lastLocation?.x
-        // eslint-disable-next-line
-        console.log('x value: ', x);
-        // const {y}  = this.game.input.mousePointer;
-        const y  = this.lastLocation?.y
-        // eslint-disable-next-line
-        console.log('y value: ', y);
-
-        // location values are hardcoded in the  method call for now.
-        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tree',location: { xIndex: x  + 50 , yIndex: y + 50}});
-
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'kVKOukZQjSZq58llngyTfhAK',placeableID: 'tree',location: {xIndex: this.lastLocation?.x, yIndex:  this.lastLocation?.y}});
+        // }
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      const ticTacButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 70, 'Tic Tac Toe',
+      const ticTacButton = this.add.text(this.lastLocation.x - 140, this.lastLocation.y + 70, 'Tic Tac Toe',
         {
           color: '#FFFFFF',
           backgroundColor: '#004d00',
@@ -435,42 +488,32 @@ class CoveyGameScene extends Phaser.Scene {
             y: 7
           },
           fixedWidth: 309,
-        }
-      );
+        });
       ticTacButton.setInteractive();
 
       ticTacButton.on('pointerover', () => {
         ticTacButton.setBackgroundColor('#008000')
-      })
+      });
       ticTacButton.on('pointerout', () => {
         ticTacButton.setBackgroundColor('#004d00')
-      })
+      });
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       ticTacButton.on('pointerdown', async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         destroyText();
-        // const {x}  = this.game.input.mousePointer;
-        const x  = this.lastLocation?.x
-        // eslint-disable-next-line
-        console.log('x value: ', x);
-        // const {y}  = this.game.input.mousePointer;
-        const y  = this.lastLocation?.y
-        // eslint-disable-next-line
-        console.log('y value: ', y);
-
-        // location values are hardcoded in the  method call for now.
-        // await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'chess',location: { xIndex: x -50 , yIndex: y +450 }});
+        const x = this.lastLocation?.x;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        await this.apiClient.addPlaceable({coveyTownID: this.townId, playerID: this.playerID, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936',placeableID: 'tictactoe',location: { xIndex: x  + 50 , yIndex: y + 50 }});
-        // tictac.location
+        const y = this.lastLocation?.y;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.apiClient.addPlaceable({coveyTownID: this.townId, coveyTownPassword: 'kVKOukZQjSZq58llngyTfhAK',placeableID: 'tictactoe',location: {xIndex: x, yIndex: y}});
       });
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-
       const cancelButton = this.add.text(this.lastLocation.x-140, this.lastLocation.y + 95, 'Cancel',{
         color: '#FFFFFF',
         backgroundColor: '#004d00',
@@ -482,25 +525,21 @@ class CoveyGameScene extends Phaser.Scene {
         fixedWidth: 309,
       });
       cancelButton.setInteractive();
-
       cancelButton.on('pointerover', () => {
         cancelButton.setBackgroundColor('#008000')
-      })
+      });
       cancelButton.on('pointerout', () => {
         cancelButton.setBackgroundColor('#004d00')
-      })
+      });
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      cancelButton.on('pointerdown', () => {destroyText()});
-
+      cancelButton.on('pointerdown', () => destroyText());
       function destroyText() {
         ticTacButton.destroy();
         cancelButton.destroy();
         buttonText.destroy();
         boxButton.destroy();
       }
-
     });
-
   }
 
   create() {
@@ -557,20 +596,6 @@ class CoveyGameScene extends Phaser.Scene {
       }
     });
 
-    /* Box object taken from tileMapJSON. Adding immovable property to the box object */
-    // const boxes = map.filterObjects('Objects',(obj)=>obj.name==='box');
-    // let boxImage;
-    // boxes.forEach(box => {
-    //  if(box.x && box.y){
-    //    boxImage = this.physics.add.image(box.x, box.y, 'box');
-    //    boxImage.setDisplaySize(50,50)
-    //    boxImage.setImmovable(true);
-    //    boxImage.body.setAllowGravity(false);
-    //  }
-    // });
-
-
-
 
     const cursorKeys = this.input.keyboard.createCursorKeys();
     this.cursors.push(cursorKeys);
@@ -590,9 +615,6 @@ class CoveyGameScene extends Phaser.Scene {
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
-
-
-
 
     const sprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
@@ -614,11 +636,7 @@ class CoveyGameScene extends Phaser.Scene {
       sprite,
       label
     };
-
-    /* Player and box object should collide. Blocks path of the player */
-    // if(boxImage){
-    //   this.physics.add.collider(sprite, boxImage);
-    // }
+    
 
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
@@ -733,6 +751,8 @@ class CoveyGameScene extends Phaser.Scene {
       this.players.forEach((p) => this.updatePlayerLocation(p));
     }
 
+
+
   }
 
 
@@ -807,7 +827,7 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlaceables(placeables);
     }
 
-  }, [players, deepPlayers, gameScene, apiClient, currentTownID]); // newly added placeableObjects
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); // newly added placeableObjects
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -823,3 +843,5 @@ export default function WorldMap(): JSX.Element {
 
   );
 }
+
+
