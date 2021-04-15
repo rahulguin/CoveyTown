@@ -314,6 +314,12 @@ class CoveyGameScene extends Phaser.Scene {
           .play('tree');
         myPlaceable.sprite = sprite;
 
+        myPlaceable.sprite.on('rightButtondown', () => {
+          // eslint-disable-next-line 
+          // @ts-ignore
+          this.placeableDeletion(myPlaceable.placeableID);
+        });
+
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -361,6 +367,11 @@ class CoveyGameScene extends Phaser.Scene {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
+        })
+        .on('rightButtondown', () => {
+          // eslint-disable-next-line 
+          // @ts-ignore
+          this.placeableDeletion(myPlaceable.placeableID);
         });
       }
     }
