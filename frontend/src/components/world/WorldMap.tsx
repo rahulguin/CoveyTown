@@ -500,10 +500,10 @@ class CoveyGameScene extends Phaser.Scene {
 
     }
 
-    async function addPlaceableWithInput(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
+    async function addPlaceableWithInput(gameScene: CoveyGameScene, placeableID: string, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void): Promise<void> {
 
       let xCord = !gameScene.lastLocation?.x ? 0 : (gameScene.lastLocation?.x);
-      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y);
+      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y + TEXT_HEIGHT);
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
@@ -521,6 +521,7 @@ class CoveyGameScene extends Phaser.Scene {
         buttonText.setInteractive();
         buttonText.on('pointerdown', () => {
           buttonText.destroy();
+          closeFunction(gameScene);
           gameScene.resume();
         });
         return
@@ -528,7 +529,7 @@ class CoveyGameScene extends Phaser.Scene {
       xCord += (X_PLACEMENT_OFFSET / 2);
       yCord += (Y_PLACEMENT_OFFSET / 2);
 
-      const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
+      const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter ${placeableName} Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
       const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
       inputBannerText.setInteractive();
       inputBannerText.addListener('keyup');
@@ -537,6 +538,9 @@ class CoveyGameScene extends Phaser.Scene {
         if (event.target.value) {
           inputText = event.target.value;
         }
+      });
+      inputBannerText.on('click',  (event: any) => {
+        closeFunction(gameScene);
       });
       
       const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
@@ -548,13 +552,13 @@ class CoveyGameScene extends Phaser.Scene {
         const objectInformation = {
           bannerText: inputText
         }
-
+        closeFunction(gameScene);
         const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
         const xIndex  = indexLocation.x 
         const yIndex  = indexLocation.y
         
         try{
-          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID: 'banner',location: { xIndex , yIndex}, placeableInformation: objectInformation});
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID ,location: { xIndex , yIndex}, placeableInformation: objectInformation});
         } catch (err) {
           const errorMessage: string = err.message;
           const errorLines = errorMessage.split("\n")
@@ -595,6 +599,7 @@ class CoveyGameScene extends Phaser.Scene {
       cancelBannerText.addListener('click');
       
       const cancelBannerCallback = function() {
+        closeFunction(gameScene);
         inputBannerText.destroy();
         submitBannerText.destroy();
         cancelBannerText.destroy();
@@ -643,7 +648,7 @@ class CoveyGameScene extends Phaser.Scene {
         if(placeableWithInput){
           button.on('pointerdown', async () => {
             closeFunction(gameScene);
-            await addPlaceableWithInput(gameScene, placeableID);
+            await addPlaceableWithInput(gameScene, placeableID, placeableName, closeFunction);
           });
         }
         else{
