@@ -429,11 +429,6 @@ class CoveyGameScene extends Phaser.Scene {
           break;
       }
 
-      if ((this.cursors.find(keySet => keySet.space?.isDown))) {
-        this.player.sprite.setVelocityY(-350);
-        this.player.sprite.play('jump', true);
-      }
-
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       this.player.sprite.body.velocity.normalize()
         .scale(speed);
@@ -692,6 +687,7 @@ class CoveyGameScene extends Phaser.Scene {
       button.on('pointerout', () => {
         button.setBackgroundColor('#004d00');
       });
+
       if (placeableID) {
         if(placeableWithInput){
           button.on('pointerdown', async () => {
