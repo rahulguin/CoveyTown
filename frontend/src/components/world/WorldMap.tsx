@@ -499,7 +499,110 @@ class CoveyGameScene extends Phaser.Scene {
         }
 
     }
-    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
+
+    async function addPlaceableWithInput(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
+
+      let xCord = !gameScene.lastLocation?.x ? 0 : (gameScene.lastLocation?.x);
+      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y);
+      if (!(xCord && yCord)) {
+        const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
+          color: '#FFFFFF',
+          fontSize: FONT_SIZE,
+          backgroundColor: 'darkred',
+          padding: {
+            x: X_PADDING,
+            y: Y_PADDING
+          },
+          fixedHeight: 50,
+          fixedWidth: 50,
+          align: 'center',
+        });
+        gameScene.pause();
+        buttonText.setInteractive();
+        buttonText.on('pointerdown', () => {
+          buttonText.destroy();
+          gameScene.resume();
+        });
+        return
+      }
+      xCord += (X_PLACEMENT_OFFSET / 2);
+      yCord += (Y_PLACEMENT_OFFSET / 2);
+
+      const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
+      const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
+      inputBannerText.setInteractive();
+      inputBannerText.addListener('keyup');
+      let inputText = '';
+      inputBannerText.on('keyup',  (event: any) => {
+        if (event.target.value) {
+          inputText = event.target.value;
+        }
+      });
+      
+      const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
+      
+      const submitBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 1).createFromHTML(submit);
+      submitBannerText.setInteractive();
+      const submitBannerCallback = async function(scene: CoveyGameScene) {
+        // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
+        const objectInformation = {
+          bannerText: inputText
+        }
+
+        const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
+        const xIndex  = indexLocation.x 
+        const yIndex  = indexLocation.y
+        
+        try{
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID: 'banner',location: { xIndex , yIndex}, placeableInformation: objectInformation});
+        } catch (err) {
+          const errorMessage: string = err.message;
+          const errorLines = errorMessage.split("\n")
+          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
+          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+          const buttonText = gameScene.add.text(xCord, yCord, `${err.message}\n(Click me to close)`, {
+            color: '#FFFFFF',
+            fontSize: FONT_SIZE,
+            backgroundColor: 'darkred',
+            padding: {
+              x: X_PADDING,
+              y: Y_PADDING
+            },
+            fixedHeight: errorLines.length * BUTTON_HEIGHT,
+            fixedWidth: maxStringLength * W_WIDTH,
+            align: 'center'
+          });
+          gameScene.pause();
+          buttonText.setInteractive();
+          buttonText.on('pointerdown', () => {
+            buttonText.destroy();
+            gameScene.resume();
+          });
+        }
+        inputBannerText.destroy();
+        submitBannerText.destroy();
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        cancelBannerText.destroy();
+      }
+      submitBannerText.addListener('click');
+      submitBannerText.on('click', () => submitBannerCallback(gameScene));
+
+      const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
+
+      const cancelBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 2).createFromHTML(cancel);
+      cancelBannerText.setInteractive();
+      cancelBannerText.addListener('click');
+      
+      const cancelBannerCallback = function() {
+        inputBannerText.destroy();
+        submitBannerText.destroy();
+        cancelBannerText.destroy();
+      };
+      cancelBannerText.on('click', cancelBannerCallback);  
+    }
+
+    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string, placeableWithInput?: boolean): Phaser.GameObjects.Text {
 
       let xLocation: integer
       let yLocation: integer
@@ -537,84 +640,10 @@ class CoveyGameScene extends Phaser.Scene {
         button.setBackgroundColor('#004d00');
       });
       if (placeableID) {
-        if(placeableID === 'banner'){
+        if(placeableWithInput){
           button.on('pointerdown', async () => {
             closeFunction(gameScene);
-            
-            // this.add.dom(x, y, 'div', 'background-color: lime; width: 220px; height: 100px; font: 48px Arial', 'Phaser');
-            const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter Banner Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; ">  `;
-            
-            const inputBannerText = gameScene.add.dom(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList).createFromHTML(form);
-            inputBannerText.setInteractive();
-            inputBannerText.addListener('keyup');
-            let inputText = '';
-            inputBannerText.on('keyup',  (event: any) => {
-              if (event.target.value) {
-                inputText = event.target.value;
-              }
-            });
-    
-            const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
-            
-            const submitBannerText = gameScene.add.dom(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList+25).createFromHTML(submit);
-            submitBannerText.setInteractive();
-            const submitBannerCallback = async function(scene: CoveyGameScene) {
-              // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
-              const objectInformation = {
-                bannerText: inputText
-              }
-
-              const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList);
-              const xIndex  = indexLocation.x 
-              const yIndex  = indexLocation.y
-              
-              try{
-                await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID: 'banner',location: { xIndex , yIndex}, placeableInformation: objectInformation});
-              } catch (err) {
-                const errorMessage: string = err.message;
-                const errorLines = errorMessage.split("\n")
-                const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
-                const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
-                const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
-                const buttonText = gameScene.add.text(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList, `${err.message}\n(Click me to close)`, {
-                  color: '#FFFFFF',
-                  fontSize: FONT_SIZE,
-                  backgroundColor: 'darkred',
-                  padding: {
-                    x: X_PADDING,
-                    y: Y_PADDING
-                  },
-                  fixedHeight: errorLines.length * BUTTON_HEIGHT,
-                  fixedWidth: maxStringLength * W_WIDTH,
-                  align: 'center'
-                });
-                gameScene.pause();
-                buttonText.setInteractive();
-                buttonText.on('pointerdown', () => {
-                  buttonText.destroy();
-                  gameScene.resume();
-                });
-              }
-              inputBannerText.destroy();
-              submitBannerText.destroy();
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              cancelBannerText.destroy();
-            }
-            submitBannerText.addListener('click');
-            submitBannerText.on('click', () => submitBannerCallback(gameScene));
-    
-            const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff" /> `;
-
-            const cancelBannerText = gameScene.add.dom(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList+50).createFromHTML(cancel);
-            cancelBannerText.setInteractive();
-            cancelBannerText.addListener('click');
-            
-            const cancelBannerCallback = function() {
-              inputBannerText.destroy();
-              submitBannerText.destroy();
-              cancelBannerText.destroy();
-            };
-            cancelBannerText.on('click', cancelBannerCallback);  
+            await addPlaceableWithInput(gameScene, placeableID);
           });
         }
         else{
@@ -660,15 +689,17 @@ class CoveyGameScene extends Phaser.Scene {
 
       const placeableButtonList: Phaser.GameObjects.Text[] = []
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree'));
+      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       // placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe'))
+      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
+      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner'))
+      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner', true))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      // placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 3, 'youtube'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 4))
 
