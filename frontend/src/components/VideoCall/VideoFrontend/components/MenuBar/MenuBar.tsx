@@ -18,7 +18,7 @@ import PermissionsButton from '../../../../Placeables/PermissionsButton';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
-    bottom: 20,
+    bottom: 0,
     left: 0,
     right: 0,
     // height: `${theme.footerHeight}px`,
@@ -94,7 +94,6 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
             <Grid style={{ flex: 1 }}>
               <Grid container justify="flex-end">
                 <TownSettings />
-                <Menu />
                 <PermissionsButton />
                 <Menu />
                 <EndCallButton />

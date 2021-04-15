@@ -29,19 +29,10 @@ const Container = styled('div')({
 const Main = styled('main')(({ theme: _theme }: { theme: Theme }) => ({
   overflow: 'hidden',
   position: 'relative',
-  paddingBottom: `${_theme.footerHeight}px`, // Leave some space for the footer
-  [_theme.breakpoints.down('sm')]: {
-    paddingBottom: `${_theme.mobileFooterHeight + _theme.mobileTopBarHeight}px`, // Leave some space for the mobile header and footer
-  },
-}));
-
-const Main2 = styled('div')(({ theme: _theme }: { theme: Theme }) => ({
-  overflow: 'hidden',
-  position: 'relative',
-  paddingBottom: `${_theme.footerHeight}px`, // Leave some space for the footer
-  [_theme.breakpoints.down('sm')]: {
-    paddingBottom: `${_theme.mobileFooterHeight + _theme.mobileTopBarHeight}px`, // Leave some space for the mobile header and footer
-  },
+  // paddingBottom: `${_theme.footerHeight}px`, // Leave some space for the footer
+  // [_theme.breakpoints.down('sm')]: {
+  //   paddingBottom: `${_theme.mobileFooterHeight + _theme.mobileTopBarHeight}px`, // Leave some space for the mobile header and footer
+  // },
 }));
 
 interface Props {
@@ -144,9 +135,9 @@ export default function VideoGrid(props: Props) {
                       backgroundColor: "white",
                       width: "100%",
                       opacity: "100%",
-                      zIndex: 10
+                      zIndex: 10,
                     }}>
-                      <Flex boxShadow="dark-lg" m="5" p="4" bg="white" width="100%">
+                      <Flex bg="white" width="100%" style={{ marginTop: '50px' }}>
                         <Box>
                           <MenuBar setMediaError={setMediaError} />
                         </Box>
@@ -159,6 +150,7 @@ export default function VideoGrid(props: Props) {
             {/* </Main> */}
             
               <Center color="white"
+                      style={{ marginTop: '50px' }}
                       backgroundImage="url('https://cdn.pixabay.com/photo/2020/01/04/18/40/trees-4741364_1280.png')" >
                 <WorldMap />
               </Center>
