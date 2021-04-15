@@ -5,7 +5,7 @@ import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-import Placeable from '../../classes/Placeable';
+import Placeable, { PlaceableLocation } from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
 // import { find } from 'ramda';
@@ -198,68 +198,77 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
 
-  placeableDeletion(placeableID: string) {
+  placeableDeletion(myPlaceable: Placeable) {
 
-    const myPlaceable = this.placeables.find((pl : Placeable) => pl.placeableID === placeableID);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    myPlaceable?.sprite?.on('pointerdown', () => {
+   if(myPlaceable && myPlaceable.sprite) {
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const deleteOption = this.add.text(this.lastLocation.x + 20, this.lastLocation.y, 'Do you want to delete\n this object?',
+    const BUTTON_WIDTH = 309;
+    const X_PADDING = 10;
+    const Y_PADDING = 7;
+    const FONT_SIZE_IN_PIXLES = 13;
+    const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
+    const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
+    const TEXT_HEIGHT = 50;
+    const PLAYER_WIDTH = 32;
+    const X_PLACEMENT_OFFSET = PLAYER_WIDTH + 12;
+    const Y_PLACEMENT_OFFSET = 42;
+    const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
+     
+    const spriteWidth = myPlaceable.sprite.width;
+    const {xIndex, yIndex} = myPlaceable.location;
+    const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(xIndex, yIndex);
+    const xCord = indexLocation.x;
+    const yCord = indexLocation.y;
+    console.log('x and y of deletable object , spriteWidth', xCord, ' ', yCord, ' ', spriteWidth);
+  
+    myPlaceable.sprite.on('pointerdown', () => {
+
+      const deleteOption = this.add.text(xCord, yCord, 'Do you want to delete\n this object?',
       {
       color: '#FFFFFF',
       backgroundColor: '#004d00',
       align: 'center',
       padding: {
-        x: 10,
-        y: 2
+        x: X_PADDING,
+        y: Y_PADDING
       },
       fixedWidth: 309,
       });
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-     // @ts-ignore
-      const deleteOptionYes = this.add.text(this.lastLocation.x + 20, this.lastLocation.y + 20, 'Yes',
+
+      const deleteOptionYes = this.add.text(xCord, yCord + 20, 'Delete',
       {
       color: '#FFFFFF',
       backgroundColor: '#004d00',
       align: 'center',
       padding: {
-        x: 10,
-        y: 7
+        x: X_PADDING,
+        y: Y_PADDING
       },
       fixedWidth: 309,
       });
       deleteOptionYes.setInteractive();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const deleteOptionNo = this.add.text(this.lastLocation.x + 20, this.lastLocation.y + 45, 'No',
+
+      const deleteOptionNo = this.add.text( xCord, yCord + 40, 'Cancel',
       {
        color: '#FFFFFF',
        backgroundColor: '#004d00',
        align: 'center',
        padding: {
-         x: 10,
-         y: 7
+         x: X_PADDING,
+         y: Y_PADDING
        },
       fixedWidth: 309,
       });
-
-
     deleteOptionNo.setInteractive();
     deleteOptionYes.on('pointerdown', () => {
     deleteOption.destroy();
     deleteOptionNo.destroy();
     deleteOptionYes.destroy();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex: this.lastLocation.x, yIndex: this.lastLocation.y}});
-    // eslint-disable-next-line
-    console.log('this.placeables  after delete ', this.placeables);
+    this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex, yIndex}});
     this.updatePlaceables(this.placeables);
     });
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  deleteOptionNo.on('pointerdown', () => destroyOptions());
+   deleteOptionNo.on('pointerdown', () => destroyOptions());
 
   function destroyOptions() {
     deleteOption.destroy();
@@ -267,6 +276,7 @@ class CoveyGameScene extends Phaser.Scene {
     deleteOptionYes.destroy();
   }
   });
+}
 }
 
   updatePlaceable(placeable: Placeable) {
@@ -283,14 +293,12 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
-
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
     const xCord = indexLocation.x
     const yCord = indexLocation.y
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
-
         this.anims.create({
           key: 'tree',
           frames: [
@@ -303,7 +311,7 @@ class CoveyGameScene extends Phaser.Scene {
           frameRate: 8,
           repeat: -1
         });
-
+        
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
           .setScale(0.4)
@@ -313,14 +321,15 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
-
-        myPlaceable.sprite.on('rightButtondown', () => {
-          // eslint-disable-next-line 
-          // @ts-ignore
-          this.placeableDeletion(myPlaceable.placeableID);
-        });
-
-      }
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
+        if(pointer.rightButtonDown()) { 
+          console.log('tree');
+          if(myPlaceable) {
+            this.placeableDeletion(myPlaceable);
+          }
+         }          
+        })
+       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
@@ -334,19 +343,22 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive();
         myPlaceable.sprite = sprite;
 
-        myPlaceable.sprite.on('pointerdown', () => {  
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
+          if(pointer.leftButtonDown()) {       
+          console.log('tictactoe');
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+          }         
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              console.log('tictactoe');
+              this.placeableDeletion(myPlaceable);
+            }           
+          }
         })
-        .on('rightButtondown', () => {
-          // eslint-disable-next-line 
-          // @ts-ignore
-          this.placeableDeletion(myPlaceable.placeableID);
-        });
-
       }
     }
 
@@ -361,26 +373,24 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', () => {
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            console.log('flapppy');
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
-        })
-        .on('rightButtondown', () => {
-          // eslint-disable-next-line 
-          // @ts-ignore
-          this.placeableDeletion(myPlaceable.placeableID);
-        });
+        }
+        else if(pointer.rightButtonDown()) {
+          if(myPlaceable) {
+            this.placeableDeletion(myPlaceable);
+          }
+        }
+      })
       }
     }
-
-
   }
-
-
-
 
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
@@ -473,14 +483,6 @@ class CoveyGameScene extends Phaser.Scene {
         this.lastLocation.moving = isMoving;
         this.emitMovement(this.lastLocation);
       }
-
-
-      /* this.placeables.forEach(placeable => {
-        if(placeable.sprite && this.player?.sprite) {
-          this.physics.collide(placeable.sprite, this.player?.sprite);
-        }
-      }) */
-
     }
   }
 
@@ -508,6 +510,7 @@ class CoveyGameScene extends Phaser.Scene {
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
       let xCord = gameScene.lastLocation?.x;
       let yCord = gameScene.lastLocation?.y;
+      console.log('x and y of added object before conversion', xCord, ' ', yCord);
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
@@ -534,6 +537,7 @@ class CoveyGameScene extends Phaser.Scene {
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
       const xIndex  = indexLocation.x 
       const yIndex  = indexLocation.y
+      console.log('x and y of added object', xIndex, ' ', yIndex);
 
         try{
           await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
