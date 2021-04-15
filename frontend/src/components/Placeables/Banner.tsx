@@ -1,6 +1,8 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
+import 'react-responsive-modal/styles.css';
+import { Modal } from 'react-responsive-modal';
+
 import {
-  Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -30,18 +32,12 @@ export const Banner: FunctionComponent<ModalProps> = ({
   };
 
   const modal = (
-    <Modal isOpen={showing} onClose={hiding} blockScrollOnMount>
-      <ModalOverlay />
-      <ModalContent maxW="50%" marginLeft="20%" marginTop="50px">
-        <ModalCloseButton boxShadow="dark-md" rounded="1rem"
-                          w={{ base: "30%", sm: "15%", md: "30%" }}
-                          mb={{ base: 12, md: 0 }}
-                          style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
-        <ModalBody isCentered>
-          <h1>{modalContent}</h1>
-        </ModalBody>
-      </ModalContent>
+    <Modal open={showing} onClose={hiding} center blockScroll>
+      <h1 style={{textAlign: "center", color: "red", fontFamily: "Lucida Handwriting", fontSize: "20px", fontWeight: "bolder"}}>TOWN ANNOUCEMENT!</h1>
+      &nbsp;
+      <h1>{modalContent}</h1>
     </Modal>
+
   );
   return modal;
 
