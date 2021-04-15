@@ -320,9 +320,8 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           .sprite(xCord, yCord, 'youtube')
           .setScale(0.2)
-          .setSize(32, 32)
           .setOffset(0, 24)
-          .setDisplaySize(40,40)
+          .setDisplaySize(50,50)
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
