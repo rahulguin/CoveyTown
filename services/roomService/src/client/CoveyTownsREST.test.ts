@@ -5,7 +5,7 @@ import Express from 'express';
 import http from 'http';
 import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
-import { PlayerUpdateSpecifications } from '../CoveyTypes';
+import { PlaceableInputInformation, PlayerUpdateSpecifications } from '../CoveyTypes';
 import addTownRoutes from '../router/towns';
 import Placeable from '../types/Placeable';
 import { randomPlaceablesFromAllowedPlaceables } from './TestUtils';
@@ -750,6 +750,7 @@ describe('TownsServiceAPIREST', () => {
     town: TestTownData,
     placedLocation: PlaceableLocation,
     sessionToken: string,
+    placeableInformation?: PlaceableInputInformation,
   ): Promise<PlaceableInfo> {
     const [placeableID] = randomPlaceablesFromAllowedPlaceables();
     const placeable: Placeable = new Placeable(placeableID, placedLocation);
@@ -759,13 +760,25 @@ describe('TownsServiceAPIREST', () => {
       playersToken: sessionToken,
       placeableID,
       location: placedLocation,
+      placeableInformation,
     });
-    const placedInfo: PlaceableInfo = {
-      coveyTownID: town.coveyTownID,
-      placeableID: placeable.placeableID,
-      placeableName: placeable.name,
-      location: placeable.location,
-    };
+    let placedInfo: PlaceableInfo;
+    if (placeableInformation) {
+      placedInfo = {
+        coveyTownID: town.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: placeable.location,
+        placeableInformation,
+      };
+    } else {
+      placedInfo = {
+        coveyTownID: town.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: placeable.location,
+      };
+    }
 
     return placedInfo;
   }
@@ -806,6 +819,25 @@ describe('TownsServiceAPIREST', () => {
       expectTownListMatches(await apiClient.listTowns(), pubTown1);
       const { sessionToken } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
       const addedPlacableInfo = await addPlaceableToTown(pubTown1, placedLocation, sessionToken);
+
+      const getResponce = await apiClient.getPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        location: placedLocation,
+      });
+      expect(getResponce).toStrictEqual(addedPlacableInfo);
+    });
+    it('should be able to get placeable info properly when given input information', async () => {
+      const inputInformation: PlaceableInputInformation = { bannerText: 'test' };
+      const placedLocation: PlaceableLocation = { xIndex: randomInt(100), yIndex: randomInt(100) };
+      const pubTown1 = await createTownForTesting(undefined, false);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const { sessionToken } = await createPlayerForTesting(pubTown1.coveyTownID, playerName);
+      const addedPlacableInfo = await addPlaceableToTown(
+        pubTown1,
+        placedLocation,
+        sessionToken,
+        inputInformation,
+      );
 
       const getResponce = await apiClient.getPlaceable({
         coveyTownID: pubTown1.coveyTownID,

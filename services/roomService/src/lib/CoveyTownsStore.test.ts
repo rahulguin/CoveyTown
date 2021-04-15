@@ -1,7 +1,11 @@
 import { randomInt } from 'crypto';
 import { nanoid } from 'nanoid';
 import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
-import { PlaceableLocation, PlayerPermissionSpecification } from '../CoveyTypes';
+import {
+  PlaceableInputInformation,
+  PlaceableLocation,
+  PlayerPermissionSpecification,
+} from '../CoveyTypes';
 import { PlaceableInfo } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Placeable from '../types/Placeable';
@@ -591,12 +595,14 @@ describe('CoveyTownsStore', () => {
           placeableID: placeable.placeableID,
           placeableName: placeable.name,
           location: placeable.location,
+          placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
         };
         emptyInfo = {
           coveyTownID: town.coveyTownID,
           placeableID: Placeable.EMPTY_PLACEABLE_ID,
           placeableName: Placeable.EMPTY_PLACEABLE_NAME,
           location,
+          placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
         };
       });
       it('Should fail if townID does not exist', async () => {
@@ -612,7 +618,7 @@ describe('CoveyTownsStore', () => {
         const getResponce = store.getPlaceable(nanoid(), location);
         expect(getResponce).toStrictEqual(undefined);
       });
-      it('Should return the same placeable that was just added if succesful', async () => {
+      it('Should return the same placeable that was just added if succesful - undefined input info', async () => {
         const addResponce = store.addPlaceable(
           town.coveyTownID,
           town.townUpdatePassword,
@@ -624,6 +630,28 @@ describe('CoveyTownsStore', () => {
 
         const getResponce = store.getPlaceable(town.coveyTownID, location);
         expect(getResponce).toStrictEqual(placeableInfo);
+      });
+      it('should return the same placeable after a succesful addPlaceable call - given input info', async () => {
+        const placeableInputInfo: PlaceableInputInformation = { bannerText: 'test' };
+        const addResponce = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          player.id,
+          placeableID,
+          location,
+          placeableInputInfo,
+        );
+        expect(addResponce).toStrictEqual(undefined);
+
+        const firstResponce = store.getPlaceable(town.coveyTownID, location);
+        const expectedInputPlaceableInfo: PlaceableInfo = {
+          placeableName: placeableInfo.placeableName,
+          placeableID: placeableInfo.placeableID,
+          coveyTownID: placeableInfo.coveyTownID,
+          location: placeableInfo.location,
+          placeableInformation: placeableInputInfo,
+        };
+        expect(firstResponce).toStrictEqual(expectedInputPlaceableInfo);
       });
       it('Should return the same placeable on repeated calls with no modifiers called', async () => {
         const addResponce = store.addPlaceable(
