@@ -80,7 +80,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('chess', '/assets/placeable/chess.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
-    this.load.image('banner', '/assets/placeable/Banner.png');
+    this.load.image('banner', '/assets/placeable/banner.png');
     this.load.image('youtube', '/assets/placeable/youtube.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
