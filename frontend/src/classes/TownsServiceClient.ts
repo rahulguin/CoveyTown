@@ -112,7 +112,7 @@ export interface PlaceableInfo {
   objectID: string,
   placeableID: string,
   location: PlaceableLocation,
-  objectInformation?: {
+  placeableInformation?: {
     bannerText: string
   },
 }

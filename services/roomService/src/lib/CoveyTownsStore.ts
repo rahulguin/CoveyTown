@@ -106,7 +106,7 @@ export default class CoveyTownsStore {
     playerSessionToken: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
-    objectInformation?: {
+    placeableInformation?: {
       bannerText?: string
     },
   ): string | undefined {
@@ -127,7 +127,7 @@ export default class CoveyTownsStore {
         ) {
           return 'Invalid Location:\nthe location to add the placeable must be defined';
         }
-        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation, objectInformation);
+        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation, placeableInformation);
         return addResponce;
       }
       return 'Do not have permission:\nask someone in the room to give you permission';

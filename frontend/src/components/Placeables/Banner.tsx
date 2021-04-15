@@ -28,6 +28,7 @@ export const Banner: FunctionComponent<ModalProps> = ({
     setShowing(false);
     hide();
   };
+
   const modal = (
     <Modal isOpen={showing} onClose={hiding} blockScrollOnMount>
       <ModalOverlay />
@@ -37,7 +38,7 @@ export const Banner: FunctionComponent<ModalProps> = ({
                           mb={{ base: 12, md: 0 }}
                           style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
         <ModalBody isCentered>
-          {modalContent}
+          <h1>{modalContent}</h1>
         </ModalBody>
       </ModalContent>
     </Modal>

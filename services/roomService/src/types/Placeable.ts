@@ -8,7 +8,7 @@ export default class Placeable {
 
   private readonly _name: string;
 
-  private _objectInformation?: {
+  private _placeableInformation?: {
     bannerText?: string
   };
 
@@ -22,11 +22,11 @@ export default class Placeable {
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();
 
-  constructor(placeableID: string, location: PlaceableLocation, objectInformation?: { bannerText?: string }, _name = 'dummy name') {
+  constructor(placeableID: string, location: PlaceableLocation, placeableInformation?: { bannerText?: string }, _name = 'dummy name') {
     this._placeableID = placeableID;
     this._location = location;
     this._name = _name;
-    this._objectInformation = objectInformation;
+    this._placeableInformation = placeableInformation;
   }
 
   get location(): PlaceableLocation {
@@ -41,8 +41,8 @@ export default class Placeable {
     return this._placeableID;
   }
 
-  get objectInformation(): { bannerText?: string } | undefined {
-    return this._objectInformation;
+  get placeableInformation(): { bannerText?: string } | undefined {
+    return this._placeableInformation;
   }
 
   get EMPTY_PLACEABLE_ID(): string {

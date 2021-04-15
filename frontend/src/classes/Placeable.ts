@@ -6,7 +6,7 @@ export default class Placeable {
 
   private readonly _name: string;
 
-  private _objectInformation?: {
+  private _placeableInformation?: {
     bannerText?: string
   };
   
@@ -15,15 +15,15 @@ export default class Placeable {
 
   public label?: Phaser.GameObjects.Text;
 
-  constructor (placeableID: string, placeableName: string, location: PlaceableLocation, objectInformation?: { bannerText?: string }) {
+  constructor (placeableID: string, placeableName: string, location: PlaceableLocation, placeableInformation?: { bannerText?: string }) {
     this._placeableID = placeableID
     this._location = location
     this._name = placeableName
-    this._objectInformation = objectInformation
+    this._placeableInformation = placeableInformation
   }
 
   static fromServerPlaceable(serverPlaceable: ServerPlaceable): Placeable {
-    return new Placeable(serverPlaceable._placeableID, serverPlaceable._placeableName, serverPlaceable._location, serverPlaceable._objectInformation)
+    return new Placeable(serverPlaceable._placeableID, serverPlaceable._placeableName, serverPlaceable._location, serverPlaceable._placeableInformation)
   }
 
   get location(): PlaceableLocation {
@@ -43,7 +43,7 @@ export default class Placeable {
   }
 
   get objectInformation(): { bannerText?: string } | undefined {
-    return this._objectInformation;
+    return this._placeableInformation;
   }
 
   /**
@@ -70,5 +70,5 @@ export default class Placeable {
 
 export type PlaceableLocation = { xIndex: number, yIndex: number }
 
-export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, _location: PlaceableLocation, _objectInformation?: { bannerText?: string } }
+export type ServerPlaceable = { _townId: string, _placeableID: string, _placeableName: string, _location: PlaceableLocation, _placeableInformation?: { bannerText?: string } }
 

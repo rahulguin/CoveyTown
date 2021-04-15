@@ -97,7 +97,7 @@ export interface PlaceableAddRequest {
   playerToken: string;
   placeableID: string;
   location: PlaceableLocation,
-  objectInformation?: {
+  placeableInformation?: {
     bannerText?: string
   };
 }
@@ -132,7 +132,7 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
-  objectInformation?: {
+  placeableInformation?: {
     bannerText?: string
   };
 }
@@ -277,7 +277,7 @@ export async function addPlaceableHandler(
     requestData.playerToken,
     requestData.placeableID,
     requestData.location,
-    requestData.objectInformation
+    requestData.placeableInformation
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {

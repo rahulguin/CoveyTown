@@ -21,7 +21,7 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
-  objectInformation?: {
+  placeableInformation?: {
     bannerText?: string
   }
 }

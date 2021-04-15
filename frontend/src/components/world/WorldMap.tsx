@@ -300,6 +300,7 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', () => {
           const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+          console.log(myPlaceable);
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -567,7 +568,33 @@ class CoveyGameScene extends Phaser.Scene {
               const xIndex  = indexLocation.x 
               const yIndex  = indexLocation.y
               
-              await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'NREiorUr6J6beBVgpvq5v7MS',placeableID: 'banner',location: { xIndex , yIndex}, placeableInformation: objectInformation});
+              try{
+                await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID: 'banner',location: { xIndex , yIndex}, placeableInformation: objectInformation});
+              } catch (err) {
+                const errorMessage: string = err.message;
+                const errorLines = errorMessage.split("\n")
+                const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+                const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
+                const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+                const buttonText = gameScene.add.text(xLocation-X_OFFSET, yLocation - TEXT_HEIGHT - BUTTON_HEIGHT * numberInList, `${err.message}\n(Click me to close)`, {
+                  color: '#FFFFFF',
+                  fontSize: FONT_SIZE,
+                  backgroundColor: 'darkred',
+                  padding: {
+                    x: X_PADDING,
+                    y: Y_PADDING
+                  },
+                  fixedHeight: errorLines.length * BUTTON_HEIGHT,
+                  fixedWidth: maxStringLength * W_WIDTH,
+                  align: 'center'
+                });
+                gameScene.pause();
+                buttonText.setInteractive();
+                buttonText.on('pointerdown', () => {
+                  buttonText.destroy();
+                  gameScene.resume();
+                });
+              }
               inputBannerText.destroy();
               submitBannerText.destroy();
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
