@@ -8,7 +8,11 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
+
 import {Chess} from "../Placeables/Chess";
+
+import { Banner } from '../Placeables/Banner';
+import { Youtube } from '../Placeables/Youtube';
 
 
 
@@ -78,6 +82,8 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('chess', '/assets/placeable/chess.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
+    this.load.image('banner', '/assets/placeable/Banner.png');
+    this.load.image('youtube', '/assets/placeable/youtube.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
@@ -209,7 +215,7 @@ class CoveyGameScene extends Phaser.Scene {
 
     let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
     if (!myPlaceable) {
-      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
+      myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location, placeable.objectInformation);
       this.placeables.push(myPlaceable);
     }
 
@@ -236,7 +242,7 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
           .setOffset(0, 60 - 32)
-          .setDisplaySize(50,50)
+          .setDisplaySize(60,60)
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
@@ -293,8 +299,7 @@ class CoveyGameScene extends Phaser.Scene {
       if (!sprite) {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'chess')
-          .setDisplaySize(50,50)
-          .setImmovable(true)
+          .setDisplaySize(50,50).setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', () => {
@@ -302,24 +307,65 @@ class CoveyGameScene extends Phaser.Scene {
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
-          ReactDOM.render(<Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
+          ReactDOM.render(<Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>, document.getElementById('modal-container'))
         });
       }
     }
 
+    else if (this.physics && myPlaceable.placeableID === 'banner') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(xCord, yCord, 'banner')
+          .setOffset(0, 24)
+          .setDisplaySize(100,100)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+
+          ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>, document.getElementById('modal-container'))
+
+        });
+      }
+    }
+
+    else if (this.physics && myPlaceable.placeableID === 'youtube') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, 'youtube')
+          .setScale(0.2)
+          .setOffset(0, 24)
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
+
+        });
+      }
+    }
 
     if(myPlaceable.sprite) {
       myPlaceable.sprite?.setSize(100,100);
       this.placeableGroup?.add(myPlaceable.sprite);
     }
 
-  }
 
-  collideObjects(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-    sprite.setVelocity(0);
-    this.placeableGroup?.setVelocity(0,0,0);
-
-    console.log('hit');
   }
 
 
@@ -414,18 +460,8 @@ class CoveyGameScene extends Phaser.Scene {
         this.lastLocation.moving = isMoving;
         this.emitMovement(this.lastLocation);
       }
-
-
-      /* this.placeables.forEach(placeable => {
-        if(placeable.sprite && this.player?.sprite) {
-          this.physics.collide(placeable.sprite, this.player?.sprite);
-        }
-      }) */
-
     }
   }
-
-
 
 
 
@@ -505,7 +541,120 @@ class CoveyGameScene extends Phaser.Scene {
         }
 
     }
-    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
+
+    async function addPlaceableWithInput(gameScene: CoveyGameScene, placeableID: string, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void): Promise<void> {
+
+      let xCord = !gameScene.lastLocation?.x ? 0 : (gameScene.lastLocation?.x);
+      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y + TEXT_HEIGHT);
+      if (!(xCord && yCord)) {
+        const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
+          color: '#FFFFFF',
+          fontSize: FONT_SIZE,
+          backgroundColor: 'darkred',
+          padding: {
+            x: X_PADDING,
+            y: Y_PADDING
+          },
+          fixedHeight: 50,
+          fixedWidth: 50,
+          align: 'center',
+        });
+        gameScene.pause();
+        buttonText.setInteractive();
+        buttonText.on('pointerdown', () => {
+          buttonText.destroy();
+          closeFunction(gameScene);
+          gameScene.resume();
+        });
+        return
+      }
+      xCord += (X_PLACEMENT_OFFSET / 2);
+      yCord += (Y_PLACEMENT_OFFSET / 2);
+      gameScene.pause();
+      const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter ${placeableName} Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
+      const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
+      inputBannerText.setInteractive();
+      inputBannerText.setDepth(5);
+      inputBannerText.addListener('keyup');
+      let inputText = '';
+      inputBannerText.on('keyup',  (event: any) => {
+        if (event.target.value) {
+          inputText = event.target.value;
+        }
+      });
+      inputBannerText.on('click',  () => {
+        closeFunction(gameScene);
+      });
+
+      const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
+
+      const submitBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 1).createFromHTML(submit);
+      submitBannerText.setInteractive();
+      submitBannerText.setDepth(5);
+      const submitBannerCallback = async function(scene: CoveyGameScene) {
+        // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
+        const objectInformation = {
+          bannerText: inputText
+        }
+        closeFunction(gameScene);
+        const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
+        const xIndex  = indexLocation.x
+        const yIndex  = indexLocation.y
+
+        try{
+          await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID ,location: { xIndex , yIndex}, placeableInformation: objectInformation});
+        } catch (err) {
+          const errorMessage: string = err.message;
+          const errorLines = errorMessage.split("\n")
+          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
+          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+          const buttonText = gameScene.add.text(xCord, yCord, `${err.message}\n(Click me to close)`, {
+            color: '#FFFFFF',
+            fontSize: FONT_SIZE,
+            backgroundColor: 'darkred',
+            padding: {
+              x: X_PADDING,
+              y: Y_PADDING
+            },
+            fixedHeight: errorLines.length * BUTTON_HEIGHT,
+            fixedWidth: maxStringLength * W_WIDTH,
+            align: 'center'
+          });
+          gameScene.pause();
+          buttonText.setInteractive();
+          buttonText.on('pointerdown', () => {
+            buttonText.destroy();
+            gameScene.resume();
+          });
+        }
+        gameScene.resume();
+        inputBannerText.destroy();
+        submitBannerText.destroy();
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        cancelBannerText.destroy();
+      }
+      submitBannerText.addListener('click');
+      submitBannerText.on('click', () => submitBannerCallback(gameScene));
+
+      const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
+
+      const cancelBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 2).createFromHTML(cancel);
+      cancelBannerText.setInteractive();
+      cancelBannerText.setDepth(5);
+      cancelBannerText.addListener('click');
+
+      const cancelBannerCallback = function() {
+        gameScene.resume();
+        closeFunction(gameScene);
+        inputBannerText.destroy();
+        submitBannerText.destroy();
+        cancelBannerText.destroy();
+      };
+      cancelBannerText.on('click', cancelBannerCallback);
+    }
+
+    function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string, placeableWithInput?: boolean): Phaser.GameObjects.Text {
 
       let xLocation: integer
       let yLocation: integer
@@ -544,10 +693,21 @@ class CoveyGameScene extends Phaser.Scene {
         button.setBackgroundColor('#004d00');
       });
       if (placeableID) {
-        button.on('pointerdown', async () => {
-          closeFunction(gameScene)
-          await addPlaceableByID(gameScene, placeableID);
-        });
+        if(placeableWithInput){
+          button.on('pointerdown', async () => {
+            closeFunction(gameScene);
+
+            await addPlaceableWithInput(gameScene, placeableID, placeableName, closeFunction);
+
+          });
+        }
+        else{
+          button.on('pointerdown', async () => {
+            closeFunction(gameScene)
+            await addPlaceableByID(gameScene, placeableID);
+          });
+        }
+
       } else {
         button.on('pointerdown', async () => {
           closeFunction(gameScene);
@@ -555,6 +715,7 @@ class CoveyGameScene extends Phaser.Scene {
       }
       return button;
     }
+
 
     sprite.on('pointerdown', () => {
       if (!this.lastLocation) {
@@ -584,17 +745,22 @@ class CoveyGameScene extends Phaser.Scene {
 
       const placeableButtonList: Phaser.GameObjects.Text[] = []
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree'));
+      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
+      // placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe'))
+      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
+      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 4, 'chess'))
+      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 5))
+      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 4, 'youtube', true))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 5, 'chess'))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 6))
+
 
       function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
@@ -879,6 +1045,9 @@ export default function WorldMap(): JSX.Element {
           gravity: { y: 0 }, // Top down game, so no gravity
         },
       },
+      dom: {
+        createContainer: true
+      }
     };
 
     const game = new Phaser.Game(config);

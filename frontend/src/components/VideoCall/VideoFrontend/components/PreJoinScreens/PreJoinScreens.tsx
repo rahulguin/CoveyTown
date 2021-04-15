@@ -21,7 +21,7 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
         backgroundColor: "white",
         width: "100%",
         opacity: "100%",
-        zIndex: 10
+        zIndex: 10,
       }}>
         <Flex boxShadow="dark-lg" p="4" bg="white" width="100%">
           <Image src="logo.png" boxSize="40px" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
