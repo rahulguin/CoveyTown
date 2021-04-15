@@ -8,20 +8,25 @@ export default class Placeable {
 
   private readonly _name: string;
 
+  private _placeableInformation?: {
+    bannerText?: string
+  };
+
   static readonly EMPTY_PLACEABLE_ID: string = 'empty';
 
   static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
 
   static initializeSet(): Set<string> {
-    return new Set<string>().add('speaker').add('tree').add('tictactoe').add('flappy').add('chess');
+    return new Set<string>().add('speaker').add('tree').add('tictactoe').add('flappy').add('banner').add('youtube').add('chess').add('flower');
   }
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();
 
-  constructor(placeableID: string, location: PlaceableLocation, _name = 'dummy name') {
+  constructor(placeableID: string, location: PlaceableLocation, placeableInformation?: { bannerText?: string }, _name = 'dummy name') {
     this._placeableID = placeableID;
     this._location = location;
     this._name = _name;
+    this._placeableInformation = placeableInformation;
   }
 
   get location(): PlaceableLocation {
@@ -34,6 +39,10 @@ export default class Placeable {
 
   get placeableID(): string {
     return this._placeableID;
+  }
+
+  get placeableInformation(): { bannerText?: string } | undefined {
+    return this._placeableInformation;
   }
 
   get EMPTY_PLACEABLE_ID(): string {
@@ -53,6 +62,6 @@ export default class Placeable {
   }
 
   static constructEmptyPlaceable(location: PlaceableLocation): Placeable {
-    return new Placeable(this.EMPTY_PLACEABLE_ID, location, this.EMPTY_PLACEABLE_NAME);
+    return new Placeable(this.EMPTY_PLACEABLE_ID, location, {}, this.EMPTY_PLACEABLE_NAME);
   }
 }

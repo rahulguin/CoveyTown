@@ -152,6 +152,9 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
+  placeableInformation?: {
+    bannerText?: string
+  };
 }
 
 /**

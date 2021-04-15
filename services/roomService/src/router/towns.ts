@@ -115,7 +115,9 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         playerToken: req.body.playersToken,
         placeableID: req.body.placeableID,
         location: req.body.location,
+        placeableInformation: req.body.placeableInformation,
       });
+      
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
       logError(err);

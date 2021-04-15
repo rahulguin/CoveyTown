@@ -96,12 +96,18 @@ export interface PlaceableAddRequest {
   coveyTownPassword: string;
   playerToken: string;
   placeableID: string;
-  location: PlaceableLocation;
+  location: PlaceableLocation,
+  placeableInformation?: {
+    bannerText?: string
+  };
 }
 
 export interface PlaceableAddResponse {
   placeableID: string;
   location: PlaceableLocation;
+  objectInformation: {
+    bannerText: string
+  };
 }
 
 /**
@@ -126,6 +132,9 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
+  placeableInformation?: {
+    bannerText?: string
+  };
 }
 
 /**
@@ -268,6 +277,7 @@ export async function addPlaceableHandler(
     requestData.playerToken,
     requestData.placeableID,
     requestData.location,
+    requestData.placeableInformation,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {

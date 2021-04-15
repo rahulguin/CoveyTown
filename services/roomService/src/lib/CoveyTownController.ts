@@ -198,12 +198,13 @@ export default class CoveyTownController {
    * @param placeableID the id assocaited of the placeable that is wanting to be added
    * @param location the location the player is wanting to add the placeable
    */
-  addPlaceable(placeableID: string, location: PlaceableLocation): string | undefined {
+  addPlaceable(placeableID: string, location: PlaceableLocation, placeableInformation?: { bannerText?: string }): string | undefined {
     // check that the placeable id given is one that exists
     if (!Placeable.isAllowedPlaceable(placeableID)) {
       // this means that the given ID is not allow
       return 'cannot add:\ngiven id for placeable that does not exist';
     }
+    
     // check that placeable can get added
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement !== undefined) {
@@ -213,7 +214,7 @@ export default class CoveyTownController {
 
     // add placeable at that location
     // will need to be updated to create the specific object wanted
-    const addedPlaceable = new Placeable(placeableID, location);
+    const addedPlaceable = new Placeable(placeableID, location, placeableInformation);
     this._placeables = this._placeables.concat([addedPlaceable]);
 
     // then for all listeners to this room notify them that an placeable was added
@@ -258,6 +259,7 @@ export default class CoveyTownController {
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location,
+        placeableInformation: {},
       };
     }
 
@@ -266,6 +268,7 @@ export default class CoveyTownController {
       placeableID: placeableAtLocation.placeableID,
       placeableName: placeableAtLocation.name,
       location: placeableAtLocation.location,
+      placeableInformation: placeableAtLocation.placeableInformation,
     };
   }
 
