@@ -8,6 +8,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
+// import { find } from 'ramda';
 
 
 
@@ -197,10 +198,11 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
 
-  placeableDeletion(myPlaceable: Placeable | undefined) {
+  placeableDeletion(placeableID: string) {
+
+    const myPlaceable = this.placeables.find((pl : Placeable) => pl.placeableID === placeableID);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    myPlaceable.sprite.on('pointerdown', () => {
+    myPlaceable?.sprite?.on('pointerdown', () => {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -256,9 +258,7 @@ class CoveyGameScene extends Phaser.Scene {
     console.log('this.placeables  after delete ', this.placeables);
     this.updatePlaceables(this.placeables);
     });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
   deleteOptionNo.on('pointerdown', () => destroyOptions());
 
   function destroyOptions() {
@@ -268,8 +268,6 @@ class CoveyGameScene extends Phaser.Scene {
   }
   });
 }
-
-
 
   updatePlaceable(placeable: Placeable) {
 
@@ -317,7 +315,6 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
 
       }
-      this.placeableDeletion(myPlaceable);
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
@@ -331,13 +328,19 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive();
         myPlaceable.sprite = sprite;
 
-        myPlaceable.sprite.on('pointerdown', () => {
+        myPlaceable.sprite.on('pointerdown', () => {  
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+        })
+        .on('rightButtondown', () => {
+          // eslint-disable-next-line 
+          // @ts-ignore
+          this.placeableDeletion(myPlaceable.placeableID);
         });
+
       }
     }
 
@@ -548,7 +551,8 @@ class CoveyGameScene extends Phaser.Scene {
             gameScene.resume();
           });
         }
-
+        
+        
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
 
@@ -591,6 +595,8 @@ class CoveyGameScene extends Phaser.Scene {
           closeFunction(gameScene)
           await addPlaceableByID(gameScene, placeableID);
         });
+        
+
       } else {
         button.on('pointerdown', async () => {
           closeFunction(gameScene);
