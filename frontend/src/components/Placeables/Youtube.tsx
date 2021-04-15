@@ -58,7 +58,7 @@ export const Youtube: FunctionComponent<ModalProps> = ({
                           mb={{ base: 12, md: 0 }}
                           style={{color: 'white', background: 'black', width: '40px', height: '30px'}}/>
         <ModalBody isCentered>
-          <YouTube videoId={ID} opts={{height:"390", width:'640', playerVars:{autoplay: 1}}}/>;
+          <YouTube videoId={ID} opts={{height:"520", width:'800', playerVars:{autoplay: 1}}}/>;
         </ModalBody>
       </ModalContent>
     </Modal>

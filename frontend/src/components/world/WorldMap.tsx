@@ -9,6 +9,7 @@ import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
 import { Banner } from '../Placeables/Banner';
+import { Youtube } from '../Placeables/Youtube';
 
 
 class CoveyGameScene extends Phaser.Scene {
@@ -73,7 +74,8 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('box', '/assets/placeable/treeObject.gif');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
-    this.load.image('banner', '/assets/placeable/FlappyBird.png');
+    this.load.image('banner', '/assets/placeable/banner.png');
+    this.load.image('youtube', '/assets/placeable/youtube.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
@@ -306,6 +308,35 @@ class CoveyGameScene extends Phaser.Scene {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
+          
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+        });
+      }
+    }
+
+    else if (this.physics && myPlaceable.placeableID === 'youtube') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - JB todo
+          .sprite(xCord, yCord, 'youtube')
+          .setScale(0.2)
+          .setSize(32, 32)
+          .setOffset(0, 24)
+          .setDisplaySize(40,40)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+          console.log(myPlaceable);
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
           
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -712,9 +743,9 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      // placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 3, 'youtube'))
+      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 4, 'youtube', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 4))
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 5))
 
 
 
