@@ -265,7 +265,6 @@ class CoveyGameScene extends Phaser.Scene {
     deleteOptionNo.destroy();
     deleteOptionYes.destroy();
     this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex, yIndex}});
-    this.updatePlaceables(this.placeables);
     });
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
    deleteOptionNo.on('pointerdown', () => destroyOptions());
@@ -323,7 +322,7 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
         if(pointer.rightButtonDown()) { 
-          console.log('tree');
+          console.log('tree delete');
           if(myPlaceable) {
             this.placeableDeletion(myPlaceable);
           }
@@ -374,8 +373,8 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive();
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-          if(pointer.leftButtonDown()) {
-            console.log('flapppy');
+        if(pointer.leftButtonDown()) {
+          console.log('flapppy');
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -383,7 +382,8 @@ class CoveyGameScene extends Phaser.Scene {
           ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
         }
         else if(pointer.rightButtonDown()) {
-          if(myPlaceable) {
+          console.log('flappy delete');
+          if (myPlaceable) {
             this.placeableDeletion(myPlaceable);
           }
         }
