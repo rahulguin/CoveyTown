@@ -89,9 +89,7 @@ export interface PlaceableAddRequest {
   playersToken: string,
   placeableID: string,
   location: PlaceableLocation,
-  placeableInformation?: {
-    bannerText: string
-  },
+  placeableInformation?: PlaceableInputInformation,
 }
 
 /**
@@ -109,13 +107,14 @@ export interface PlaceableGetRequest {
 export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
-  objectID: string,
   placeableID: string,
   location: PlaceableLocation,
-  placeableInformation?: {
-    bannerText: string
-  },
+  placeableInformation?: PlaceableInputInformation,
 }
+
+export type PlaceableInputInformation = {
+  bannerText?: string;
+};
 
 /**
  * represents a location on the map based on index
