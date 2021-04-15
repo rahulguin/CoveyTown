@@ -885,7 +885,7 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
-      .setDepth(100)
+      .setDepth(5)
       .setInteractive();
 
     this.placeableGroup = this.physics.add.group({
