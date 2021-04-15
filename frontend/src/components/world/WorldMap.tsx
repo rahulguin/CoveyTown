@@ -296,7 +296,6 @@ class CoveyGameScene extends Phaser.Scene {
           .setOffset(0, 24)
           .setDisplaySize(100,100)
           .setImmovable(true)
-          .setDepth(90)
           .setInteractive();
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', () => {
