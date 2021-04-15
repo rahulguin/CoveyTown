@@ -107,6 +107,7 @@ export interface PlaceableGetRequest {
 export interface PlaceableInfo {
   coveyTownID: string,
   coveyTownpassword: string,
+  objectID: string,
   placeableID: string,
   location: PlaceableLocation,
   placeableInformation?: PlaceableInputInformation,

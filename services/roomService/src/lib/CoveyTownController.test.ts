@@ -156,6 +156,59 @@ describe('CoveyTownController', () => {
       townController.deletePlaceable(placedLocation);
       expect(townController.getPlaceableAt(placedLocation)).toStrictEqual(defaultPlaceable);
     });
+    it('should not delete any nearby placeables', async () => {
+      const addPlaceableMessage = townController.addPlaceable(placeableID, placedLocation);
+
+      const offSetLocations: PlaceableLocation[] = [];
+
+      const posXLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex + 1,
+        yIndex: placedLocation.yIndex,
+      };
+      offSetLocations.push(posXLocation);
+      const addPlaceableMessagePosX = townController.addPlaceable(placeableID, posXLocation);
+
+      const negXLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex - 1,
+        yIndex: placedLocation.yIndex,
+      };
+      offSetLocations.push(negXLocation);
+      const addPlaceableMessageNegX = townController.addPlaceable(placeableID, negXLocation);
+
+      const posYLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex,
+        yIndex: placedLocation.yIndex + 1,
+      };
+      offSetLocations.push(posYLocation);
+      const addPlaceableMessagePosY = townController.addPlaceable(placeableID, posYLocation);
+
+      const negYLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex,
+        yIndex: placedLocation.yIndex - 1,
+      };
+      offSetLocations.push(negYLocation);
+      const addPlaceableMessageNegY = townController.addPlaceable(placeableID, negYLocation);
+
+      const placeable: Placeable = new Placeable(placeableID, placedLocation);
+      expect(addPlaceableMessage).toBe(undefined);
+      expect(addPlaceableMessagePosX).toBe(undefined);
+      expect(addPlaceableMessageNegX).toBe(undefined);
+      expect(addPlaceableMessagePosY).toBe(undefined);
+      expect(addPlaceableMessageNegY).toBe(undefined);
+
+      // delete the placable at the center
+      townController.deletePlaceable(placedLocation);
+      // for each nearby location check that it is still there
+      offSetLocations.forEach(offsetLocation => {
+        const placeablesInfo: PlaceableInfo = {
+          coveyTownID: townController.coveyTownID,
+          placeableID: placeable.placeableID,
+          placeableName: placeable.name,
+          location: offsetLocation,
+        };
+        expect(townController.getPlaceableAt(offsetLocation)).toStrictEqual(placeablesInfo);
+      });
+    });
   });
   describe('getPlaceableAt', () => {
     let townName: string;

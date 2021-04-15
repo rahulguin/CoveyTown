@@ -8,14 +8,19 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
+import {Chess} from "../Placeables/Chess";
 import { Banner } from '../Placeables/Banner';
 import { Youtube } from '../Placeables/Youtube';
+
 
 
 class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
+
+
+  private placeableGroup: Phaser.Physics.Arcade.Group | undefined;
 
 
   private myPlayerID: string;
@@ -73,6 +78,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.gif');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
+    this.load.image('chess', '/assets/placeable/chess.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.image('banner', '/assets/placeable/Banner.png');
     this.load.image('youtube', '/assets/placeable/youtube.png');
@@ -86,6 +92,12 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tree3', '/assets/placeable/treeSprite/frame3.gif');
     this.load.image('tree4', '/assets/placeable/treeSprite/frame4.gif');
     this.load.image('tree5', '/assets/placeable/treeSprite/frame5.gif');
+
+    this.load.image('flower1', '/assets/placeable/flowerSprite/flower1.gif');
+    this.load.image('flower2', '/assets/placeable/flowerSprite/flower2.gif');
+    this.load.image('flower3', '/assets/placeable/flowerSprite/flower3.gif');
+    this.load.image('flower4', '/assets/placeable/flowerSprite/flower4.gif');
+    this.load.image('flower5', '/assets/placeable/flowerSprite/flower5.gif');
   }
 
 
@@ -210,6 +222,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location, placeable.objectInformation);
       this.placeables.push(myPlaceable);
     }
+
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
     const xCord = indexLocation.x
     const yCord = indexLocation.y
@@ -232,14 +245,40 @@ class CoveyGameScene extends Phaser.Scene {
 
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
-          .setScale(0.4)
-          .setSize(32, 32)
           .setOffset(0, 60 - 32)
           .setDisplaySize(60,60)
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
+        this.placeableGroup?.add(myPlaceable.sprite);
+      }
+    }
 
+    if (this.physics && myPlaceable.placeableID === 'flower') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+
+        this.anims.create({
+          key: 'flower',
+          frames: [
+            { key: 'flower1' },
+            { key: 'flower5' },
+            { key: 'flower2' },
+            { key: 'flower3' },
+            { key: 'flower4', duration: 50 }
+          ],
+          frameRate: 8,
+          repeat: -1
+        });
+
+        sprite = this.physics.add
+          .sprite(xCord, yCord, 'flower1')
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(60,60)
+          .setImmovable(true)
+          .play('flower');
+        myPlaceable.sprite = sprite;
+        this.placeableGroup?.add(myPlaceable.sprite);
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -249,11 +288,13 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tictactoe')
           .setScale(0.2)
-          .setSize(32, 32)
           .setDisplaySize(32,32)
           .setImmovable(true)
+          .setCollideWorldBounds(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
+
+
 
         myPlaceable.sprite.on('pointerdown', () => {
           const isShown = true;
@@ -271,7 +312,6 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'flappy')
           .setScale(0.2)
-          .setSize(32, 32)
           .setDisplaySize(32,32)
           .setImmovable(true)
           .setInteractive();
@@ -282,6 +322,24 @@ class CoveyGameScene extends Phaser.Scene {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
+        });
+      }
+    }
+
+    else if (this.physics && myPlaceable.placeableID === 'chess') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, 'chess')
+          .setDisplaySize(50,50).setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>, document.getElementById('modal-container'))
         });
       }
     }
@@ -304,10 +362,9 @@ class CoveyGameScene extends Phaser.Scene {
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
-          ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>, document.getElementById('modal-container'))
+
         });
       }
     }
@@ -316,8 +373,6 @@ class CoveyGameScene extends Phaser.Scene {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - JB todo
           .sprite(xCord, yCord, 'youtube')
           .setScale(0.2)
           .setOffset(0, 24)
@@ -333,14 +388,17 @@ class CoveyGameScene extends Phaser.Scene {
           };
           ReactDOM.render(<Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
         });
       }
     }
+
+    if(myPlaceable.sprite) {
+      myPlaceable.sprite?.setSize(100,100);
+      this.placeableGroup?.add(myPlaceable.sprite);
+    }
+
+
   }
-
-
 
 
   getNewMovementDirection() {
@@ -403,11 +461,6 @@ class CoveyGameScene extends Phaser.Scene {
           break;
       }
 
-      if ((this.cursors.find(keySet => keySet.space?.isDown))) {
-        this.player.sprite.setVelocityY(-350);
-        this.player.sprite.play('jump', true);
-      }
-
       // Normalize and scale the velocity so that player can't move faster along a diagonal
       this.player.sprite.body.velocity.normalize()
         .scale(speed);
@@ -434,18 +487,8 @@ class CoveyGameScene extends Phaser.Scene {
         this.lastLocation.moving = isMoving;
         this.emitMovement(this.lastLocation);
       }
-
-
-      /* this.placeables.forEach(placeable => {
-        if(placeable.sprite && this.player?.sprite) {
-          this.physics.collide(placeable.sprite, this.player?.sprite);
-        }
-      }) */
-
     }
   }
-
-
 
 
 
@@ -665,6 +708,7 @@ class CoveyGameScene extends Phaser.Scene {
       });
       button.setDepth(10);
       button.setInteractive();
+
       const escapeKey = gameScene.input.keyboard.addKey('ESC');
       escapeKey.on('down', async () => {
         closeFunction(gameScene);
@@ -675,6 +719,7 @@ class CoveyGameScene extends Phaser.Scene {
       button.on('pointerout', () => {
         button.setBackgroundColor('#004d00');
       });
+
       if (placeableID) {
         if(placeableWithInput){
           button.on('pointerdown', async () => {
@@ -730,18 +775,19 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      // placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
+      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 1, 'flower', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe', false))
+      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 2, 'tictactoe', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy', false))
+      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 3, 'flappy', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner', true))
+      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 4, 'banner', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 4, 'youtube', true))
+      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 5, 'youtube', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 5))
-
+      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 6, 'chess'))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 7))
 
 
       function destroyText(gameScene: CoveyGameScene ) {
@@ -839,8 +885,13 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
+      .setDepth(100)
       .setInteractive();
 
+    this.placeableGroup = this.physics.add.group({
+      immovable: true
+    })
+    this.physics.add.collider(mainSprite, this.placeableGroup);
 
     this.placeableAddition(mainSprite);
 
@@ -850,7 +901,7 @@ class CoveyGameScene extends Phaser.Scene {
       color: '#000000',
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
-    });
+    }).setDepth(100);
     this.player = {
       sprite: mainSprite,
       label

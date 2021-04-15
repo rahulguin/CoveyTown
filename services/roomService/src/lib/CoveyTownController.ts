@@ -209,7 +209,6 @@ export default class CoveyTownController {
       // this means that the given ID is not allow
       return 'cannot add:\ngiven id for placeable that does not exist';
     }
-
     // check that placeable can get added
     const conflictingPlacement: Placeable | undefined = this.findPlaceableByLocation(location);
     if (conflictingPlacement !== undefined) {

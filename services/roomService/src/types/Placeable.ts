@@ -23,7 +23,9 @@ export default class Placeable {
       .add('tictactoe')
       .add('flappy')
       .add('banner')
-      .add('youtube');
+      .add('youtube')
+      .add('chess')
+      .add('flower');
   }
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();
