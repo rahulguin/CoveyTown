@@ -8,6 +8,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
+import {Chess} from "../Placeables/Chess";
 
 
 
@@ -15,6 +16,9 @@ class CoveyGameScene extends Phaser.Scene {
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
+
+
+  private placeableGroup: Phaser.Physics.Arcade.Group | undefined;
 
 
   private myPlayerID: string;
@@ -72,6 +76,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.gif');
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
+    this.load.image('chess', '/assets/placeable/chess.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
@@ -207,6 +212,7 @@ class CoveyGameScene extends Phaser.Scene {
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location);
       this.placeables.push(myPlaceable);
     }
+
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
     const xCord = indexLocation.x
     const yCord = indexLocation.y
@@ -229,14 +235,12 @@ class CoveyGameScene extends Phaser.Scene {
 
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
-          .setScale(0.4)
-          .setSize(32, 32)
           .setOffset(0, 60 - 32)
-          .setDisplaySize(32,32)
+          .setDisplaySize(50,50)
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
-
+        this.placeableGroup?.add(myPlaceable.sprite);
       }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -246,11 +250,13 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tictactoe')
           .setScale(0.2)
-          .setSize(32, 32)
           .setDisplaySize(32,32)
           .setImmovable(true)
+          .setCollideWorldBounds(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
+
+
 
         myPlaceable.sprite.on('pointerdown', () => {
           const isShown = true;
@@ -268,7 +274,6 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'flappy')
           .setScale(0.2)
-          .setSize(32, 32)
           .setDisplaySize(32,32)
           .setImmovable(true)
           .setInteractive();
@@ -283,10 +288,39 @@ class CoveyGameScene extends Phaser.Scene {
       }
     }
 
+    else if (this.physics && myPlaceable.placeableID === 'chess') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, 'chess')
+          .setDisplaySize(50,50)
+          .setImmovable(true)
+          .setInteractive();
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', () => {
+          const isShown = true;
+          const toggle = () => {
+            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+          };
+          ReactDOM.render(<Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
+        });
+      }
+    }
+
+
+    if(myPlaceable.sprite) {
+      myPlaceable.sprite?.setSize(100,100);
+      this.placeableGroup?.add(myPlaceable.sprite);
+    }
 
   }
 
+  collideObjects(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+    sprite.setVelocity(0);
+    this.placeableGroup?.setVelocity(0,0,0);
 
+    console.log('hit');
+  }
 
 
   getNewMovementDirection() {
@@ -439,7 +473,7 @@ class CoveyGameScene extends Phaser.Scene {
       xCord += (X_PLACEMENT_OFFSET / 2);
       yCord += (Y_PLACEMENT_OFFSET / 2);
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
-      const xIndex  = indexLocation.x 
+      const xIndex  = indexLocation.x
       const yIndex  = indexLocation.y
 
         try{
@@ -498,6 +532,7 @@ class CoveyGameScene extends Phaser.Scene {
       });
       button.setDepth(10);
       button.setInteractive();
+
       const escapeKey = gameScene.input.keyboard.addKey('ESC');
       escapeKey.on('down', async () => {
         closeFunction(gameScene);
@@ -557,7 +592,9 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 3))
+      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 4, 'chess'))
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 5))
 
       function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
@@ -654,8 +691,13 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
+      .setDepth(100)
       .setInteractive();
 
+    this.placeableGroup = this.physics.add.group({
+      immovable: true
+    })
+    this.physics.add.collider(mainSprite, this.placeableGroup);
 
     this.placeableAddition(mainSprite);
 
@@ -665,7 +707,7 @@ class CoveyGameScene extends Phaser.Scene {
       color: '#000000',
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
-    });
+    }).setDepth(100);
     this.player = {
       sprite: mainSprite,
       label

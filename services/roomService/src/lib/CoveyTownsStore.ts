@@ -122,14 +122,14 @@ export default class CoveyTownsStore {
             isDefined(placeableLocation.yIndex)
           )
         ) {
-          return 'Invalid Location:\nthe location to add the placeable must be defined';
+          return 'Invalid Location:\nThe location to add the placeable must be defined.';
         }
         const addResponce = existingTown.addPlaceable(placeableID, placeableLocation);
         return addResponce;
       }
-      return 'Do not have permission:\nask someone in the room to give you permission';
+      return 'Do not have permission:\nAsk someone in the room to give you permission.';
     }
-    return 'Invalid room information:\nDouble check that the room exists';
+    return 'Invalid room information:\nDouble check that the room exists.';
   }
 
   deletePlaceable(
@@ -149,9 +149,9 @@ export default class CoveyTownsStore {
         const deleteResponce = existingTown.deletePlaceable(placeableLocation);
         return deleteResponce;
       }
-      return 'Do not have permission:\nask someone in the room to give you permission';
+      return 'Do not have permission:\nAsk someone in the room to give you permission.';
     }
-    return 'Invalid room information:\n Double check that the room exists';
+    return 'Invalid room information:\n Double check that the room exists.';
   }
 
   getPlaceable(
@@ -177,9 +177,9 @@ export default class CoveyTownsStore {
         const updateResponce = existingTown.updatePlayerPermissions(updates);
         return updateResponce;
       }
-      return 'Incorrect password:\nplease double check that you have the password correct';
+      return 'Incorrect password:\nPlease enter the correct password.';
     }
-    return 'Invalid room information:\nDouble check that the room exists';
+    return 'Invalid room information:\nDouble check that the room exists.';
   }
 
   getPlayersPermission(townID: string, playerID: string): boolean | undefined {
