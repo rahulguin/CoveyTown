@@ -532,6 +532,7 @@ class CoveyGameScene extends Phaser.Scene {
       const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter ${placeableName} Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
       const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
       inputBannerText.setInteractive();
+      inputBannerText.setDepth(5);
       inputBannerText.addListener('keyup');
       let inputText = '';
       inputBannerText.on('keyup',  (event: any) => {
@@ -547,6 +548,7 @@ class CoveyGameScene extends Phaser.Scene {
       
       const submitBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 1).createFromHTML(submit);
       submitBannerText.setInteractive();
+      submitBannerText.setDepth(5);
       const submitBannerCallback = async function(scene: CoveyGameScene) {
         // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
         const objectInformation = {
@@ -597,6 +599,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       const cancelBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 2).createFromHTML(cancel);
       cancelBannerText.setInteractive();
+      cancelBannerText.setDepth(5);
       cancelBannerText.addListener('click');
       
       const cancelBannerCallback = function() {
@@ -641,10 +644,11 @@ class CoveyGameScene extends Phaser.Scene {
         closeFunction(gameScene);
       });
       button.on('pointerover', () => {
-        console.log("hellllllllllloooooooooooooooooooooo");
-        // button.setBackgroundColor('#008000');
+        console.log("hello")
+        button.setBackgroundColor('#008000');
       });
       button.on('pointerout', () => {
+        console.log("hello")
         button.setBackgroundColor('#004d00');
       });
       if (placeableID) {
@@ -668,6 +672,7 @@ class CoveyGameScene extends Phaser.Scene {
       }
       return button;
     }
+
 
     sprite.on('pointerdown', () => {
       if (!this.lastLocation) {
