@@ -302,7 +302,6 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', () => {
           const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
-          console.log(myPlaceable);
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -331,7 +330,6 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', () => {
           const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
-          console.log(myPlaceable);
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -571,7 +569,7 @@ class CoveyGameScene extends Phaser.Scene {
           inputText = event.target.value;
         }
       });
-      inputBannerText.on('click',  (event: any) => {
+      inputBannerText.on('click',  () => {
         closeFunction(gameScene);
       });
       
@@ -675,11 +673,9 @@ class CoveyGameScene extends Phaser.Scene {
         closeFunction(gameScene);
       });
       button.on('pointerover', () => {
-        console.log("hello")
         button.setBackgroundColor('#008000');
       });
       button.on('pointerout', () => {
-        console.log("hello")
         button.setBackgroundColor('#004d00');
       });
       if (placeableID) {
