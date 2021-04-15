@@ -611,6 +611,139 @@ describe('TownsServiceAPIREST', () => {
         // the format of the exception :(
       }
     });
+    it('should not delete any nearby placeables', async () => {
+      const pubTown1 = await createTownForTesting(undefined, true);
+      expectTownListMatches(await apiClient.listTowns(), pubTown1);
+      const { sessionToken } = await createPlayerForTesting(
+        pubTown1.coveyTownID,
+        playerName,
+        pubTown1.townUpdatePassword,
+        true,
+      );
+      const placedLocation = { xIndex: 1, yIndex: 1 };
+      const placeable: Placeable = new Placeable(placeableID, placedLocation);
+      await apiClient.addPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        placeableID,
+        location: placedLocation,
+      });
+
+      const offSetLocations: PlaceableLocation[] = [];
+
+      // create and add a placeable in each direction nearby to the location being delted
+      const posXLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex + 1,
+        yIndex: placedLocation.yIndex,
+      };
+      offSetLocations.push(posXLocation);
+      await apiClient.addPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        placeableID,
+        location: posXLocation,
+      });
+
+      const negXLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex - 1,
+        yIndex: placedLocation.yIndex,
+      };
+      offSetLocations.push(negXLocation);
+      apiClient.addPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        placeableID,
+        location: negXLocation,
+      });
+
+      const posYLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex,
+        yIndex: placedLocation.yIndex + 1,
+      };
+      offSetLocations.push(posYLocation);
+      apiClient.addPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        placeableID,
+        location: posYLocation,
+      });
+
+      const negYLocation: PlaceableLocation = {
+        xIndex: placedLocation.xIndex,
+        yIndex: placedLocation.yIndex - 1,
+      };
+      offSetLocations.push(negYLocation);
+      apiClient.addPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        placeableID,
+        location: negYLocation,
+      });
+
+      // delete the placable at the center
+      await apiClient.deletePlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        coveyTownPassword: pubTown1.townUpdatePassword,
+        playersToken: sessionToken,
+        location: placedLocation,
+      });
+
+      // checking nearby placeables
+      // checking posX
+      let placeableInfo = {
+        coveyTownID: pubTown1.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: posXLocation,
+      };
+      let getResponce = await apiClient.getPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        location: posXLocation,
+      });
+      expect(getResponce).toStrictEqual(placeableInfo);
+      // checking negX
+      placeableInfo = {
+        coveyTownID: pubTown1.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: negXLocation,
+      };
+      getResponce = await apiClient.getPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        location: negXLocation,
+      });
+      // checking posY
+      expect(getResponce).toStrictEqual(placeableInfo);
+      placeableInfo = {
+        coveyTownID: pubTown1.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: posYLocation,
+      };
+      getResponce = await apiClient.getPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        location: posYLocation,
+      });
+      expect(getResponce).toStrictEqual(placeableInfo);
+      // checking negY
+      expect(getResponce).toStrictEqual(placeableInfo);
+      placeableInfo = {
+        coveyTownID: pubTown1.coveyTownID,
+        placeableID: placeable.placeableID,
+        placeableName: placeable.name,
+        location: negYLocation,
+      };
+      getResponce = await apiClient.getPlaceable({
+        coveyTownID: pubTown1.coveyTownID,
+        location: negYLocation,
+      });
+      expect(getResponce).toStrictEqual(placeableInfo);
+    });
   });
 
   async function addPlaceableToTown(

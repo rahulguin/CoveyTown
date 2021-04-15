@@ -487,6 +487,99 @@ describe('CoveyTownsStore', () => {
         expect(secondResponce).not.toBe(undefined);
         expect(secondResponce?.length).toBeGreaterThan(0);
       });
+      it('should not delete any nearby placeables', async () => {
+        const playerSession = await town.addPlayer(player);
+        player.canPlace = true;
+        const addPlaceableMessage = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          placeableID,
+          location,
+        );
+
+        const offSetLocations: PlaceableLocation[] = [];
+
+        // create and add a placeable in each direction nearby to the location being delted
+        const posXLocation: PlaceableLocation = {
+          xIndex: location.xIndex + 1,
+          yIndex: location.yIndex,
+        };
+        offSetLocations.push(posXLocation);
+        const addPlaceableMessagePosX = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          placeableID,
+          posXLocation,
+        );
+
+        const negXLocation: PlaceableLocation = {
+          xIndex: location.xIndex - 1,
+          yIndex: location.yIndex,
+        };
+        offSetLocations.push(negXLocation);
+        const addPlaceableMessageNegX = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          placeableID,
+          negXLocation,
+        );
+
+        const posYLocation: PlaceableLocation = {
+          xIndex: location.xIndex,
+          yIndex: location.yIndex + 1,
+        };
+        offSetLocations.push(posYLocation);
+        const addPlaceableMessagePosY = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          placeableID,
+          posYLocation,
+        );
+
+        const negYLocation: PlaceableLocation = {
+          xIndex: location.xIndex,
+          yIndex: location.yIndex - 1,
+        };
+        offSetLocations.push(negYLocation);
+        const addPlaceableMessageNegY = store.addPlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          placeableID,
+          negYLocation,
+        );
+
+        const placeable: Placeable = new Placeable(placeableID, location);
+        expect(addPlaceableMessage).toBe(undefined);
+        expect(addPlaceableMessagePosX).toBe(undefined);
+        expect(addPlaceableMessageNegX).toBe(undefined);
+        expect(addPlaceableMessagePosY).toBe(undefined);
+        expect(addPlaceableMessageNegY).toBe(undefined);
+
+        // delete the placable at the center
+        store.deletePlaceable(
+          town.coveyTownID,
+          town.townUpdatePassword,
+          playerSession.sessionToken,
+          location,
+        );
+        // for each nearby location check that it is still there
+        offSetLocations.forEach(offsetLocation => {
+          const placeablesInfo: PlaceableInfo = {
+            coveyTownID: town.coveyTownID,
+            placeableID: placeable.placeableID,
+            placeableName: placeable.name,
+            location: offsetLocation,
+          };
+          expect(store.getPlaceable(town.coveyTownID, offsetLocation)).toStrictEqual(
+            placeablesInfo,
+          );
+        });
+      });
     });
     describe('getPlaceable', () => {
       let placeableInfo: PlaceableInfo;
