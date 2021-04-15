@@ -528,7 +528,7 @@ class CoveyGameScene extends Phaser.Scene {
       }
       xCord += (X_PLACEMENT_OFFSET / 2);
       yCord += (Y_PLACEMENT_OFFSET / 2);
-
+      gameScene.pause();
       const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter ${placeableName} Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
       const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
       inputBannerText.setInteractive();
@@ -584,6 +584,7 @@ class CoveyGameScene extends Phaser.Scene {
             gameScene.resume();
           });
         }
+        gameScene.resume();
         inputBannerText.destroy();
         submitBannerText.destroy();
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -599,6 +600,7 @@ class CoveyGameScene extends Phaser.Scene {
       cancelBannerText.addListener('click');
       
       const cancelBannerCallback = function() {
+        gameScene.resume();
         closeFunction(gameScene);
         inputBannerText.destroy();
         submitBannerText.destroy();
@@ -639,7 +641,8 @@ class CoveyGameScene extends Phaser.Scene {
         closeFunction(gameScene);
       });
       button.on('pointerover', () => {
-        button.setBackgroundColor('#008000');
+        console.log("hellllllllllloooooooooooooooooooooo");
+        // button.setBackgroundColor('#008000');
       });
       button.on('pointerout', () => {
         button.setBackgroundColor('#004d00');
