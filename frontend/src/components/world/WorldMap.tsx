@@ -314,17 +314,6 @@ updatePlaceable(placeable: Placeable) {
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
-<<<<<<< HEAD
-=======
-        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
-        if(pointer.rightButtonDown()) { 
-          console.log('tree delete');
-          if(myPlaceable) {
-            this.placeableDeletion(myPlaceable);
-          }
-         }          
-        })
->>>>>>> 19733715a5f6b2d24938562c3c1fba10b10bd096
        }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -368,12 +357,7 @@ updatePlaceable(placeable: Placeable) {
           .setInteractive();
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-<<<<<<< HEAD
           if(pointer.leftButtonDown()) {
-=======
-        if(pointer.leftButtonDown()) {
-          console.log('flapppy');
->>>>>>> 19733715a5f6b2d24938562c3c1fba10b10bd096
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -381,7 +365,6 @@ updatePlaceable(placeable: Placeable) {
           ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
         }
         else if(pointer.rightButtonDown()) {
-          console.log('flappy delete');
           if (myPlaceable) {
             this.placeableDeletion(myPlaceable);
           }

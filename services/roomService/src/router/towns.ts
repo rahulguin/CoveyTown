@@ -131,8 +131,6 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   app.delete('/placeables/:townID', BodyParser.json(), async (req, res) => {
     try {
 
-     // eslint-disable-next-line
-     console.log('entered in towns with details');
       const result = await deletePlaceableHandler({
         coveyTownID: req.params.townID,
         coveyTownPassword: req.body.coveyTownPassword,

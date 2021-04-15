@@ -243,9 +243,6 @@ export default class CoveyTownController {
       (placeable: Placeable) => !CoveyTownController.compareLocation(placeable.location, location),
     );
 
-    // eslint-disable-next-line
-    console.log('placeable afte deletion in towncont',this.placeables);
-
     const placeableNow = Placeable.constructEmptyPlaceable(location);
     // for all listeners notifies them that the object was deleted, with what is now at the location
     this._listeners.forEach(listener => listener.onPlaceableDeleted(placeableNow));

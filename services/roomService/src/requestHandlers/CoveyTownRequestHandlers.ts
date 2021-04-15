@@ -284,8 +284,6 @@ export async function deletePlaceableHandler(
   requestData: PlaceableDeleteRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
 
-  // eslint-disable-next-line
-  console.log('location  and playerstoken in rqst',requestData.playersToken, ' ', requestData.location);
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
