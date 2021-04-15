@@ -17,7 +17,7 @@ export default class Placeable {
   static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
 
   static initializeSet(): Set<string> {
-    return new Set<string>().add('speaker').add('tree').add('tictactoe').add('flappy').add('banner').add('youtube').add('chess');
+    return new Set<string>().add('speaker').add('tree').add('tictactoe').add('flappy').add('banner').add('youtube').add('chess').add('flower');
   }
 
   static readonly ALLOWED_PLACEABLES: Set<string> = Placeable.initializeSet();

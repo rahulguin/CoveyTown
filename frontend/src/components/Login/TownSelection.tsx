@@ -41,8 +41,8 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
   const { apiClient } = useCoveyAppState();
   const toast = useToast();
 
+
   const updateTownListings = useCallback(() => {
-    // console.log(apiClient);
     apiClient.listTowns()
       .then((towns) => {
         setCurrentPublicTowns(towns.towns
@@ -110,6 +110,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
       return;
     }
     try {
+
       const newTownInfo = await apiClient.createTown({
         friendlyName: newTownName,
         isPubliclyListed: newTownIsPublic
@@ -120,11 +121,15 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           <p>This town will NOT be publicly listed. To re-enter it, you will need to use this
             ID: {newTownInfo.coveyTownID}</p>;
       }
+
       toast({
         title: `Town ${newTownName} is ready to go!`,
-        description: <>{privateMessage}Please record these values in case you need to change the
-          room:<br/>Town ID: {newTownInfo.coveyTownID}<br/>Town Editing
-          Password: {newTownInfo.coveyTownPassword}</>,
+        description: <>
+          {privateMessage}Please record these values in case you need to change the
+          room:<br/>Town ID: {newTownInfo.coveyTownID}
+          <br/>Town Editing
+          Password: {newTownInfo.coveyTownPassword}
+        </>,
         status: 'success',
         isClosable: true,
         duration: null,

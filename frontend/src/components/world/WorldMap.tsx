@@ -94,6 +94,12 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tree3', '/assets/placeable/treeSprite/frame3.gif');
     this.load.image('tree4', '/assets/placeable/treeSprite/frame4.gif');
     this.load.image('tree5', '/assets/placeable/treeSprite/frame5.gif');
+
+    this.load.image('flower1', '/assets/placeable/flowerSprite/flower1.gif');
+    this.load.image('flower2', '/assets/placeable/flowerSprite/flower2.gif');
+    this.load.image('flower3', '/assets/placeable/flowerSprite/flower3.gif');
+    this.load.image('flower4', '/assets/placeable/flowerSprite/flower4.gif');
+    this.load.image('flower5', '/assets/placeable/flowerSprite/flower5.gif');
   }
 
 
@@ -245,6 +251,34 @@ class CoveyGameScene extends Phaser.Scene {
           .setDisplaySize(60,60)
           .setImmovable(true)
           .play('tree');
+        myPlaceable.sprite = sprite;
+        this.placeableGroup?.add(myPlaceable.sprite);
+      }
+    }
+
+    if (this.physics && myPlaceable.placeableID === 'flower') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+
+        this.anims.create({
+          key: 'flower',
+          frames: [
+            { key: 'flower1' },
+            { key: 'flower5' },
+            { key: 'flower2' },
+            { key: 'flower3' },
+            { key: 'flower4', duration: 50 }
+          ],
+          frameRate: 8,
+          repeat: -1
+        });
+
+        sprite = this.physics.add
+          .sprite(xCord, yCord, 'flower1')
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(60,60)
+          .setImmovable(true)
+          .play('flower');
         myPlaceable.sprite = sprite;
         this.placeableGroup?.add(myPlaceable.sprite);
       }
@@ -743,19 +777,19 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      // placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flowers'))
+      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flower', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 3, 'banner', true))
+      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 4, 'banner', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 4, 'youtube', true))
+      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 5, 'youtube', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 5, 'chess'))
+      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 6, 'chess'))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 6))
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 7))
 
 
       function destroyText(gameScene: CoveyGameScene ) {
