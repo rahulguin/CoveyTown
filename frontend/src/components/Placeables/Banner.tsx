@@ -1,15 +1,13 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
+import React, { FunctionComponent, useState } from 'react';
 
 import {
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button, Box
 } from "@chakra-ui/react";
 
 

@@ -277,7 +277,7 @@ export async function addPlaceableHandler(
     requestData.playerToken,
     requestData.placeableID,
     requestData.location,
-    requestData.placeableInformation
+    requestData.placeableInformation,
   );
   const placeableAt = townsStore.getPlaceable(requestData.coveyTownID, requestData.location);
   return {
