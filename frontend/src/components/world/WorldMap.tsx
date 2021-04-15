@@ -80,7 +80,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.image('tictactoe', '/assets/placeable/tictactoe.png');
     this.load.image('chess', '/assets/placeable/chess.png');
     this.load.image('flappy', '/assets/placeable/FlappyBird.png');
-    this.load.image('banner', '/assets/placeable/Banner.png');
+    this.load.image('banner', '/assets/placeable/banner.png');
     this.load.image('youtube', '/assets/placeable/youtube.png');
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
@@ -352,7 +352,7 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           .sprite(xCord, yCord, 'banner')
           .setOffset(0, 24)
-          .setDisplaySize(100,100)
+          .setDisplaySize(60,60)
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
@@ -885,7 +885,7 @@ class CoveyGameScene extends Phaser.Scene {
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
       .setSize(30, 40)
       .setOffset(0, 24)
-      .setDepth(100)
+      .setDepth(5)
       .setInteractive();
 
     this.placeableGroup = this.physics.add.group({
