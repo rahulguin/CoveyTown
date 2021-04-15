@@ -352,7 +352,7 @@ class CoveyGameScene extends Phaser.Scene {
           // @ts-ignore - JB todo
           .sprite(xCord, yCord, 'banner')
           .setOffset(0, 24)
-          .setDisplaySize(100,100)
+          .setDisplaySize(60,60)
           .setImmovable(true)
           .setInteractive();
         myPlaceable.sprite = sprite;
