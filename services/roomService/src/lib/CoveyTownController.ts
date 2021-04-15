@@ -263,7 +263,7 @@ export default class CoveyTownController {
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location,
-        placeableInformation: {},
+        placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
       };
     }
 

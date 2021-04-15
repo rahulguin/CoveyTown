@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import { PlaceableInputInformation, PlaceableLocation } from '../CoveyTypes';
+import { isDefined } from '../Utils';
 
 export default class Placeable {
   private readonly _placeableID: string;
@@ -8,13 +9,13 @@ export default class Placeable {
 
   private readonly _name: string;
 
-  private _placeableInformation?: {
-    bannerText?: string;
-  };
+  private _placeableInformation?: PlaceableInputInformation;
 
   static readonly EMPTY_PLACEABLE_ID: string = 'empty';
 
   static readonly EMPTY_PLACEABLE_NAME: string = 'empty space';
+
+  static readonly EMPTY_PLACEABLE_INFO: PlaceableInputInformation | undefined = undefined;
 
   static initializeSet(): Set<string> {
     return new Set<string>()
@@ -31,13 +32,17 @@ export default class Placeable {
   constructor(
     placeableID: string,
     location: PlaceableLocation,
-    placeableInformation?: { bannerText?: string },
+    placeableInformation?: PlaceableInputInformation,
     _name = 'dummy name',
   ) {
     this._placeableID = placeableID;
     this._location = location;
     this._name = _name;
-    this._placeableInformation = placeableInformation;
+    if (isDefined(placeableInformation)) {
+      this._placeableInformation = placeableInformation;
+    } else {
+      this._placeableInformation = Placeable.EMPTY_PLACEABLE_INFO;
+    }
   }
 
   get location(): PlaceableLocation {
@@ -73,6 +78,11 @@ export default class Placeable {
   }
 
   static constructEmptyPlaceable(location: PlaceableLocation): Placeable {
-    return new Placeable(this.EMPTY_PLACEABLE_ID, location, {}, this.EMPTY_PLACEABLE_NAME);
+    return new Placeable(
+      this.EMPTY_PLACEABLE_ID,
+      location,
+      this.EMPTY_PLACEABLE_INFO,
+      this.EMPTY_PLACEABLE_NAME,
+    );
   }
 }
