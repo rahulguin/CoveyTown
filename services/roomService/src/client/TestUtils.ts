@@ -1,4 +1,4 @@
-import http from 'http';
+import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Socket as ServerSocket } from 'socket.io';
 // eslint-disable-next-line import/no-extraneous-dependencies
