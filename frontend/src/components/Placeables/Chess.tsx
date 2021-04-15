@@ -1,7 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-// import Button from 'react-bootstrap/Button';
-// import Modal from 'react-bootstrap/Modal'\;
+import React, { FunctionComponent, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -20,12 +17,7 @@ export interface ModalProps {
   modalContent: string;
   headerText: string;
 }
-export const Chess: FunctionComponent<ModalProps> = ({
-                                                           isShown,
-                                                           hide,
-                                                           modalContent,
-                                                           headerText,
-                                                         }) => {
+export const Chess: FunctionComponent<ModalProps> = ({hide}) => {
   const [showing, setShowing] = useState<boolean>(true);
   const hiding = () => {
     setShowing(false);

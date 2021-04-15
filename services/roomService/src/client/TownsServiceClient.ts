@@ -101,7 +101,7 @@ export interface PlaceableAddRequest {
   coveyTownID: string;
 
   coveyTownPassword: string;
-  playerID: string;
+  playersToken: string;
   placeableID: string;
   location: PlaceableLocation;
 }
@@ -128,7 +128,7 @@ export interface PlaceableLocation {
 export interface PlaceableDeleteRequest {
   coveyTownID: string;
   coveyTownPassword: string;
-  playerID: string;
+  playersToken: string;
   location: PlaceableLocation;
 }
 
@@ -152,7 +152,7 @@ export interface PlaceableInfo {
   placeableID: string;
   placeableName: string;
   location: PlaceableLocation;
-  objectInformation: {
+  placeableInformation?: {
     bannerText?: string
   };
 }
@@ -274,8 +274,7 @@ export default class TownsServiceClient {
 
   async getPlayersPermission(requestData: PlayerGetPermissionRequest): Promise<boolean> {
     const responseWrapper = await this._axios.get<ResponseEnvelope<boolean>>(
-      `/towns/${requestData.coveyTownID}/permissions`,
-      { data: requestData },
+      `/towns/${requestData.coveyTownID}/permissions/${requestData.playerID}`,
     );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }

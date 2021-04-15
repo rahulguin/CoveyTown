@@ -248,7 +248,7 @@ describe('TownServiceApiSocket', () => {
     const addInfo = {
       coveyTownID: town.coveyTownID,
       coveyTownPassword: town.townUpdatePassword,
-      playerID: nanoid(),
+      playersToken: nanoid(),
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
@@ -292,7 +292,7 @@ describe('TownServiceApiSocket', () => {
     const placeableInfo = {
       coveyTownID: town.coveyTownID,
       coveyTownPassword: town.townUpdatePassword,
-      playerID: nanoid(),
+      playersToken: nanoid(),
       placeableID: placeableIdAdded,
       location: placeablePlacedLocation,
     };
