@@ -5,7 +5,7 @@ import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import { TicTacToe } from '../Placeables/TicTacToe';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-import Placeable, { PlaceableLocation } from '../../classes/Placeable';
+import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
 // import { find } from 'ramda';
@@ -202,27 +202,13 @@ class CoveyGameScene extends Phaser.Scene {
 
    if(myPlaceable && myPlaceable.sprite) {
 
-    const BUTTON_WIDTH = 309;
     const X_PADDING = 10;
     const Y_PADDING = 7;
-    const FONT_SIZE_IN_PIXLES = 13;
-    const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
-    const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
-    const TEXT_HEIGHT = 50;
-    const PLAYER_WIDTH = 32;
-    const X_PLACEMENT_OFFSET = PLAYER_WIDTH + 12;
-    const Y_PLACEMENT_OFFSET = 42;
-    const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
-     
-    const spriteWidth = myPlaceable.sprite.width;
     const {xIndex, yIndex} = myPlaceable.location;
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(xIndex, yIndex);
     const xCord = indexLocation.x;
     const yCord = indexLocation.y;
-    console.log('x and y of deletable object , spriteWidth', xCord, ' ', yCord, ' ', spriteWidth);
-  
     myPlaceable.sprite.on('pointerdown', () => {
-
       const deleteOption = this.add.text(xCord, yCord, 'Do you want to delete\n this object?',
       {
       color: '#FFFFFF',
@@ -234,8 +220,7 @@ class CoveyGameScene extends Phaser.Scene {
       },
       fixedWidth: 309,
       });
-
-      const deleteOptionYes = this.add.text(xCord, yCord + 20, 'Delete',
+      const deleteOptionYes = this.add.text(xCord, yCord + 25, 'Delete',
       {
       color: '#FFFFFF',
       backgroundColor: '#004d00',
@@ -247,8 +232,13 @@ class CoveyGameScene extends Phaser.Scene {
       fixedWidth: 309,
       });
       deleteOptionYes.setInteractive();
-
-      const deleteOptionNo = this.add.text( xCord, yCord + 40, 'Cancel',
+      deleteOptionYes.on('pointerover', () => {
+        deleteOptionYes.setBackgroundColor('#008000');
+      });
+      deleteOptionYes.on('pointerout', () => {
+        deleteOptionYes.setBackgroundColor('#004d00');
+      });
+      const deleteOptionNo = this.add.text( xCord, yCord + 50, 'Cancel',
       {
        color: '#FFFFFF',
        backgroundColor: '#004d00',
@@ -260,6 +250,12 @@ class CoveyGameScene extends Phaser.Scene {
       fixedWidth: 309,
       });
     deleteOptionNo.setInteractive();
+    deleteOptionNo.on('pointerover', () => {
+      deleteOptionNo.setBackgroundColor('#008000');
+    });
+    deleteOptionNo.on('pointerout', () => {
+      deleteOptionNo.setBackgroundColor('#004d00');
+    });
     deleteOptionYes.on('pointerdown', () => {
     deleteOption.destroy();
     deleteOptionNo.destroy();
@@ -269,8 +265,7 @@ class CoveyGameScene extends Phaser.Scene {
     });
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
    deleteOptionNo.on('pointerdown', () => destroyOptions());
-
-  function destroyOptions() {
+   function destroyOptions() {
     deleteOption.destroy();
     deleteOptionNo.destroy();
     deleteOptionYes.destroy();
@@ -279,8 +274,7 @@ class CoveyGameScene extends Phaser.Scene {
 }
 }
 
-  updatePlaceable(placeable: Placeable) {
-
+updatePlaceable(placeable: Placeable) {
     let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
     if (!myPlaceable) {
       let { location } = placeable;
@@ -321,14 +315,6 @@ class CoveyGameScene extends Phaser.Scene {
           .setImmovable(true)
           .play('tree');
         myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
-        if(pointer.rightButtonDown()) { 
-          console.log('tree');
-          if(myPlaceable) {
-            this.placeableDeletion(myPlaceable);
-          }
-         }          
-        })
        }
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
@@ -345,7 +331,6 @@ class CoveyGameScene extends Phaser.Scene {
 
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
           if(pointer.leftButtonDown()) {       
-          console.log('tictactoe');
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -354,7 +339,6 @@ class CoveyGameScene extends Phaser.Scene {
           }         
           else if(pointer.rightButtonDown()) {
             if(myPlaceable) {
-              console.log('tictactoe');
               this.placeableDeletion(myPlaceable);
             }           
           }
@@ -375,7 +359,6 @@ class CoveyGameScene extends Phaser.Scene {
         myPlaceable.sprite = sprite;
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
           if(pointer.leftButtonDown()) {
-            console.log('flapppy');
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
@@ -510,7 +493,6 @@ class CoveyGameScene extends Phaser.Scene {
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
       let xCord = gameScene.lastLocation?.x;
       let yCord = gameScene.lastLocation?.y;
-      console.log('x and y of added object before conversion', xCord, ' ', yCord);
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
@@ -537,7 +519,6 @@ class CoveyGameScene extends Phaser.Scene {
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
       const xIndex  = indexLocation.x 
       const yIndex  = indexLocation.y
-      console.log('x and y of added object', xIndex, ' ', yIndex);
 
         try{
           await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
