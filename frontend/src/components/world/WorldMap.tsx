@@ -13,6 +13,30 @@ import { FlappyBird } from '../Placeables/FlappyBird';
 
 
 class CoveyGameScene extends Phaser.Scene {
+
+
+  private BUTTON_WIDTH = 309;
+
+  private readonly X_PADDING: number= 10;
+
+  private readonly Y_PADDING: number = 7;
+
+  private readonly FONT_SIZE_IN_PIXLES : number= 13;
+
+  private readonly FONT_SIZE: string= `${this.FONT_SIZE_IN_PIXLES}px`
+
+  private readonly BUTTON_HEIGHT: number = (2 * this.Y_PADDING) + this.FONT_SIZE_IN_PIXLES;
+
+  private readonly TEXT_HEIGHT: number = 50;
+
+  private readonly PLAYER_WIDTH : number= 32;
+
+  private readonly X_PLACEMENT_OFFSET: number= this.PLAYER_WIDTH + 12;
+
+  private readonly Y_PLACEMENT_OFFSET: number = 42;
+
+  private readonly X_OFFSET: number = (this.PLAYER_WIDTH - this.BUTTON_WIDTH) / 2;
+
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
@@ -197,13 +221,36 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+  errorMessageDisplay(message: string, gameScene: CoveyGameScene, xCord : number, yCord: number) {
+
+      const errorLines = message.split("\n")
+      const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+      const W_WIDTH = this.FONT_SIZE_IN_PIXLES * 0.8
+      const xErrorOffset = (gameScene.PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+      const buttonText = gameScene.add.text(xCord + xErrorOffset, yCord, `${message}\n(Click me to close)`, {
+        color: '#FFFFFF',
+        fontSize: gameScene.FONT_SIZE,
+        backgroundColor: 'darkred',
+        padding: {
+          x: this.X_PADDING,
+          y: this.Y_PADDING
+        },
+        fixedHeight: errorLines.length * gameScene.BUTTON_HEIGHT,
+        fixedWidth: maxStringLength * W_WIDTH,
+        align: 'center'
+      });
+      gameScene.pause();
+      buttonText.setInteractive();
+      buttonText.on('pointerdown', () => {
+        buttonText.destroy();
+        gameScene.resume();
+      });
+  }
+
 
   placeableDeletion(myPlaceable: Placeable) {
 
    if(myPlaceable && myPlaceable.sprite) {
-
-    const X_PADDING = 10;
-    const Y_PADDING = 7;
     const {xIndex, yIndex} = myPlaceable.location;
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(xIndex, yIndex);
     const xCord = indexLocation.x;
@@ -215,8 +262,8 @@ class CoveyGameScene extends Phaser.Scene {
       backgroundColor: '#004d00',
       align: 'center',
       padding: {
-        x: X_PADDING,
-        y: Y_PADDING
+        x: this.X_PADDING,
+        y: this.Y_PADDING
       },
       fixedWidth: 309,
       });
@@ -226,8 +273,8 @@ class CoveyGameScene extends Phaser.Scene {
       backgroundColor: '#004d00',
       align: 'center',
       padding: {
-        x: X_PADDING,
-        y: Y_PADDING
+        x: this.X_PADDING,
+        y: this.Y_PADDING
       },
       fixedWidth: 309,
       });
@@ -244,8 +291,8 @@ class CoveyGameScene extends Phaser.Scene {
        backgroundColor: '#004d00',
        align: 'center',
        padding: {
-         x: X_PADDING,
-         y: Y_PADDING
+         x: this.X_PADDING,
+         y: this.Y_PADDING
        },
       fixedWidth: 309,
       });
@@ -257,10 +304,15 @@ class CoveyGameScene extends Phaser.Scene {
       deleteOptionNo.setBackgroundColor('#004d00');
     });
     deleteOptionYes.on('pointerdown', () => {
-    deleteOption.destroy();
-    deleteOptionNo.destroy();
-    deleteOptionYes.destroy();
-    this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex, yIndex}});
+      deleteOption.destroy();
+      deleteOptionNo.destroy();
+      deleteOptionYes.destroy();
+      try{
+        this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex, yIndex}});
+      } catch (err) {
+        console.log("error message");
+        this.errorMessageDisplay(err.message, this, xCord, yCord);
+      }
     });
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
    deleteOptionNo.on('pointerdown', () => destroyOptions());
@@ -468,38 +520,22 @@ updatePlaceable(placeable: Placeable) {
     }
   }
 
-
-
-
-
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 
-
-    const BUTTON_WIDTH = 309;
-    const X_PADDING = 10;
-    const Y_PADDING = 7;
-    const FONT_SIZE_IN_PIXLES = 13;
-    const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
-    const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
-    const TEXT_HEIGHT = 50;
-    const PLAYER_WIDTH = 32;
-    const X_PLACEMENT_OFFSET = PLAYER_WIDTH + 12;
-    const Y_PLACEMENT_OFFSET = 42;
-    const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
       let xCord = gameScene.lastLocation?.x;
       let yCord = gameScene.lastLocation?.y;
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
-          fontSize: FONT_SIZE,
+          fontSize: gameScene.FONT_SIZE,
           backgroundColor: 'darkred',
           padding: {
-            x: X_PADDING,
-            y: Y_PADDING
+            x: gameScene.X_PADDING,
+            y: gameScene.Y_PADDING
           },
           fixedHeight: 50,
           fixedWidth: 50,
@@ -513,8 +549,8 @@ updatePlaceable(placeable: Placeable) {
         });
         return
       }
-      xCord += (X_PLACEMENT_OFFSET / 2);
-      yCord += (Y_PLACEMENT_OFFSET / 2);
+      xCord += (gameScene.X_PLACEMENT_OFFSET / 2);
+      yCord += (gameScene.Y_PLACEMENT_OFFSET / 2);
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
       const xIndex  = indexLocation.x 
       const yIndex  = indexLocation.y
@@ -522,29 +558,7 @@ updatePlaceable(placeable: Placeable) {
         try{
           await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
         } catch (err) {
-          const errorMessage: string = err.message;
-          const errorLines = errorMessage.split("\n")
-          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
-          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
-          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
-          const buttonText = gameScene.add.text(xCord + xErrorOffset, yCord, `${err.message}\n(Click me to close)`, {
-            color: '#FFFFFF',
-            fontSize: FONT_SIZE,
-            backgroundColor: 'darkred',
-            padding: {
-              x: X_PADDING,
-              y: Y_PADDING
-            },
-            fixedHeight: errorLines.length * BUTTON_HEIGHT,
-            fixedWidth: maxStringLength * W_WIDTH,
-            align: 'center'
-          });
-          gameScene.pause();
-          buttonText.setInteractive();
-          buttonText.on('pointerdown', () => {
-            buttonText.destroy();
-            gameScene.resume();
-          });
+            gameScene.errorMessageDisplay(err.message, gameScene, xCord, yCord);
         }
         
         
@@ -554,8 +568,8 @@ updatePlaceable(placeable: Placeable) {
       let xLocation: integer
       let yLocation: integer
       if (gameScene.lastLocation) {
-        xLocation = gameScene.lastLocation.x + X_OFFSET
-        yLocation = gameScene.lastLocation.y + TEXT_HEIGHT + BUTTON_HEIGHT * numberInList
+        xLocation = gameScene.lastLocation.x + gameScene.X_OFFSET
+        yLocation = gameScene.lastLocation.y + gameScene.TEXT_HEIGHT + gameScene.BUTTON_HEIGHT * numberInList
       } else {
         // need to figure out what to do here
         xLocation = 0;
@@ -564,15 +578,15 @@ updatePlaceable(placeable: Placeable) {
 
       const button = gameScene.add.text(xLocation, yLocation, placeableName,
       {
-        fontSize: FONT_SIZE,
+        fontSize: gameScene.FONT_SIZE,
         color: '#FFFFFF',
         backgroundColor: '#004d00',
         align: 'center',
         padding: {
-          x: X_PADDING,
-          y: Y_PADDING
+          x: gameScene.X_PADDING,
+          y: gameScene.Y_PADDING
         },
-        fixedWidth: BUTTON_WIDTH,
+        fixedWidth: gameScene.BUTTON_WIDTH,
       });
       button.setInteractive();
       const escapeKey = gameScene.input.keyboard.addKey('ESC');
@@ -604,19 +618,18 @@ updatePlaceable(placeable: Placeable) {
       if (!this.lastLocation) {
         return
       }
-      const buttonText = this.add.text(this.lastLocation.x + X_OFFSET, this.lastLocation.y, "Which placeable would\nyou like to create here?", {
+      const buttonText = this.add.text(this.lastLocation.x + this.X_OFFSET, this.lastLocation.y, "Which placeable would\nyou like to create here?", {
         color: '#FFFFFF',
-        fontSize: FONT_SIZE,
+        fontSize: this.FONT_SIZE,
         // backgroundColor: '#F0000',
         backgroundColor: '#003300',
         padding: {
-          x: X_PADDING,
-          y: Y_PADDING
+          x: this.X_PADDING,
+          y: this.Y_PADDING
         },
-        fixedHeight: TEXT_HEIGHT,
-        fixedWidth: BUTTON_WIDTH,
+        fixedHeight: this.TEXT_HEIGHT,
+        fixedWidth: this.BUTTON_WIDTH,
         align: 'center',
-
         shadow: {
           offsetX: 5,
           offsetY: 5,
@@ -942,13 +955,14 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlaceables(placeables);
     }
 
-  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); // newly added placeableObjects
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); 
 
   useEffect(() => {
-    gameScene?.updatePlaceables(placeables); // newly added this fun call
-  }, [placeables, gameScene]); // newly added placeableObjects
+    gameScene?.updatePlaceables(placeables); 
+  }, [placeables, gameScene]); 
 
   return (
+
     <div>
       <div id="map-container"/>
       <div id="modal-container"/>
