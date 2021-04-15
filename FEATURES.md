@@ -23,7 +23,8 @@ To Delete a placeable from your town
 1. make sure the placeable you want to delete is in view on your screen
 2. make sure that you have permission to perform this actions (if you do not see [giving a removing player permissions](#giving-and-removing-player-positions))
 3. right click on the placeable you would like to delete
-4. then hit delete
+4. then hit yes
+   if you would like to cancel the request hit no
 
 ### Current placeables
 
