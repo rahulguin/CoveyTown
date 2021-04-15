@@ -22,9 +22,13 @@ export interface PlaceableInfo {
   placeableName: string;
   location: PlaceableLocation;
   placeableInformation?: {
-    bannerText?: string
-  }
+    bannerText?: string;
+  };
 }
+
+export type PlaceableInputInformation = {
+  bannerText?: string;
+};
 
 export type PlayerUpdateSpecifications = {
   specifications: PlayerPermissionSpecification[];

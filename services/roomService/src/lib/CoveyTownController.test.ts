@@ -4,7 +4,12 @@ import { nanoid } from 'nanoid';
 import { Socket } from 'socket.io';
 import * as TestUtils from '../client/TestUtils';
 import { randomPlaceablesFromAllowedPlaceables } from '../client/TestUtils';
-import { PlaceableLocation, PlayerPermissionSpecification, UserLocation } from '../CoveyTypes';
+import {
+  PlaceableInputInformation,
+  PlaceableLocation,
+  PlayerPermissionSpecification,
+  UserLocation,
+} from '../CoveyTypes';
 import {
   PlaceableInfo,
   townSubscriptionHandler,
@@ -231,12 +236,14 @@ describe('CoveyTownController', () => {
         placeableID: placeable.placeableID,
         placeableName: placeable.name,
         location: placeable.location,
+        placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
       };
       emptyInfo = {
         coveyTownID: townController.coveyTownID,
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
         location: placedLocation,
+        placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
       };
     });
 
@@ -244,12 +251,31 @@ describe('CoveyTownController', () => {
       const firstResponce = townController.getPlaceableAt(placedLocation);
       expect(firstResponce).toStrictEqual(emptyInfo);
     });
-    it('should return the specific placeable after a succesful addPlaceable call', async () => {
+    it('should return the specific placeable after a succesful addPlaceable call - undefined input info', async () => {
       const addResponce = townController.addPlaceable(placeableID, placedLocation);
       expect(addResponce).toStrictEqual(undefined);
 
       const firstResponce = townController.getPlaceableAt(placedLocation);
       expect(firstResponce).toStrictEqual(placeableInfo);
+    });
+    it('should return the specific placeable after a succesful addPlaceable call - given input info', async () => {
+      const placeableInputInfo: PlaceableInputInformation = { bannerText: 'test' };
+      const addResponce = townController.addPlaceable(
+        placeableID,
+        placedLocation,
+        placeableInputInfo,
+      );
+      expect(addResponce).toStrictEqual(undefined);
+
+      const firstResponce = townController.getPlaceableAt(placedLocation);
+      const expectedInputPlaceableInfo: PlaceableInfo = {
+        placeableName: placeableInfo.placeableName,
+        placeableID: placeableInfo.placeableID,
+        coveyTownID: placeableInfo.coveyTownID,
+        location: placeableInfo.location,
+        placeableInformation: placeableInputInfo,
+      };
+      expect(firstResponce).toStrictEqual(expectedInputPlaceableInfo);
     });
     it('should return the same info after successive calls with no modifiers call inbetween', () => {
       const addResponce = townController.addPlaceable(placeableID, placedLocation);

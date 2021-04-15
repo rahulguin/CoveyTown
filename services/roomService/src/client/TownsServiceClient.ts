@@ -1,6 +1,6 @@
 import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { PlayerUpdateSpecifications, UserLocation } from '../CoveyTypes';
+import { PlaceableInputInformation, PlayerUpdateSpecifications, UserLocation } from '../CoveyTypes';
 
 export type ServerPlayer = { _id: string; _userName: string; location: UserLocation };
 
@@ -99,11 +99,11 @@ export type CoveyTownInfo = {
  */
 export interface PlaceableAddRequest {
   coveyTownID: string;
-
   coveyTownPassword: string;
   playersToken: string;
   placeableID: string;
   location: PlaceableLocation;
+  placeableInformation?: PlaceableInputInformation;
 }
 
 /**
@@ -145,6 +145,7 @@ export interface PlaceableListRequest {
 export interface PlaceableGetRequest {
   coveyTownID: string;
   location: PlaceableLocation;
+  placeableInformation?: PlaceableInputInformation;
 }
 
 export interface PlaceableInfo {
@@ -153,7 +154,7 @@ export interface PlaceableInfo {
   placeableName: string;
   location: PlaceableLocation;
   placeableInformation?: {
-    bannerText?: string
+    bannerText?: string;
   };
 }
 

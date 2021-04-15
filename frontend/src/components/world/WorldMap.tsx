@@ -8,9 +8,7 @@ import useCoveyAppState from '../../hooks/useCoveyAppState';
 import Placeable from '../../classes/Placeable';
 import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
-
 import {Chess} from "../Placeables/Chess";
-
 import { Banner } from '../Placeables/Banner';
 import { Youtube } from '../Placeables/Youtube';
 
@@ -777,11 +775,11 @@ class CoveyGameScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 3, 'flower', false))
+      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 1, 'flower', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 1, 'tictactoe', false))
+      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 2, 'tictactoe', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 2, 'flappy', false))
+      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 3, 'flappy', false))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       placeableButtonList.push(createListButton(this, 'Banner', destroyText, 4, 'banner', true))
       // eslint-disable-next-line @typescript-eslint/no-use-before-define

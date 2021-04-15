@@ -1,6 +1,7 @@
 import {
   CoveyTownList,
   PlaceableInfo,
+  PlaceableInputInformation,
   PlaceableLocation,
   PlayerUpdateSpecifications,
 } from '../CoveyTypes';
@@ -106,9 +107,7 @@ export default class CoveyTownsStore {
     playerSessionToken: string,
     placeableID: string,
     placeableLocation: PlaceableLocation,
-    placeableInformation?: {
-      bannerText?: string
-    },
+    placeableInformation?: PlaceableInputInformation,
   ): string | undefined {
     const existingTown = this.getControllerForTown(coveyTownID);
 
@@ -127,7 +126,11 @@ export default class CoveyTownsStore {
         ) {
           return 'Invalid Location:\nThe location to add the placeable must be defined.';
         }
-        const addResponce = existingTown.addPlaceable(placeableID, placeableLocation, placeableInformation);
+        const addResponce = existingTown.addPlaceable(
+          placeableID,
+          placeableLocation,
+          placeableInformation,
+        );
         return addResponce;
       }
       return 'Do not have permission:\nAsk someone in the room to give you permission.';
