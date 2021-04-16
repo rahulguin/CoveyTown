@@ -769,25 +769,9 @@ class CoveyGameScene extends Phaser.Scene {
         }
       });
       buttonText.setDepth(10);
+      
 
       const placeableButtonList: Phaser.GameObjects.Text[] = []
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 1, 'flower', false))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 2, 'tictactoe', false))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 3, 'flappy', false))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 4, 'banner', true))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 5, 'youtube', true))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 6, 'chess'))
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 7))
-
 
       function destroyText(gameScene: CoveyGameScene ) {
         buttonText.destroy();
@@ -795,8 +779,17 @@ class CoveyGameScene extends Phaser.Scene {
           button.destroy();
         })
         gameScene.resume();
-
       }
+
+      placeableButtonList.push(createListButton(this, 'Tree', destroyText, 0,'tree', false));
+      placeableButtonList.push(createListButton(this, 'Flowers', destroyText, 1, 'flower', false))
+      placeableButtonList.push(createListButton(this, 'Tic Tac Toe', destroyText, 2, 'tictactoe', false))
+      placeableButtonList.push(createListButton(this, 'Flappy Bird', destroyText, 3, 'flappy', false))
+      placeableButtonList.push(createListButton(this, 'Banner', destroyText, 4, 'banner', true))
+      placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 5, 'youtube', true))
+      placeableButtonList.push(createListButton(this, 'Chess', destroyText, 6, 'chess'))
+      placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 7))
+      
       this.pause();
     });
   }
