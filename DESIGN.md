@@ -84,9 +84,11 @@ Contains the information of where the placeable was deleted from so players can 
 
 # CRC Cards for back-end changes
 
+
+
 Class | State | Responsibility | Collaborators
-| :---: | :---: 
-PlayerSession | _player, _sessionToken, _videoToken
+| :---: | :---: | :---: | :---:
+PlayerSession  | _player, _sessionToken, _videoToken | Content Cell | 
 
 # Changes to front-end
 
