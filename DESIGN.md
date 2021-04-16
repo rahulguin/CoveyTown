@@ -108,15 +108,22 @@ The following fields are now being stored in the coveyAppState:
 - placeables - Stores the list of placeables that have been placed in the current room.
 - currentTownID - Stores the townID of the room we are currently in.
 - apiClient - An object of TownServiceClient that provides the service calls used. The API calls for adding and deleting are used inside CoveyGameScene
-- sessionToken -
+  <<<<<<< HEAD
+- # sessionToken -
+- sessionToken
+  > > > > > > > 0a73a348aa86b0175d825bc7ef21107b6982015f
 
 ## WorldMap
+
+Significant changes were made to WorldMap to provide the Placeables feature:
 
 ## PermissionsButton
 
 This component was created to display the Permissions button. This component is being rendered in the MenuBar component, so that it displays alongside the Town Settings and A/V Settings buttons. Clicking on the Permissions button opens up a Chakra UI Modal with options for entering password and changing player's permissions.
 
 ## Placeable Images
+
+All images used for displaying placeables are stored in public/assets/placeable.
 
 ## Placable Components
 
