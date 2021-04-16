@@ -48,7 +48,12 @@ The frontend will automatically re-compile and reload in your browser if you cha
 
 ### Installation instructions
 
-This new upgraded version of Covey.Town doesn't have any extra installation features that you need to worry about. Just make sure to do an `npm install` in both the front-end and back-end, follow the above steps for running locally and you should be all set. 
+This new upgraded version of Covey.Town doesn't have any extra installation features that you need to worry about. Just make sure to do an `npm install` in both the front-end and back-end, follow the above steps for running locally and you should be all set.
+
+You can clone our repository by entering:
+
+`$ git clone https://github.com/rahulguin/CoveyTown.git`
+
 
 ### Syncing with original repo
 
