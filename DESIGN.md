@@ -80,7 +80,9 @@ Contains the information of the placeable that was just added so players can add
 ## placeableDeleted
 
 A socket connection sent from the sever to every player when a placeable has successfully been deleted - including the player that made the request to add.
-Contains the information of where the placeable was deleted from so players can remove the placeable they have at that location
+Contains the information of where the placeable was deleted from so players can remove the placeable they have at that location.
+
+# CRC Cards for back-end changes
 
 # Changes to front-end
 
