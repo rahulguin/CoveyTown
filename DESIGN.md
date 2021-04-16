@@ -2,7 +2,7 @@
 
 In order to support both our Placeables and Permissions features we made many changes and additions to the back-end code.
 
-## towns
+## Towns
 
 Added a list of placeables to the townController to allow each town to have a reference to all the placeables that have been created in it.
 It represents the definitive list of all placeables that a room has.
