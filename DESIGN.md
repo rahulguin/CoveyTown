@@ -139,3 +139,12 @@ We have created a React Component for each interactive placeable object (No comp
 - FlappyBird
 - TicTacToe
 - Youtube
+
+## Visual Changes
+
+Significant changes have made to the look-and-feel of the entire application. The first thing you would notice is that the landing page has been significantly altered, but with the same functionality as before. Additionally, minor changes were made for the display inside the room as well (menubar fixed on top and the town map is centered). The following components were altered to achieve this:
+ - App
+ - VideoOverlay
+ - MenuBar
+ - PreJoinScreens
+ - DeviceSelectionScreen
