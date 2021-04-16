@@ -133,4 +133,11 @@ All images used for displaying placeables are stored in public/assets/placeable.
 
 ## Placable Components
 
+We have created a React Component for each interactive placeable object (No component has been created for Tree and Flowers). They have all been implemented as Modals that get rendered on clicking the appropriate button in the game scene.
+- Banner
+- Chess
+- FlappyBird
+- TicTacToe
+- Youtube
+
 # UI Changes
