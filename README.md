@@ -17,9 +17,15 @@ A backend service (in the `services/roomService` directory) implements the appli
 
 Running the application locally entails running both the backend service and a frontend.
 
-### Link to Repository
+### Important Links
 
-Click [here](https://github.com/rahulguin/CoveyTown) to access our repository. You can clone our repository by entering:
+Click [here](https://github.com/rahulguin/CoveyTown) to access our repository.
+
+Click [here](https://coveyplace.netlify.app/) for our frontend Netlify deployment.
+
+Click [here](https://covey-town-team40.herokuapp.com/) for our HEROKU backend deployment.
+
+You can clone our repository by entering:
 
 ```
 $ git clone https://github.com/rahulguin/CoveyTown.git
