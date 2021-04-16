@@ -607,7 +607,7 @@ class CoveyGameScene extends Phaser.Scene {
       inputBannerText.setDepth(5);
       inputBannerText.addListener('keyup');
       let inputText = '';
-      inputBannerText.on('keyup',  (event: any) => {
+      inputBannerText.on('keyup',  (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.value) {
           inputText = event.target.value;
         }
@@ -621,8 +621,7 @@ class CoveyGameScene extends Phaser.Scene {
       const submitBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 1).createFromHTML(submit);
       submitBannerText.setInteractive();
       submitBannerText.setDepth(5);
-      const submitBannerCallback = async function(scene: CoveyGameScene) {
-        // console.log(inputBannerText.node.getElementsByClassName('form-banner')[0].getAttribute('value'));
+      const submitBannerCallback = async function submitCallback(scene: CoveyGameScene) {
         const objectInformation = {
           bannerText: inputText
         }
@@ -638,7 +637,6 @@ class CoveyGameScene extends Phaser.Scene {
           const errorLines = errorMessage.split("\n")
           const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
           const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
-          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
           const buttonText = gameScene.add.text(xCord, yCord, `${err.message}\n(Click me to close)`, {
             color: '#FFFFFF',
             fontSize: FONT_SIZE,
@@ -675,7 +673,7 @@ class CoveyGameScene extends Phaser.Scene {
       cancelBannerText.setDepth(5);
       cancelBannerText.addListener('click');
 
-      const cancelBannerCallback = function() {
+      const cancelBannerCallback = function cancelCallback() {
         gameScene.resume();
         closeFunction(gameScene);
         inputBannerText.destroy();
