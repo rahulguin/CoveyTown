@@ -23,19 +23,20 @@ To Delete a placeable from your town
 1. make sure the placeable you want to delete is in view on your screen
 2. make sure that you have permission to perform this actions (if you do not see [giving a removing player permissions](#giving-and-removing-player-positions))
 3. right click on the placeable you would like to delete
-4. then hit yes
-   if you would like to cancel the request hit no
+4. then hit delete
+   if you would like to cancel the request cancel
 
 ### Current placeables
 
-|  Placeable  |                                  Icon                                  | number of players | Blocks path | Placeable ID |
-| :---------: | :--------------------------------------------------------------------: | :---------------: | :---------: | :----------: |
-|    Tree     | <img src="frontend/public/assets/placeable/treeSprite.png" width="32"> | non interactable  |    true     |     tree     |
-|   Flowers   |  <img src="frontend/public/assets/placeable/flowers.png" width="32">   | non interactable  |    false    |   flowers    |
-|   banner    |   <img src="frontend/public/assets/placeable/banner.png" width="32">   |     infinite      |    true     |    banner    |
-| Chess board |   <img src="frontend/public/assets/placeable/chess.png" width="32">    |         1         |    true     |    chess     |
-| tic-tac-toe | <img src="frontend/public/assets/placeable/tictactoe.png" width="32">  |         1         |    true     |  tictactoe   |
-| Flappy Bird | <img src="frontend/public/assets/placeable/FlappyBird.png" width="32"> |         1         |    true     |    flappy    |
+|  Placeable  |                                       Icon                                       | number of players | Blocks path | Placeable ID |
+| :---------: | :------------------------------------------------------------------------------: | :---------------: | :---------: | :----------: |
+|    Tree     |  <img src="frontend/public/assets/placeable/treeSprite/frame1.gif" width="32">   | non interactable  |    true     |     tree     |
+|   Flowers   | <img src="frontend/public/assets/placeable/flowerSprite/flower1.gif" width="32"> | non interactable  |    false    |    flower    |
+|   banner    |        <img src="frontend/public/assets/placeable/banner.png" width="32">        |     infinite      |    true     |    banner    |
+| Chess board |        <img src="frontend/public/assets/placeable/chess.png" width="32">         |         1         |    true     |    chess     |
+| tic-tac-toe |      <img src="frontend/public/assets/placeable/tictactoe.png" width="32">       |         1         |    true     |  tictactoe   |
+| Flappy Bird |      <img src="frontend/public/assets/placeable/FlappyBird.png" width="32">      |         1         |    true     |    flappy    |
+|   youtube   |       <img src="frontend/public/assets/placeable/youtube.png" width="32">        |     infinite      |    true     |   youtube    |
 
 ### How to interact with placables
 
