@@ -12,8 +12,7 @@ import * as React from 'react'
 import {FaGithub} from "react-icons/fa";
 import {Text} from "@chakra-ui/layout";
 
-// eslint-disable-next-line import/prefer-default-export
-export const Footer = () => (
+const Footer: React.FunctionComponent = () => (
   <Box as="footer" role="contentinfo" mx="auto" maxW="100%" py="3" px={{ base: '4', md: '8' }} backgroundColor="#F5F5F5">
     <Stack>
       <Stack direction="row" spacing="4" align="center" justify="space-between">
@@ -58,4 +57,7 @@ export const Footer = () => (
       </Text>
     </Stack>
   </Box>
-)
+);
+
+export default Footer;
+

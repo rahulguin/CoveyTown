@@ -25,7 +25,7 @@ import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/us
 import Video from '../../classes/Video/Video';
 import { CoveyTownInfo, TownJoinResponse, } from '../../classes/TownsServiceClient';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-import { Footer } from "../Footer/Footer";
+import Footer from "../Footer/Footer";
 
 
 interface TownSelectionProps {
