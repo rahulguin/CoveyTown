@@ -1,35 +1,20 @@
 # Covey.Town
 
-Covey.Town provides a virtual meeting space where different groups of people can have simultaneous video calls, allowing participants to drift between different conversations, just like in real life.
-Covey.Town was built for Northeastern's [Spring 2021 software engineering course](https://neu-se.github.io/CS4530-CS5500-Spring-2021/), and is designed to be reused across semesters.
-You can view our reference deployment of the app at [app.covey.town](https://app.covey.town/).
+Covey.Town provides a virtual meeting space where different groups of people can have simultaneous video calls, allowing participants to drift between different conversations, just like in real life. Our application extends the Covey.Town application created by [Jonathan Bell](https://github.com/jon-bell) for Northeastern's [Spring 2021 software engineering course](https://neu-se.github.io/CS4530-CS5500-Spring-2021/). The github repo for the original application can be found [here](https://github.com/neu-se/covey.town).  
+
+This [addition](FEATURES.md) to the Covey.Town Codebase allows users to interact with a two new features "Placeables" and "player Permissions"
 
 ![Covey.Town Architecture](docs/covey-town-architecture.png)
 
 The figure above depicts the high-level architecture of Covey.Town.
 The frontend client (in the `frontend` directory of this repository) uses the [PhaserJS Game Library](https://phaser.io) to create a 2D game interface, using tilemaps and sprites.
 The frontend implements video chat using the [Twilio Programmable Video](https://www.twilio.com/docs/video) API, and that aspect of the interface relies heavily on [Twilio's React Starter App](https://github.com/twilio/twilio-video-app-react).
-Using the Twilio API's, an user can enter a room and interact with the game interface by using Placeables. Placeables are interactive objects which can be placed on a map to serve a particular purpose. They can be used for playing games, watching YouTube videos, making annoucements etc. Users can add, delete and place placeables anywhere they want.
 
 A backend service (in the `services/roomService` directory) implements the application logic: tracking which "towns" are available to be joined, and the state of each of those towns.
 
 ## Running this app locally
 
 Running the application locally entails running both the backend service and a frontend.
-
-### Important Links
-
-Click [here](https://github.com/rahulguin/CoveyTown) to access our repository.
-
-Click [here](https://coveyplace.netlify.app/) for our frontend Netlify deployment.
-
-Click [here](https://covey-town-team40.herokuapp.com/) for our HEROKU backend deployment.
-
-You can clone our repository by entering:
-
-```
-$ git clone https://github.com/rahulguin/CoveyTown.git
-```
 
 ### Setting up the backend
 
