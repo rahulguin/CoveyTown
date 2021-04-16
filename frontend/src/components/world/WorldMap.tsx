@@ -401,6 +401,19 @@ class CoveyGameScene extends Phaser.Scene {
       return sprite;
     }
 
+    const isShown = true;
+    const toggle = () => {
+      ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+    };
+    const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+
+    const spriteMap = new Map()
+    spriteMap.set('tictactoe',<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>)
+    spriteMap.set('flappy', <FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>)
+    spriteMap.set('chess', <Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>)
+    spriteMap.set('banner', <Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>)
+    spriteMap.set('youtube', <Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>)
+
 
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
@@ -408,7 +421,7 @@ class CoveyGameScene extends Phaser.Scene {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
           .setOffset(0, 60 - 32)
-          .setDisplaySize(60,60)
+          .setDisplaySize(65,65)
           .setImmovable(true)
           .play('tree')
           .setInteractive();
@@ -446,41 +459,122 @@ class CoveyGameScene extends Phaser.Scene {
           }
         })
       }
-    } else if (this.physics) {
+    } else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, myPlaceable.placeableID)
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(40, 40)
+          .setImmovable(true)
+          .setInteractive();
 
-      const isShown = true;
-      const toggle = () => {
-        ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-      };
-      const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
-
-      const spriteMap = new Map()
-      spriteMap.set('tictactoe',<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>)
-      spriteMap.set('flappy', <FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>)
-      spriteMap.set('chess', <Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>)
-      spriteMap.set('banner', <Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>)
-      spriteMap.set('youtube', <Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>)
-
-
-
-      if(myPlaceable.placeableID === 'banner') {
-        myPlaceable.sprite = createSprite(this,myPlaceable,100);
-      }
-      else {
-        myPlaceable.sprite = createSprite(this,myPlaceable,40);
-      }
-
-      myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        if(pointer.leftButtonDown()) {
-          ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
-        }
-        else if(pointer.rightButtonDown()) {
-          if(myPlaceable) {
-            this.placeableDeletion(myPlaceable);
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
           }
-        }
-      })
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
+      }
     }
+    else if (this.physics && myPlaceable.placeableID === 'chess') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, myPlaceable.placeableID)
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(60, 60)
+          .setImmovable(true)
+          .setInteractive();
+
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
+          }
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
+      }
+    }
+    else if (this.physics && myPlaceable.placeableID === 'youtube') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, myPlaceable.placeableID)
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(65, 65)
+          .setImmovable(true)
+          .setInteractive();
+
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
+          }
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
+      }
+    }
+    else if (this.physics && myPlaceable.placeableID === 'banner') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, myPlaceable.placeableID)
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(100, 100)
+          .setImmovable(true)
+          .setInteractive();
+
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
+          }
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
+      }
+    }
+    else if (this.physics && myPlaceable.placeableID === 'flappy') {
+      let { sprite } = myPlaceable;
+      if (!sprite) {
+        sprite = this.physics.add
+          .sprite(xCord, yCord, myPlaceable.placeableID)
+          .setOffset(0, 60 - 32)
+          .setDisplaySize(40, 40)
+          .setImmovable(true)
+          .setInteractive();
+
+        myPlaceable.sprite = sprite;
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
+          }
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
+      }
+    }
+
 
     if(myPlaceable.sprite) {
       myPlaceable.sprite?.setSize(100,100);
@@ -800,7 +894,7 @@ class CoveyGameScene extends Phaser.Scene {
         }
       });
       buttonText.setDepth(10);
-      
+
 
       const placeableButtonList: Phaser.GameObjects.Text[] = []
 
@@ -820,7 +914,7 @@ class CoveyGameScene extends Phaser.Scene {
       placeableButtonList.push(createListButton(this, 'YouTube', destroyText, 5, 'youtube', true))
       placeableButtonList.push(createListButton(this, 'Chess', destroyText, 6, 'chess'))
       placeableButtonList.push(createListButton(this, 'Cancel', destroyText, 7))
-      
+
       this.pause();
     });
   }
