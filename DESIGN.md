@@ -31,35 +31,35 @@ Extend: such as wanting a permission to updateTown could be added as well.
 
 ## addPlaceable
 
-**Path**: POST /placeables/:townID
-**Data**: placeableID, location, inputInformation, townPassword, playerSessionToken
+**Path**: POST /placeables/:townID <br />
+**Data**: placeableID, location, inputInformation, townPassword, playerSessionToken <br />
 **Description**: Adds the placeable (created fromt the provided information) to the town with the given townID. Is only sucessful if either the player provides the correct password associated with that town or provides a sessionToken that references a player that has permissions to add placeables in that town.
 Will return a fail status if there is already a placeable in the town at the provided location
 
 ## deletePlaceable
 
-**Path**: DELETE /placeables/:townID
-**Data**: location, townPassword, playerSessionToken
+**Path**: DELETE /placeables/:townID <br />
+**Data**: location, townPassword, playerSessionToken <br />
 **Description**: Adds the placeable from the provided location with in the the town associated with the given townID. Is only sucessful if either the player provides the correct password associated with that town or provides a sessionToken that references a player that has permissions to add placeables in that town.
 Will return a fail status if there is nothing to delete in the town at the provided location
 
 ## getPlaceable
 
-**Path**: GET /placeables/:townID
-**Data**: location
+**Path**: GET /placeables/:townID <br />
+**Data**: location <br />
 **Description**: Get the information of the placeable in the town associated with the provided id at the given location.
 If there is no placeable at the provided location it will return the information assocaited with the empty placable at that location
 
 ## getPlayersPermission
 
-**Path**: GET /towns/:townID/permissions/:playerID
+**Path**: GET /towns/:townID/permissions/:playerID <br />
 **Description**: Gets if the provided player (from playerID) in the provided town (from townID) has permissions to add/delete Placables.
 Will return a fail status if there the there is no town or associated with the given townID or playerID respectively.
 
 ## updatePlayerPermissions
 
-**Path**: POST /towns/:townID/permissions
-**Data**: list of tuples of playerIDs and booleans, townPassword
+**Path**: POST /towns/:townID/permissions <br />
+**Data**: list of tuples of playerIDs and booleans, townPassword <br />
 **Description**: Updates if all players provides have the permission to add/delete placeables, if their id is provided with a false they will not have permission and if provided with true they will have permission.
 Will return a fail status and not update any values if:
 
