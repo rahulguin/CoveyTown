@@ -84,11 +84,53 @@ Contains the information of where the placeable was deleted from so players can 
 
 # CRC Cards for back-end changes
 
-
-
 Class | State | Responsibility | Collaborators
 | :---: | :---: | :---: | :---:
 PlayerSession  | _player, _sessionToken, _videoToken | Represents the connection of a player to a town. Stores the secret tokens that this player uses to access resources in the town. | Player, CoveyTownController
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+Placeable  | _placeableID, _location, _name, EMPTY_PLACEABLE_ID, EMPTY_PLACEABLE_NAME, ALLOWED_PLACEABLES | Represents the objects that can be added by a player to a town. Stores the secret tokens that this player uses to access resources in the town. | CoveyTownController,CoveyTownListener, CoveyTownRequestHandlers
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+Player  | location, _id, _userName, _canPlace | Represents the user who is connected to a player object. Initialises the player with location, id and username and permission to delete/add object. | PlayerSession, CoveyTownListener, CoveyTownRequestHandlers, CoveyTownController
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+CoveyTownListener  | None | Defines a listener in each town. Updates when a player joins, moves or disconnects the town, when a placeable is added to the town, placeable is deleted or when the town is destroyed. | Player,Placeable CoveyTownRequestHandlers, CoveyTownController
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+CoveyTownController  | players, sessions, videoClient, listeners, _instance | Implements the logic of each town such as joining of a player into the town, moving from the location and leaving a town, object addition, object deletion, updating player permission to add/ delete objects. | CoveyTownListener,Player, PlayerSession, TwilioVideo, IVideoClient, CoverTownsStore, Placeable
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+townJoinHandler  | newPlayers, newSession, coveyTownController | Process a player's request to join a town. Returns a sessionToken that is used by the client to make subscription to the town. | CoverTownController, Player, TownJoinRequest,town, Placeable, PlayerSession
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+addPlaceableHandler  | None | Process a player's request to add objects to a town. Returns a sessionToken that is used by the client to add objects to the town. | CoverTownRequestHandlers,  town
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+deletePlaceableHandler  | None | Process a player's request to delete objects on a town. Returns a sessionToken that is used by the client to add objects to the town. | CoverTownRequestHandlers,  town
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+getPlaceableHandler  | None | Process a player's request to get the object details on a town. Returns a sessionToken that is used by the client. | CoverTownRequestHandlers,  town
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+updatePlayerPermissionsHandler  | None | Process a player's request to get permissions for the addition or deletion of objects in a town. Returns a sessionToken that is used by the client. | CoverTownRequestHandlers,  town
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+townSubscriptionHandler  | newPlayers, newSession, coveyTownController | Process a remote player's subscription to updates for a town. | CoverTownController,  town
+
+Class | State | Responsibility | Collaborators
+| :---: | :---: | :---: | :---:
+IVideoClient  | None | Authorize a client to connect to a video town. | CoverTownController
 
 # Changes to front-end
 
