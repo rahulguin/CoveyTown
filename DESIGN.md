@@ -84,6 +84,10 @@ Contains the information of where the placeable was deleted from so players can 
 
 # CRC Cards for back-end changes
 
+One    | Two | Three | Four    | Five  | Six
+-|||||-
+Span <td colspan=3>triple  <td colspan=2>double
+
 # Changes to front-end
 
 ## coveyAppState
