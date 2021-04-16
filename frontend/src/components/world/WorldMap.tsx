@@ -303,14 +303,13 @@ class CoveyGameScene extends Phaser.Scene {
     deleteOptionNo.on('pointerout', () => {
       deleteOptionNo.setBackgroundColor('#004d00');
     });
-    deleteOptionYes.on('pointerdown', () => {
+    deleteOptionYes.on('pointerdown', async () => {
       deleteOption.destroy();
       deleteOptionNo.destroy();
       deleteOptionYes.destroy();
-      try{
-        this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o',playersToken: this.playersToken,location: {xIndex, yIndex}});
+      try {
+        await this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o', playersToken: this.playersToken, location: {xIndex, yIndex}});
       } catch (err) {
-        console.log("error message");
         this.errorMessageDisplay(err.message, this, xCord, yCord);
       }
     });
