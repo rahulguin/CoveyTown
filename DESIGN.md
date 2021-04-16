@@ -84,6 +84,7 @@ Contains the information of where the placeable was deleted from so players can 
 
 # CRC Cards for back-end changes
 
+Header | Header
 | :---: | :---: 
 Class: PlayerSession
 State: _player, _sessionToken, _videoToken
