@@ -86,8 +86,8 @@ Contains the information of where the placeable was deleted from so players can 
 
 Header | Header
 | :---: | :---: 
-Class: PlayerSession
-State: _player, _sessionToken, _videoToken
+<td rowspan=2>Class: PlayerSession</td>
+<td rowspan=2>State: _player, _sessionToken, _videoToken</td>
 Responsibility | Collaborators
 Represents the connection of a player to a town. Stores the secret tokens that this player uses to access resources in the town | Player, CoveyTownController
 
