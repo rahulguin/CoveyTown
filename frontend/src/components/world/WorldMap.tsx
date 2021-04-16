@@ -348,8 +348,6 @@ class CoveyGameScene extends Phaser.Scene {
       let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore - JB todo
           .sprite(xCord, yCord, 'banner')
           .setOffset(0, 24)
           .setDisplaySize(60,60)
@@ -754,7 +752,6 @@ class CoveyGameScene extends Phaser.Scene {
       const buttonText = this.add.text(this.lastLocation.x + X_OFFSET, this.lastLocation.y, "Which placeable would\nyou like to create here?", {
         color: '#FFFFFF',
         fontSize: FONT_SIZE,
-        // backgroundColor: '#F0000',
         backgroundColor: '#003300',
         padding: {
           x: X_PADDING,
