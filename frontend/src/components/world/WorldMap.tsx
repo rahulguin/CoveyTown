@@ -410,17 +410,16 @@ class CoveyGameScene extends Phaser.Scene {
           .play('tree')
           .setInteractive();
         myPlaceable.sprite = sprite;
-        this.placeableGroup?.add(myPlaceable.sprite);
+        // this.placeableGroup?.add(myPlaceable.sprite);
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
       }
 
-      myPlaceable.sprite = sprite;
-      myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        if(pointer.rightButtonDown()) {
-          if(myPlaceable) {
-            this.placeableDeletion(myPlaceable);
-          }
-        }
-      })
     }
 
     else if (this.physics && myPlaceable.placeableID === 'flower') {
@@ -435,7 +434,7 @@ class CoveyGameScene extends Phaser.Scene {
           .setInteractive();
 
         myPlaceable.sprite = sprite;
-        this.placeableGroup?.add(myPlaceable.sprite);
+        // this.placeableGroup?.add(myPlaceable.sprite);
         myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
           if(pointer.rightButtonDown()) {
             if(myPlaceable) {
