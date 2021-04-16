@@ -1,6 +1,6 @@
-# changes to back end
+# Changes to back-end
 
-In order to support both our Placeables and Permisions features we made many changes and addition to the backend code.
+In order to support both our Placeables and Permissions features we made many changes and additions to the back-end code.
 
 ## towns
 
@@ -17,16 +17,16 @@ This class currently stores information that the placeable needs to know
 placeableID, name, townID, InputInformation, and location
 and has defined constants of how to represent the empty Placeable (what is assumed to be in every tile there is currently nothing)
 
-this class was designed in a way to be easily extendable both in functionality and fields, ....
+This class was designed in a way to be easily extendable both in functionality and fields.
 
-## players
+## Players
 
-in order to support permissions players now have an added field 'canPlace' that is used to store if a specific player canPlace or delete placeables.
-We hope this design of making permissions part of the players themselves will make it easy to both track and extend
-track: once a programmer has a reference to the player on the backend they will already have a reference to all of those players permissions
-extend off of: such as wanting a permission to updateTown could be added as well.
+In order to support permissions players now have an added field 'canPlace' that is used to store if a specific player canPlace or delete placeables.
+We hope this design of making permissions part of the players themselves will make it easy to both track and extend. <br />
+Track: once a programmer has a reference to the player on the backend they will already have a reference to all of those players permissions <br />
+Extend: such as wanting a permission to updateTown could be added as well.
 
-# api Methods
+# New API Methods
 
 ## addPlaceable
 
@@ -81,7 +81,7 @@ contains the information of the placeable that was just added so players can add
 a socket connection sent from the sever to every player when a placeable has successfully been deleted - including the player that made the request to add.
 contains the information of where the placeable was deleted from so players can remove the placeable they have at that location
 
-# changes to front end
+# Changes to front-end
 
 ## coveyAppState
 
