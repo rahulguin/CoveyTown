@@ -293,6 +293,7 @@ export async function addPlaceableHandler(
 export async function deletePlaceableHandler(
   requestData: PlaceableDeleteRequest,
 ): Promise<ResponseEnvelope<PlaceableInfo>> {
+
   const townsStore = CoveyTownsStore.getInstance();
   const success = townsStore.deletePlaceable(
     requestData.coveyTownID,
