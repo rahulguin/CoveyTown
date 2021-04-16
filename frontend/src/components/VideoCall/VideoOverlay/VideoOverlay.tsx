@@ -146,10 +146,6 @@ export default function VideoGrid(props: Props) {
                       </Flex>
                     </div>
 
-            {/* <Main style={{marginBottom: '0px', background: '#1111'}}> */}
-              {/* <MenuBar setMediaError={setMediaError} /> */}
-            {/* </Main> */}
-            
               <Center color="white"
                       style={{ marginTop: '50px' }}
                       backgroundImage="url('https://cdn.pixabay.com/photo/2020/01/04/18/40/trees-4741364_1280.png')" >
