@@ -14,7 +14,7 @@ import {Text} from "@chakra-ui/layout";
 
 // eslint-disable-next-line import/prefer-default-export
 export const Footer = () => (
-  <Box as="footer" role="contentinfo" mx="auto" maxW="7xl" py="3" px={{ base: '4', md: '8' }} backgroundColor="#F5F5F5">
+  <Box as="footer" role="contentinfo" mx="auto" maxW="100%" py="3" px={{ base: '4', md: '8' }} backgroundColor="#F5F5F5">
     <Stack>
       <Stack direction="row" spacing="4" align="center" justify="space-between">
         <HStack>
