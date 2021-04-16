@@ -25,6 +25,7 @@ import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/us
 import Video from '../../classes/Video/Video';
 import { CoveyTownInfo, TownJoinResponse, } from '../../classes/TownsServiceClient';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import { Footer } from "../Footer/Footer";
 
 
 interface TownSelectionProps {
@@ -217,7 +218,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           mb={16}
         >
           <Box boxShadow="dark-md" rounded="1rem" w={{ base: "30%", sm: "15%", md: "30%" }} mb={{ base: 12, md: 0 }}>
-            <Image src="https://i.pinimg.com/originals/a5/2d/9b/a52d9ba54264337baa487a48141a1bcf.gif" size="80%" rounded="1rem" shadow="2xl" />
+            <Image src="assets/building.gif" size="80%" rounded="1rem" shadow="2xl" />
           </Box>
           <Stack
             spacing={4}
@@ -337,6 +338,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           </Stack>
         </Flex>
       </Element>
+      <Footer/>
     </>
   );
 }

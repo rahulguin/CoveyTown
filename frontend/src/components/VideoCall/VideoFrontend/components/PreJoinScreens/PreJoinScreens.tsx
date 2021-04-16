@@ -23,7 +23,7 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
         opacity: "100%",
         zIndex: 10,
       }}>
-        <Flex boxShadow="dark-lg" p="4" bg="white" width="100%">
+        <Flex boxShadow="dark-lg" p="4" width="100%">
           <Image src="logo.png" boxSize="40px" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 ></Image>
           <Button colorScheme="teal" mr="5" variant="ghost" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -77,7 +77,7 @@ export default function PreJoinScreens(props: { doLogin: (initData: TownJoinResp
 
 
         <VStack spacing="100px" style={{
-          backgroundImage: `url("https://cdn.dribbble.com/users/2598533/screenshots/7097479/media/609a54abd7bcda31d7efc1242d20cfa7.gif")`
+          backgroundImage: `url("/assets/town.gif")`
         }}>
           <Center height="30px">
             <Divider orientation="vertical" />
