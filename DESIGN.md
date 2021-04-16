@@ -84,9 +84,11 @@ Contains the information of where the placeable was deleted from so players can 
 
 # CRC Cards for back-end changes
 
-Left aligned Header | Right aligned Header | Center aligned Header
-| :---: | :---: | :---:
-Span | double
+| :---: | :---: 
+Class: PlayerSession
+State: _player, _sessionToken, _videoToken
+Responsibility | Collaborators
+Represents the connection of a player to a town. Stores the secret tokens that this player uses to access resources in the town | Player, CoveyTownController
 
 # Changes to front-end
 
