@@ -10,7 +10,9 @@ import TownsServiceClient from '../../classes/TownsServiceClient';
 import { FlappyBird } from '../Placeables/FlappyBird';
 // import { find } from 'ramda';
 
-
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
 
 class CoveyGameScene extends Phaser.Scene {
 
@@ -92,6 +94,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.playersToken = playerSessionToken;
     this.myPlayerID = myPlayerID;
   }
+
 
   preload() {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
@@ -251,6 +254,7 @@ class CoveyGameScene extends Phaser.Scene {
   placeableDeletion(myPlaceable: Placeable) {
 
    if(myPlaceable && myPlaceable.sprite) {
+
     const {xIndex, yIndex} = myPlaceable.location;
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(xIndex, yIndex);
     const xCord = indexLocation.x;
@@ -355,7 +359,7 @@ updatePlaceable(placeable: Placeable) {
           frameRate: 8,
           repeat: -1
         });
-        
+
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
           .setScale(0.4)
@@ -363,9 +367,30 @@ updatePlaceable(placeable: Placeable) {
           .setOffset(0, 60 - 32)
           .setDisplaySize(60,60)
           .setImmovable(true)
-          .play('tree');
+          .play('tree')
+          .setInteractive();
         myPlaceable.sprite = sprite;
+
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
+            const isShown = true;
+            const toggle = () => {
+              ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+            };
+            ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
+          }
+          else if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
        }
+
+
+
+
+
     }
     else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
       let { sprite } = myPlaceable;
@@ -379,18 +404,18 @@ updatePlaceable(placeable: Placeable) {
           .setInteractive();
         myPlaceable.sprite = sprite;
 
-        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {  
-          if(pointer.leftButtonDown()) {       
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.leftButtonDown()) {
           const isShown = true;
           const toggle = () => {
             ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
           };
           ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
-          }         
+          }
           else if(pointer.rightButtonDown()) {
             if(myPlaceable) {
               this.placeableDeletion(myPlaceable);
-            }           
+            }
           }
         })
       }
@@ -551,7 +576,7 @@ updatePlaceable(placeable: Placeable) {
       xCord += (gameScene.X_PLACEMENT_OFFSET / 2);
       yCord += (gameScene.Y_PLACEMENT_OFFSET / 2);
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
-      const xIndex  = indexLocation.x 
+      const xIndex  = indexLocation.x
       const yIndex  = indexLocation.y
 
         try{
@@ -559,8 +584,8 @@ updatePlaceable(placeable: Placeable) {
         } catch (err) {
             gameScene.errorMessageDisplay(err.message, gameScene, xCord, yCord);
         }
-        
-        
+
+
     }
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string): Phaser.GameObjects.Text {
 
@@ -603,7 +628,7 @@ updatePlaceable(placeable: Placeable) {
           closeFunction(gameScene)
           await addPlaceableByID(gameScene, placeableID);
         });
-        
+
 
       } else {
         button.on('pointerdown', async () => {
@@ -954,11 +979,11 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlaceables(placeables);
     }
 
-  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); 
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]);
 
   useEffect(() => {
-    gameScene?.updatePlaceables(placeables); 
-  }, [placeables, gameScene]); 
+    gameScene?.updatePlaceables(placeables);
+  }, [placeables, gameScene]);
 
   return (
 
