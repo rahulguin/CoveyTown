@@ -1,7 +1,7 @@
-import * as CORS from 'cors';
+import CORS from 'cors';
 import { randomInt } from 'crypto';
-import * as Express from 'express';
-import * as http from 'http';
+import Express from 'express';
+import http from 'http';
 import { nanoid } from 'nanoid';
 import { AddressInfo } from 'net';
 import { PlaceableLocation, UserLocation } from '../CoveyTypes';

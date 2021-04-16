@@ -58,6 +58,10 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
     };
   }, [updateTownListings]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const handleJoin = useCallback(async (coveyRoomID: string) => {
     try {
       if (!userName || userName.length === 0) {

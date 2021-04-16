@@ -156,6 +156,7 @@ describe('CoveyTownController', () => {
         coveyTownID: townController.coveyTownID,
         placeableID: Placeable.EMPTY_PLACEABLE_ID,
         placeableName: Placeable.EMPTY_PLACEABLE_NAME,
+        placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
         location: placedLocation,
       };
       townController.deletePlaceable(placedLocation);
@@ -210,6 +211,7 @@ describe('CoveyTownController', () => {
           placeableID: placeable.placeableID,
           placeableName: placeable.name,
           location: offsetLocation,
+          placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
         };
         expect(townController.getPlaceableAt(offsetLocation)).toStrictEqual(placeablesInfo);
       });
