@@ -101,11 +101,21 @@ IVideoClient  | None | Authorize a client to connect to a video town. | CoverTow
 
 # Changes to front-end
 
+In order to display both our Placeables and Permissions features we made many changes and additions to the front-end code.
+
 ## coveyAppState
+
+The following fields are now being stored in the coveyAppState:
+- placeables - Stores the list of placeables that have been placed in the current room.
+- currentTownID - Stores the townID of the room we are currently in.
+- apiClient - An object of TownServiceClient that provides the service calls used. The API calls for adding and deleting are used inside CoveyGameScene
+- sessionToken - 
 
 ## WorldMap
 
-## PermisionsButton
+## PermissionsButton
+
+This component was created to display the Permissions button. This component is being rendered in the MenuBar component, so that it displays alongside the Town Settings and A/V Settings buttons. Clicking on the Permissions button opens up a Chakra UI Modal with options for entering password and changing player's permissions.  
 
 ## Placeable Images
 
