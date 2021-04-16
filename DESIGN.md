@@ -86,8 +86,7 @@ Contains the information of where the placeable was deleted from so players can 
 
 Left aligned Header | Right aligned Header | Center aligned Header
 | :---: | :---: | :---:
-Content Cell  | <td colspan=2>triple |
-Content Cell  | Content Cell | Content Cell
+Span  <td colspan=2>double
 
 # Changes to front-end
 
