@@ -29,12 +29,9 @@ export const Youtube: FunctionComponent<ModalProps> = ({
     hide();
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const [ID] = useState<string>(getYoutubeID(modalContent));
+  const youtubeById = getYoutubeID(modalContent) || '';
+  const [ID] = useState<string>(youtubeById);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const modal = (
     <Modal isOpen={showing} onClose={hiding} blockScrollOnMount>
       <ModalOverlay />
