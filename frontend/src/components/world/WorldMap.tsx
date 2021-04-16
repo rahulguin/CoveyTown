@@ -13,8 +13,35 @@ import { Banner } from '../Placeables/Banner';
 import { Youtube } from '../Placeables/Youtube';
 
 
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
 
 class CoveyGameScene extends Phaser.Scene {
+
+
+  private BUTTON_WIDTH = 309;
+
+  private readonly X_PADDING: number= 10;
+
+  private readonly Y_PADDING: number = 7;
+
+  private readonly FONT_SIZE_IN_PIXLES : number= 13;
+
+  private readonly FONT_SIZE: string= `${this.FONT_SIZE_IN_PIXLES}px`
+
+  private readonly BUTTON_HEIGHT: number = (2 * this.Y_PADDING) + this.FONT_SIZE_IN_PIXLES;
+
+  private readonly TEXT_HEIGHT: number = 50;
+
+  private readonly PLAYER_WIDTH : number= 32;
+
+  private readonly X_PLACEMENT_OFFSET: number= this.PLAYER_WIDTH + 12;
+
+  private readonly Y_PLACEMENT_OFFSET: number = 42;
+
+  private readonly X_OFFSET: number = (this.PLAYER_WIDTH - this.BUTTON_WIDTH) / 2;
+
   private player?: {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, label: Phaser.GameObjects.Text
   };
@@ -74,6 +101,7 @@ class CoveyGameScene extends Phaser.Scene {
     this.myPlayerID = myPlayerID;
   }
 
+
   preload() {
     this.load.image('tiles', '/assets/tilesets/tuxmon-sample-32px-extruded.png');
     this.load.image('box', '/assets/placeable/treeObject.gif');
@@ -85,8 +113,6 @@ class CoveyGameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', '/assets/tilemaps/tuxemon-town.json');
     this.load.atlas('atlas', '/assets/atlas/atlas.png', '/assets/atlas/atlas.json');
     this.load.atlas('placeables', '/assets/placeables/placeable.png', '/assets/placeables/placeable.json');
-
-
     this.load.image('tree1', '/assets/placeable/treeSprite/frame1.gif');
     this.load.image('tree2', '/assets/placeable/treeSprite/frame2.gif');
     this.load.image('tree3', '/assets/placeable/treeSprite/frame3.gif');
@@ -213,12 +239,120 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+  errorMessageDisplay(message: string, gameScene: CoveyGameScene, xCord : number, yCord: number) {
 
+      const errorLines = message.split("\n")
+      const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
+      const W_WIDTH = this.FONT_SIZE_IN_PIXLES * 0.8
+      const xErrorOffset = (gameScene.PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
+      const buttonText = gameScene.add.text(xCord + xErrorOffset, yCord, `${message}\n(Click me to close)`, {
+        color: '#FFFFFF',
+        fontSize: gameScene.FONT_SIZE,
+        backgroundColor: 'darkred',
+        padding: {
+          x: this.X_PADDING,
+          y: this.Y_PADDING
+        },
+        fixedHeight: errorLines.length * gameScene.BUTTON_HEIGHT,
+        fixedWidth: maxStringLength * W_WIDTH,
+        align: 'center'
+      });
+      gameScene.pause();
+      buttonText.setInteractive();
+      buttonText.on('pointerdown', () => {
+        buttonText.destroy();
+        gameScene.resume();
+      });
+  }
+
+
+  async placeableDeletion(myPlaceable: Placeable) {
+
+   if(myPlaceable && myPlaceable.sprite) {
+
+    const {xIndex, yIndex} = myPlaceable.location;
+    const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(xIndex, yIndex);
+    const xCord = indexLocation.x;
+    const yCord = indexLocation.y;
+    myPlaceable.sprite.on('pointerdown', () => {
+      const deleteOption = this.add.text(xCord, yCord, 'Do you want to delete\n this object?',
+      {
+      color: '#FFFFFF',
+      backgroundColor: '#004d00',
+      align: 'center',
+      padding: {
+        x: this.X_PADDING,
+        y: this.Y_PADDING
+      },
+      fixedWidth: 309,
+      });
+      const deleteOptionYes = this.add.text(xCord, yCord + 25, 'Delete',
+      {
+      color: '#FFFFFF',
+      backgroundColor: '#004d00',
+      align: 'center',
+      padding: {
+        x: this.X_PADDING,
+        y: this.Y_PADDING
+      },
+      fixedWidth: 309,
+      });
+      deleteOptionYes.setInteractive();
+      deleteOptionYes.on('pointerover', () => {
+        deleteOptionYes.setBackgroundColor('#008000');
+      });
+      deleteOptionYes.on('pointerout', () => {
+        deleteOptionYes.setBackgroundColor('#004d00');
+      });
+      const deleteOptionNo = this.add.text( xCord, yCord + 50, 'Cancel',
+      {
+       color: '#FFFFFF',
+       backgroundColor: '#004d00',
+       align: 'center',
+       padding: {
+         x: this.X_PADDING,
+         y: this.Y_PADDING
+       },
+      fixedWidth: 309,
+      });
+    deleteOptionNo.setInteractive();
+    deleteOptionNo.on('pointerover', () => {
+      deleteOptionNo.setBackgroundColor('#008000');
+    });
+    deleteOptionNo.on('pointerout', () => {
+      deleteOptionNo.setBackgroundColor('#004d00');
+    });
+    deleteOptionYes.on('pointerdown', async () => {
+      deleteOption.destroy();
+      deleteOptionNo.destroy();
+      deleteOptionYes.destroy();
+      try {
+        await this.apiClient.deletePlaceable({coveyTownID: this.townId, coveyTownPassword: '5F6N8ZfXy7S1k9rf2s2uJ1_o', playersToken: this.playersToken, location: {xIndex, yIndex}});
+      } catch (err) {
+        this.errorMessageDisplay(err.message, this, xCord, yCord);
+      }
+    });
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+   deleteOptionNo.on('pointerdown', () => destroyOptions());
+   function destroyOptions() {
+    deleteOption.destroy();
+    deleteOptionNo.destroy();
+    deleteOptionYes.destroy();
+  }
+  });
+}
+}
 
   updatePlaceable(placeable: Placeable) {
-
     let myPlaceable: Placeable | undefined = this.placeables.find((p) => Placeable.compareLocation(p.location, placeable.location));
     if (!myPlaceable) {
+      let { location } = placeable;
+      if (!location) {
+        location = {
+          xIndex: 0,
+          yIndex: 0,
+        };
+      }
       myPlaceable = new Placeable(placeable.placeableID, placeable.name, placeable.location, placeable.objectInformation);
       this.placeables.push(myPlaceable);
     }
@@ -226,175 +360,132 @@ class CoveyGameScene extends Phaser.Scene {
     const indexLocation: Phaser.Math.Vector2 = this.tilemap.tileToWorldXY(myPlaceable.location.xIndex, myPlaceable.location.yIndex);
     const xCord = indexLocation.x
     const yCord = indexLocation.y
+
+    this.anims.create({
+      key: 'tree',
+      frames: [
+        { key: 'tree1' },
+        { key: 'tree2' },
+        { key: 'tree3' },
+        { key: 'tree4' },
+        { key: 'tree5', duration: 50 }
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'flower',
+      frames: [
+        {key: 'flower1'},
+        {key: 'flower5'},
+        {key: 'flower2'},
+        {key: 'flower3'},
+        {key: 'flower4', duration: 50}
+      ],
+      frameRate: 8,
+      repeat: -1
+    });
+
+    function createSprite(gameScene: CoveyGameScene, curPlaceable: Placeable, displaySize: integer): Phaser.GameObjects.Sprite {
+      let { sprite } = curPlaceable;
+      if(!sprite) {
+         sprite = gameScene.physics.add
+          .sprite(xCord, yCord, curPlaceable.placeableID)
+          .setScale(0.2)
+          .setDisplaySize(displaySize,displaySize)
+          .setImmovable(true)
+          .setCollideWorldBounds(true)
+          .setInteractive();
+      }
+      return sprite;
+    }
+
+
     if (this.physics && myPlaceable.placeableID === 'tree') {
       let { sprite } = myPlaceable;
       if (!sprite) {
-
-        this.anims.create({
-          key: 'tree',
-          frames: [
-            { key: 'tree1' },
-            { key: 'tree2' },
-            { key: 'tree3' },
-            { key: 'tree4' },
-            { key: 'tree5', duration: 50 }
-          ],
-          frameRate: 8,
-          repeat: -1
-        });
-
         sprite = this.physics.add
           .sprite(xCord, yCord, 'tree1')
           .setOffset(0, 60 - 32)
           .setDisplaySize(60,60)
           .setImmovable(true)
-          .play('tree');
+          .play('tree')
+          .setInteractive();
         myPlaceable.sprite = sprite;
-        this.placeableGroup?.add(myPlaceable.sprite);
+        // this.placeableGroup?.add(myPlaceable.sprite);
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
       }
+
     }
 
-    if (this.physics && myPlaceable.placeableID === 'flower') {
+    else if (this.physics && myPlaceable.placeableID === 'flower') {
       let { sprite } = myPlaceable;
       if (!sprite) {
-
-        this.anims.create({
-          key: 'flower',
-          frames: [
-            { key: 'flower1' },
-            { key: 'flower5' },
-            { key: 'flower2' },
-            { key: 'flower3' },
-            { key: 'flower4', duration: 50 }
-          ],
-          frameRate: 8,
-          repeat: -1
-        });
-
         sprite = this.physics.add
           .sprite(xCord, yCord, 'flower1')
           .setOffset(0, 60 - 32)
-          .setDisplaySize(60,60)
+          .setDisplaySize(60, 60)
           .setImmovable(true)
-          .play('flower');
-        myPlaceable.sprite = sprite;
-        this.placeableGroup?.add(myPlaceable.sprite);
-      }
-    }
-    else if (this.physics && myPlaceable.placeableID === 'tictactoe') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
-
-        sprite = this.physics.add
-          .sprite(xCord, yCord, 'tictactoe')
-          .setScale(0.2)
-          .setDisplaySize(32,32)
-          .setImmovable(true)
-          .setCollideWorldBounds(true)
+          .play('flower')
           .setInteractive();
+
         myPlaceable.sprite = sprite;
-
-
-
-        myPlaceable.sprite.on('pointerdown', () => {
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>, document.getElementById('modal-container'))
-        });
+        // this.placeableGroup?.add(myPlaceable.sprite);
+        myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          if(pointer.rightButtonDown()) {
+            if(myPlaceable) {
+              this.placeableDeletion(myPlaceable);
+            }
+          }
+        })
       }
-    }
+    } else if (this.physics) {
 
-    else if (this.physics && myPlaceable.placeableID === 'flappy') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
-        sprite = this.physics.add
-          .sprite(xCord, yCord, 'flappy')
-          .setScale(0.2)
-          .setDisplaySize(32,32)
-          .setImmovable(true)
-          .setInteractive();
-        myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', () => {
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>, document.getElementById('modal-container'))
-        });
+      const isShown = true;
+      const toggle = () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
+      };
+      const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
+
+      const spriteMap = new Map()
+      spriteMap.set('tictactoe',<TicTacToe isShown={isShown} hide={toggle} modalContent='game' headerText='TicTacToe'/>)
+      spriteMap.set('flappy', <FlappyBird isShown={isShown} hide={toggle} modalContent='game' headerText='Flappy Bird'/>)
+      spriteMap.set('chess', <Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>)
+      spriteMap.set('banner', <Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>)
+      spriteMap.set('youtube', <Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>)
+
+
+
+      if(myPlaceable.placeableID === 'banner') {
+        myPlaceable.sprite = createSprite(this,myPlaceable,100);
       }
-    }
-
-    else if (this.physics && myPlaceable.placeableID === 'chess') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
-        sprite = this.physics.add
-          .sprite(xCord, yCord, 'chess')
-          .setDisplaySize(50,50).setImmovable(true)
-          .setInteractive();
-        myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', () => {
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<Chess isShown={isShown} hide={toggle} modalContent='game' headerText='Chess'/>, document.getElementById('modal-container'))
-        });
+      else {
+        myPlaceable.sprite = createSprite(this,myPlaceable,40);
       }
-    }
 
-    else if (this.physics && myPlaceable.placeableID === 'banner') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
-        sprite = this.physics.add
-          .sprite(xCord, yCord, 'banner')
-          .setOffset(0, 24)
-          .setDisplaySize(60,60)
-          .setImmovable(true)
-          .setInteractive();
-        myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', () => {
-          const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-
-          ReactDOM.render(<Banner isShown={isShown} hide={toggle} modalContent={bannerText} headerText='Banner'/>, document.getElementById('modal-container'))
-
-        });
-      }
-    }
-
-    else if (this.physics && myPlaceable.placeableID === 'youtube') {
-      let { sprite } = myPlaceable;
-      if (!sprite) {
-        sprite = this.physics.add
-          .sprite(xCord, yCord, 'youtube')
-          .setScale(0.2)
-          .setOffset(0, 24)
-          .setDisplaySize(50,50)
-          .setImmovable(true)
-          .setInteractive();
-        myPlaceable.sprite = sprite;
-        myPlaceable.sprite.on('pointerdown', () => {
-          const bannerText = !myPlaceable?.objectInformation?.bannerText ? '' : myPlaceable?.objectInformation?.bannerText
-          const isShown = true;
-          const toggle = () => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('modal-container') as Element)
-          };
-          ReactDOM.render(<Youtube isShown={isShown} hide={toggle} modalContent={bannerText} headerText='TicTacToe'/>, document.getElementById('modal-container'))
-
-        });
-      }
+      myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        if(pointer.leftButtonDown()) {
+          ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
+        }
+        else if(pointer.rightButtonDown()) {
+          if(myPlaceable) {
+            this.placeableDeletion(myPlaceable);
+          }
+        }
+      })
     }
 
     if(myPlaceable.sprite) {
       myPlaceable.sprite?.setSize(100,100);
       this.placeableGroup?.add(myPlaceable.sprite);
     }
-
 
   }
 
@@ -489,35 +580,22 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
 
-
 // This method is where addPlaceable method is called using the apiClient.On clicking the
 // yes button, apiClient calls the addPlaceable method in the TownServiceClient.ts file
 
   placeableAddition(sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
 
-
-    const BUTTON_WIDTH = 309;
-    const X_PADDING = 10;
-    const Y_PADDING = 7;
-    const FONT_SIZE_IN_PIXLES = 13;
-    const FONT_SIZE = `${FONT_SIZE_IN_PIXLES}px`
-    const BUTTON_HEIGHT = (2 * Y_PADDING) + FONT_SIZE_IN_PIXLES;
-    const TEXT_HEIGHT = 50;
-    const PLAYER_WIDTH = 32;
-    const X_PLACEMENT_OFFSET = PLAYER_WIDTH + 12;
-    const Y_PLACEMENT_OFFSET = 42;
-    const X_OFFSET = (PLAYER_WIDTH - BUTTON_WIDTH) / 2;
     async function addPlaceableByID(gameScene: CoveyGameScene, placeableID: string): Promise<void> {
       let xCord = gameScene.lastLocation?.x;
       let yCord = gameScene.lastLocation?.y;
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
-          fontSize: FONT_SIZE,
+          fontSize: gameScene.FONT_SIZE,
           backgroundColor: 'darkred',
           padding: {
-            x: X_PADDING,
-            y: Y_PADDING
+            x: gameScene.X_PADDING,
+            y: gameScene.Y_PADDING
           },
           fixedHeight: 50,
           fixedWidth: 50,
@@ -532,8 +610,8 @@ class CoveyGameScene extends Phaser.Scene {
         });
         return
       }
-      xCord += (X_PLACEMENT_OFFSET / 2);
-      yCord += (Y_PLACEMENT_OFFSET / 2);
+      xCord += (gameScene.X_PLACEMENT_OFFSET / 2);
+      yCord += (gameScene.Y_PLACEMENT_OFFSET / 2);
       const indexLocation: Phaser.Math.Vector2 = gameScene.tilemap.worldToTileXY(xCord, yCord);
       const xIndex  = indexLocation.x
       const yIndex  = indexLocation.y
@@ -541,30 +619,7 @@ class CoveyGameScene extends Phaser.Scene {
         try{
           await gameScene.apiClient.addPlaceable({coveyTownID: gameScene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'bn35hyo0bF-c3aEysO5uJ936', placeableID , location: { xIndex , yIndex }});
         } catch (err) {
-          const errorMessage: string = err.message;
-          const errorLines = errorMessage.split("\n")
-          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
-          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
-          const xErrorOffset = (PLAYER_WIDTH - maxStringLength * W_WIDTH) / 2
-          const buttonText = gameScene.add.text(xCord + xErrorOffset, yCord, `${err.message}\n(Click me to close)`, {
-            color: '#FFFFFF',
-            fontSize: FONT_SIZE,
-            backgroundColor: 'darkred',
-            padding: {
-              x: X_PADDING,
-              y: Y_PADDING
-            },
-            fixedHeight: errorLines.length * BUTTON_HEIGHT,
-            fixedWidth: maxStringLength * W_WIDTH,
-            align: 'center'
-          });
-          gameScene.pause();
-          buttonText.setInteractive();
-          buttonText.setDepth(10);
-          buttonText.on('pointerdown', () => {
-            buttonText.destroy();
-            gameScene.resume();
-          });
+          gameScene.errorMessageDisplay(err.message, gameScene, xCord, yCord);
         }
 
     }
@@ -572,15 +627,15 @@ class CoveyGameScene extends Phaser.Scene {
     async function addPlaceableWithInput(gameScene: CoveyGameScene, placeableID: string, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void): Promise<void> {
 
       let xCord = !gameScene.lastLocation?.x ? 0 : (gameScene.lastLocation?.x);
-      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y + TEXT_HEIGHT);
+      let yCord = !gameScene.lastLocation?.y ? 0 : (gameScene.lastLocation?.y + gameScene.TEXT_HEIGHT);
       if (!(xCord && yCord)) {
         const buttonText = gameScene.add.text(15, 15, `(Click me to close)`, {
           color: '#FFFFFF',
-          fontSize: FONT_SIZE,
+          fontSize: gameScene.FONT_SIZE,
           backgroundColor: 'darkred',
           padding: {
-            x: X_PADDING,
-            y: Y_PADDING
+            x: gameScene.X_PADDING,
+            y: gameScene.Y_PADDING
           },
           fixedHeight: 50,
           fixedWidth: 50,
@@ -596,8 +651,8 @@ class CoveyGameScene extends Phaser.Scene {
         });
         return
       }
-      xCord += (X_PLACEMENT_OFFSET / 2);
-      yCord += (Y_PLACEMENT_OFFSET / 2);
+      xCord += (gameScene.X_PLACEMENT_OFFSET / 2);
+      yCord += (gameScene.Y_PLACEMENT_OFFSET / 2);
       gameScene.pause();
       const form = `<input type="text" name="form-banner" class="form-banner" placeholder="Enter ${placeableName} Text" style="width: 309px; text-align: center; background-color: #008000; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px">  `;
       const inputBannerText = gameScene.add.dom(xCord, yCord).createFromHTML(form);
@@ -616,7 +671,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       const submit = `<input type="button" value="Submit" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
 
-      const submitBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 1).createFromHTML(submit);
+      const submitBannerText = gameScene.add.dom(xCord, yCord + gameScene.BUTTON_HEIGHT).createFromHTML(submit);
       submitBannerText.setInteractive();
       submitBannerText.setDepth(5);
       const submitBannerCallback = async function submitCallback(scene: CoveyGameScene) {
@@ -631,29 +686,7 @@ class CoveyGameScene extends Phaser.Scene {
         try{
           await scene.apiClient.addPlaceable({coveyTownID: scene.townId, playersToken: gameScene.playersToken, coveyTownPassword: 'Fsrxni4kC8qKlwBbfCY',placeableID ,location: { xIndex , yIndex}, placeableInformation: objectInformation});
         } catch (err) {
-          const errorMessage: string = err.message;
-          const errorLines = errorMessage.split("\n")
-          const maxStringLength = Math.max(...errorLines.map(o => o.length), 0);
-          const W_WIDTH = FONT_SIZE_IN_PIXLES * 0.8
-          const buttonText = gameScene.add.text(xCord, yCord, `${err.message}\n(Click me to close)`, {
-            color: '#FFFFFF',
-            fontSize: FONT_SIZE,
-            backgroundColor: 'darkred',
-            padding: {
-              x: X_PADDING,
-              y: Y_PADDING
-            },
-            fixedHeight: errorLines.length * BUTTON_HEIGHT,
-            fixedWidth: maxStringLength * W_WIDTH,
-            align: 'center'
-          });
-          gameScene.pause();
-          buttonText.setInteractive();
-          buttonText.setDepth(10);
-          buttonText.on('pointerdown', () => {
-            buttonText.destroy();
-            gameScene.resume();
-          });
+            gameScene.errorMessageDisplay(err.message, gameScene, xCord, yCord);
         }
         gameScene.resume();
         inputBannerText.destroy();
@@ -666,7 +699,7 @@ class CoveyGameScene extends Phaser.Scene {
 
       const cancel = `<input type="button" value="Cancel" style="width: 309px; text-align: center; background-color: #004d00; color: #ffffff; padding: 7px 10px 7px 10px; font-size: 13px" /> `;
 
-      const cancelBannerText = gameScene.add.dom(xCord, yCord+BUTTON_HEIGHT * 2).createFromHTML(cancel);
+      const cancelBannerText = gameScene.add.dom(xCord, yCord+ gameScene.BUTTON_HEIGHT * 2).createFromHTML(cancel);
       cancelBannerText.setInteractive();
       cancelBannerText.setDepth(5);
       cancelBannerText.addListener('click');
@@ -681,13 +714,14 @@ class CoveyGameScene extends Phaser.Scene {
       cancelBannerText.on('click', cancelBannerCallback);
     }
 
+
     function createListButton(gameScene: CoveyGameScene, placeableName: string, closeFunction: (coveyGameScene: CoveyGameScene) => void, numberInList: integer, placeableID?: string, placeableWithInput?: boolean): Phaser.GameObjects.Text {
 
       let xLocation: integer
       let yLocation: integer
       if (gameScene.lastLocation) {
-        xLocation = gameScene.lastLocation.x + X_OFFSET
-        yLocation = gameScene.lastLocation.y + TEXT_HEIGHT + BUTTON_HEIGHT * numberInList
+        xLocation = gameScene.lastLocation.x + gameScene.X_OFFSET
+        yLocation = gameScene.lastLocation.y + gameScene.TEXT_HEIGHT + gameScene.BUTTON_HEIGHT * numberInList
       } else {
         // need to figure out what to do here
         xLocation = 0;
@@ -696,15 +730,15 @@ class CoveyGameScene extends Phaser.Scene {
 
       const button = gameScene.add.text(xLocation, yLocation, placeableName,
       {
-        fontSize: FONT_SIZE,
+        fontSize: gameScene.FONT_SIZE,
         color: '#FFFFFF',
         backgroundColor: '#004d00',
         align: 'center',
         padding: {
-          x: X_PADDING,
-          y: Y_PADDING
+          x: gameScene.X_PADDING,
+          y: gameScene.Y_PADDING
         },
-        fixedWidth: BUTTON_WIDTH,
+        fixedWidth: gameScene.BUTTON_WIDTH,
       });
       button.setDepth(10);
       button.setInteractive();
@@ -720,23 +754,20 @@ class CoveyGameScene extends Phaser.Scene {
         button.setBackgroundColor('#004d00');
       });
 
-      if (placeableID) {
-        if(placeableWithInput){
-          button.on('pointerdown', async () => {
-            closeFunction(gameScene);
+      if (placeableID && placeableWithInput) {
+        button.on('pointerdown', async () => {
+          closeFunction(gameScene);
 
-            await addPlaceableWithInput(gameScene, placeableID, placeableName, closeFunction);
-
-          });
-        }
-        else{
-          button.on('pointerdown', async () => {
-            closeFunction(gameScene)
-            await addPlaceableByID(gameScene, placeableID);
-          });
-        }
-
-      } else {
+          await addPlaceableWithInput(gameScene, placeableID, placeableName, closeFunction);
+        });
+      }
+      else if (placeableID) {
+        button.on('pointerdown', async () => {
+          closeFunction(gameScene)
+          await addPlaceableByID(gameScene, placeableID);
+        });
+      }
+      else {
         button.on('pointerdown', async () => {
           closeFunction(gameScene);
         });
@@ -749,18 +780,18 @@ class CoveyGameScene extends Phaser.Scene {
       if (!this.lastLocation) {
         return
       }
-      const buttonText = this.add.text(this.lastLocation.x + X_OFFSET, this.lastLocation.y, "Which placeable would\nyou like to create here?", {
+      const buttonText = this.add.text(this.lastLocation.x + this.X_OFFSET, this.lastLocation.y, "Which placeable would\nyou like to create here?", {
         color: '#FFFFFF',
-        fontSize: FONT_SIZE,
+
+        fontSize: this.FONT_SIZE,
         backgroundColor: '#003300',
         padding: {
-          x: X_PADDING,
-          y: Y_PADDING
+          x: this.X_PADDING,
+          y: this.Y_PADDING
         },
-        fixedHeight: TEXT_HEIGHT,
-        fixedWidth: BUTTON_WIDTH,
+        fixedHeight: this.TEXT_HEIGHT,
+        fixedWidth: this.BUTTON_WIDTH,
         align: 'center',
-
         shadow: {
           offsetX: 5,
           offsetY: 5,
@@ -850,7 +881,6 @@ class CoveyGameScene extends Phaser.Scene {
     });
 
 
-
     const cursorKeys = this.input.keyboard.createCursorKeys();
     this.cursors.push(cursorKeys);
     this.cursors.push(this.input.keyboard.addKeys({
@@ -869,9 +899,6 @@ class CoveyGameScene extends Phaser.Scene {
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
-
-
-
 
     const mainSprite = this.physics.add
       .sprite(spawnPoint.x, spawnPoint.y, 'atlas', 'misa-front')
@@ -1092,13 +1119,14 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlaceables(placeables);
     }
 
-  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]); // newly added placeableObjects
+  }, [players, deepPlayers, gameScene, apiClient, currentTownID, placeables]);
 
   useEffect(() => {
-    gameScene?.updatePlaceables(placeables); // newly added this fun call
-  }, [placeables, gameScene]); // newly added placeableObjects
+    gameScene?.updatePlaceables(placeables);
+  }, [placeables, gameScene]);
 
   return (
+
     <div>
       <div id="map-container"/>
       <div id="modal-container"/>

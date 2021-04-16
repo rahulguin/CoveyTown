@@ -165,6 +165,7 @@ export interface PlaceableListResponce {
   updates: PlayerUpdateSpecifications;
 }
 
+
 /**
  * Payload sent by the client to get if the given player (by ID) has permission to add/delete placeables
  */

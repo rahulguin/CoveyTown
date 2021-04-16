@@ -73,7 +73,6 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     apiClient: state.apiClient,
-    // newly
     placeables: state.placeables,
   };
 
@@ -87,7 +86,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       }
       return false;
     };
-    return { nearbyPlayers: players.filter((p) => isWithinCallRadius(p, currentLocation)) };
+    return { nearbyPlayers: players.filter((p) => isWithinCallRadius(p, currentLocation))};
   }
 
   function samePlayers(a1: NearbyPlayers, a2: NearbyPlayers) {
@@ -139,9 +138,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       break;
     case 'playerDisconnect':
       nextState.players = nextState.players.filter((player) => player.id !== update.player.id);
-
-      nextState.nearbyPlayers = calculateNearbyPlayers(nextState.players,
-        nextState.currentLocation);
+      nextState.nearbyPlayers = calculateNearbyPlayers(nextState.players, nextState.currentLocation);
       if (samePlayers(nextState.nearbyPlayers, state.nearbyPlayers)) {
         nextState.nearbyPlayers = state.nearbyPlayers;
       }
@@ -154,7 +151,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.placeables = nextState.placeables.concat([update.addedPlaceable])
       break;
     case 'placeableDeleted':
-      nextState.placeables = nextState.placeables.filter((placeable) => placeable.location !== update.deletedPlaceable.location)
+      nextState.placeables = nextState.placeables.filter((placeable) => (placeable.location.xIndex !== update.deletedPlaceable.location.xIndex) || (placeable.location.yIndex !== update.deletedPlaceable.location.yIndex))
       break;
 
     default:
@@ -242,7 +239,6 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       return Video.teardown();
     });
   }, [dispatchAppUpdate, setOnDisconnect]);
-
   const page = useMemo(() => {
     if (!appState.sessionToken) {
       return <Login doLogin={setupGameController} />;

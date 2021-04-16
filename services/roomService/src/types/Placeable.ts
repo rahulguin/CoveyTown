@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/indent */
 import { PlaceableInputInformation, PlaceableLocation } from '../CoveyTypes';
 import { isDefined } from '../Utils';
+
 
 export default class Placeable {
   private readonly _placeableID: string;
