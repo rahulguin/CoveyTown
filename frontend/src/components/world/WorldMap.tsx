@@ -266,7 +266,7 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
 
-  placeableDeletion(myPlaceable: Placeable) {
+  async placeableDeletion(myPlaceable: Placeable) {
 
    if(myPlaceable && myPlaceable.sprite) {
 
@@ -387,14 +387,17 @@ class CoveyGameScene extends Phaser.Scene {
       repeat: -1
     });
 
-    function createSprite(gameScene: CoveyGameScene, placeableID: string, displaySize: integer): Phaser.GameObjects.Sprite {
-      const sprite = gameScene.physics.add
-        .sprite(xCord, yCord, placeableID)
-        .setScale(0.2)
-        .setDisplaySize(displaySize,displaySize)
-        .setImmovable(true)
-        .setCollideWorldBounds(true)
-        .setInteractive();
+    function createSprite(gameScene: CoveyGameScene, curPlaceable: Placeable, displaySize: integer): Phaser.GameObjects.Sprite {
+      let { sprite } = curPlaceable;
+      if(!sprite) {
+         sprite = gameScene.physics.add
+          .sprite(xCord, yCord, curPlaceable.placeableID)
+          .setScale(0.2)
+          .setDisplaySize(displaySize,displaySize)
+          .setImmovable(true)
+          .setCollideWorldBounds(true)
+          .setInteractive();
+      }
       return sprite;
     }
 
@@ -423,7 +426,7 @@ class CoveyGameScene extends Phaser.Scene {
     }
 
     else if (this.physics && myPlaceable.placeableID === 'flower') {
-      let {sprite} = myPlaceable;
+      let { sprite } = myPlaceable;
       if (!sprite) {
         sprite = this.physics.add
           .sprite(xCord, yCord, 'flower1')
@@ -443,7 +446,7 @@ class CoveyGameScene extends Phaser.Scene {
           }
         })
       }
-    } else {
+    } else if (this.physics) {
 
       const isShown = true;
       const toggle = () => {
@@ -460,7 +463,13 @@ class CoveyGameScene extends Phaser.Scene {
 
 
 
-      myPlaceable.sprite = createSprite(this,myPlaceable.placeableID,32);
+      if(myPlaceable.placeableID === 'banner') {
+        myPlaceable.sprite = createSprite(this,myPlaceable,100);
+      }
+      else {
+        myPlaceable.sprite = createSprite(this,myPlaceable,40);
+      }
+
       myPlaceable.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
         if(pointer.leftButtonDown()) {
           ReactDOM.render(spriteMap.get(myPlaceable?.placeableID), document.getElementById('modal-container'))
