@@ -151,9 +151,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.placeables = nextState.placeables.concat([update.addedPlaceable])
       break;
     case 'placeableDeleted':
-      nextState.placeables = nextState.placeables.filter((placeable) => (placeable.location.xIndex !== update.deletedPlaceable.location.xIndex) && (placeable.location.yIndex !== update.deletedPlaceable.location.yIndex))
-
-
+      nextState.placeables = nextState.placeables.filter((placeable) => (placeable.location.xIndex !== update.deletedPlaceable.location.xIndex) || (placeable.location.yIndex !== update.deletedPlaceable.location.yIndex))
       break;
 
     default:
@@ -241,7 +239,6 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       return Video.teardown();
     });
   }, [dispatchAppUpdate, setOnDisconnect]);
-
   const page = useMemo(() => {
     if (!appState.sessionToken) {
       return <Login doLogin={setupGameController} />;
