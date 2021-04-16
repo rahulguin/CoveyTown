@@ -906,13 +906,6 @@ class CoveyGameScene extends Phaser.Scene {
       label
     };
 
-
-
-    /* Player and box object should collide. Blocks path of the player */
-    // if(boxImage){
-    //   this.physics.add.collider(sprite, boxImage);
-    // }
-
     /* Configure physics overlap behavior for when the player steps into
     a transporter area. If you enter a transporter and press 'space', you'll
     transport to the location on the map that is referenced by the 'target' property
