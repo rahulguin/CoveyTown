@@ -527,6 +527,7 @@ class CoveyGameScene extends Phaser.Scene {
         });
         gameScene.pause();
         buttonText.setInteractive();
+        buttonText.setDepth(10);
         buttonText.on('pointerdown', () => {
           buttonText.destroy();
           gameScene.resume();
@@ -561,6 +562,7 @@ class CoveyGameScene extends Phaser.Scene {
           });
           gameScene.pause();
           buttonText.setInteractive();
+          buttonText.setDepth(10);
           buttonText.on('pointerdown', () => {
             buttonText.destroy();
             gameScene.resume();
@@ -588,6 +590,7 @@ class CoveyGameScene extends Phaser.Scene {
         });
         gameScene.pause();
         buttonText.setInteractive();
+        buttonText.setDepth(10);
         buttonText.on('pointerdown', () => {
           buttonText.destroy();
           closeFunction(gameScene);
@@ -650,6 +653,7 @@ class CoveyGameScene extends Phaser.Scene {
           });
           gameScene.pause();
           buttonText.setInteractive();
+          buttonText.setDepth(10);
           buttonText.on('pointerdown', () => {
             buttonText.destroy();
             gameScene.resume();
