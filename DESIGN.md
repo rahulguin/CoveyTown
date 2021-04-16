@@ -1,4 +1,4 @@
-# Changes to back-end
+# Changes to Back-End
 
 In order to support both our Placeables and Permissions features we made many changes and additions to the back-end code.
 
@@ -99,7 +99,7 @@ updatePlayerPermissionsHandler  | None | Process a player's request to get permi
 townSubscriptionHandler  | newPlayers, newSession, coveyTownController | Process a remote player's subscription to updates for a town. | CoverTownController,  town
 IVideoClient  | None | Authorize a client to connect to a video town. | CoverTownController
 
-# Changes to front-end
+# Changes to Front-End
 
 In order to display both our Placeables and Permissions features we made many changes and additions to the front-end code.
 
@@ -139,5 +139,3 @@ We have created a React Component for each interactive placeable object (No comp
 - FlappyBird
 - TicTacToe
 - Youtube
-
-# UI Changes
