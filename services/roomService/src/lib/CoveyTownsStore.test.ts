@@ -577,6 +577,7 @@ describe('CoveyTownsStore', () => {
             coveyTownID: town.coveyTownID,
             placeableID: placeable.placeableID,
             placeableName: placeable.name,
+            placeableInformation: Placeable.EMPTY_PLACEABLE_INFO,
             location: offsetLocation,
           };
           expect(store.getPlaceable(town.coveyTownID, offsetLocation)).toStrictEqual(
