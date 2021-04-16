@@ -3,14 +3,6 @@ import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 import React, { FunctionComponent, useState } from 'react';
 
-import {
-  ModalOverlay,
-  ModalContent,
-  ModalBody,
-  ModalCloseButton,
-} from "@chakra-ui/react";
-
-
 export interface ModalProps {
   isShown: boolean;
   hide: () => void;
@@ -18,10 +10,8 @@ export interface ModalProps {
   headerText: string;
 }
 export const Banner: FunctionComponent<ModalProps> = ({
-                                                        isShown,
                                                         hide,
                                                         modalContent,
-                                                        headerText,
                                                       }) => {
   const [showing, setShowing] = useState<boolean>(true);
   const hiding = () => {

@@ -1,15 +1,12 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import YouTube from 'react-youtube';
 import getYoutubeID from "get-youtube-id";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Button, Box
 } from "@chakra-ui/react";
 
 
@@ -23,10 +20,8 @@ export interface ModalProps {
 
 
 export const Youtube: FunctionComponent<ModalProps> = ({
-                                                        isShown,
                                                         hide,
                                                         modalContent,
-                                                        headerText,
                                                       }) => {
   const [showing, setShowing] = useState<boolean>(true);
   const hiding = () => {
@@ -36,16 +31,7 @@ export const Youtube: FunctionComponent<ModalProps> = ({
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const [ID, setID] = useState<string>(getYoutubeID(modalContent));
-
-  const opts = {
-    height: '390',
-    width: '640',
-    playerVars: {
-      // https://developers.google.com/youtube/player_parameters
-      autoplay: 1,
-    },
-  };
+  const [ID] = useState<string>(getYoutubeID(modalContent));
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
