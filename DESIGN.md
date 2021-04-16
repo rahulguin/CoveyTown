@@ -87,6 +87,7 @@ Contains the information of where the placeable was deleted from so players can 
 Class | State | Responsibility | Collaborators
 | :---: | :---: | :---: | :---:
 PlayerSession  | _player, _sessionToken, _videoToken | Represents the connection of a player to a town. Stores the secret tokens that this player uses to access resources in the town. | Player, CoveyTownController
+
 Placeable  | _placeableID, _location, _name, EMPTY_PLACEABLE_ID, EMPTY_PLACEABLE_NAME, ALLOWED_PLACEABLES | Represents the objects that can be added by a player to a town. Stores the secret tokens that this player uses to access resources in the town. | CoveyTownController,CoveyTownListener, CoveyTownRequestHandlers
 Player  | location, _id, _userName, _canPlace | Represents the user who is connected to a player object. Initialises the player with location, id and username and permission to delete/add object. | PlayerSession, CoveyTownListener, CoveyTownRequestHandlers, CoveyTownController
 CoveyTownListener  | None | Defines a listener in each town. Updates when a player joins, moves or disconnects the town, when a placeable is added to the town, placeable is deleted or when the town is destroyed. | Player,Placeable CoveyTownRequestHandlers, CoveyTownController
@@ -113,7 +114,7 @@ The following fields are now being stored in the coveyAppState:
 
 ## WorldMap
 
-
+Significant changes were made to WorldMap to provide the Placeables feature:
 
 ## PermissionsButton
 
