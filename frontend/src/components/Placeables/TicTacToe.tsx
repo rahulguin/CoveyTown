@@ -1,6 +1,4 @@
 import React, { FunctionComponent, useState } from 'react';
-// import Button from 'react-bootstrap/Button';
-// import Modal from 'react-bootstrap/Modal'\;
 import {
   Modal,
   ModalOverlay,
@@ -34,13 +32,10 @@ export const TicTacToe: FunctionComponent<ModalProps> = ({hide}) => {
               <iframe src="https://codepen.io/kapinoida/embed/OjmEGB?default-tab=result&theme-id=dark"
                       title="tictactoe"
                       style={{width:'800px' ,height:'520px'}} frameBorder="0" scrolling="no" />
-              { /* <iframe src="https://funhtml5games.com?embed=flappy" title="gf" style={{width:'800px' ,height:'520px'}}
-                      frameBorder="0" scrolling="no" /> */ }
             </ModalBody>
             </ModalContent>
         </Modal>
     );
-    //   return isShown ? ReactDOM.createPortal(modal, document.body) : null;
     return modal;
 
 };
