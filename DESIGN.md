@@ -119,6 +119,9 @@ Significant changes were made to WorldMap to provide the Placeables feature:
   - A new div 'modal-container' that is used for rendering the placeable modals.
   - Changes to the width of the game map.
 - CoveyGameScene: 
+  - create: Updated to call the method placeableAddition, which displays the menu for creating a placeable.
+  - updatePlaceables: Method that creates the sprite objects for all placeables.
+  - preload: Loads the assets required for displaying placeables.
 
 ## PermissionsButton
 
